@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="primary">#3E4D44</color>
+    <color name="secondary">#677559</color>
+    <color name="content">#677559</color>
+    <color name="tertiary">#97A49C</color>
+    <color name="neutral">#FEFBF4</color>
+    <color name="nav_icon_color">#DDDFC4</color>
+
+    <!-- Gray tones -->
+    <color name="gray_light">#E0E4E2</color>
+    <color name="gray_dark">#7E8A83</color>
+</resources>

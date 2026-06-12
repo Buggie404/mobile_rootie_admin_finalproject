@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="80dp"
+    android:background="@drawable/bg_nav_bar"
+    android:elevation="8dp"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:weightSum="5">
+
+    <!-- 1. Trang chủ -->
+    <FrameLayout
+        android:id="@+id/nav_home"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:clickable="true"
+        android:focusable="true">
+
+        <FrameLayout
+            android:id="@+id/nav_home_pill"
+            android:layout_width="72dp"
+            android:layout_height="44dp"
+            android:layout_gravity="center"
+            android:background="@drawable/bg_nav_pill">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_home"
+                android:contentDescription="Trang chủ" />
+        </FrameLayout>
+    </FrameLayout>
+
+    <!-- 2. Sản phẩm -->
+    <FrameLayout
+        android:id="@+id/nav_product"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:clickable="true"
+        android:focusable="true">
+
+        <FrameLayout
+            android:id="@+id/nav_product_pill"
+            android:layout_width="72dp"
+            android:layout_height="44dp"
+            android:layout_gravity="center"
+            android:background="@android:color/transparent">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_bag"
+                android:contentDescription="Sản phẩm" />
+        </FrameLayout>
+    </FrameLayout>
+
+    <!-- 3. Khách hàng -->
+    <FrameLayout
+        android:id="@+id/nav_customer"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:clickable="true"
+        android:focusable="true">
+
+        <FrameLayout
+            android:id="@+id/nav_customer_pill"
+            android:layout_width="72dp"
+            android:layout_height="44dp"
+            android:layout_gravity="center"
+            android:background="@android:color/transparent">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_friends"
+                android:contentDescription="Khách hàng" />
+        </FrameLayout>
+    </FrameLayout>
+
+    <!-- 4. Đơn hàng -->
+    <FrameLayout
+        android:id="@+id/nav_order"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:clickable="true"
+        android:focusable="true">
+
+        <FrameLayout
+            android:id="@+id/nav_order_pill"
+            android:layout_width="72dp"
+            android:layout_height="44dp"
+            android:layout_gravity="center"
+            android:background="@android:color/transparent">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_box"
+                android:contentDescription="Đơn hàng" />
+        </FrameLayout>
+    </FrameLayout>
+
+    <!-- 5. Menu / Khác -->
+    <FrameLayout
+        android:id="@+id/nav_menu"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:clickable="true"
+        android:focusable="true">
+
+        <FrameLayout
+            android:id="@+id/nav_menu_pill"
+            android:layout_width="72dp"
+            android:layout_height="44dp"
+            android:layout_gravity="center"
+            android:background="@android:color/transparent">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_grid"
+                android:contentDescription="Khác" />
+        </FrameLayout>
+    </FrameLayout>
+
+</LinearLayout>

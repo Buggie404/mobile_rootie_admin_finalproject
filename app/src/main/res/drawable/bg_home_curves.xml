@@ -1,0 +1,30 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="360dp"
+    android:height="800dp"
+    android:viewportWidth="360"
+    android:viewportHeight="800">
+
+    <!-- Base Cream Color -->
+    <path
+        android:fillColor="#FEFBF4"
+        android:pathData="M0,0h360v800h-360z" />
+
+    <!-- Top Right Large Soft Curve -->
+    <path
+        android:fillColor="#F0F2E8"
+        android:pathData="M 120,0 C 180,120 280,180 360,150 L 360,0 Z" />
+
+    <path
+        android:fillColor="#E5E8DA"
+        android:pathData="M 220,0 C 260,80 300,110 360,90 L 360,0 Z" />
+
+    <!-- Bottom Left/Right Soft Curves -->
+    <path
+        android:fillColor="#E8EAE0"
+        android:pathData="M 0,800 C 60,780 120,790 180,785 C 240,780 320,770 360,785 L 360,800 L 0,800 Z" />
+
+    <path
+        android:fillColor="#DCE0D0"
+        android:pathData="M 0,800 C 40,790 90,795 120,790 C 180,785 240,795 360,792 L 360,800 L 0,800 Z" />
+
+</vector>

@@ -1,0 +1,22 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Back Person Head -->
+    <path
+        android:fillColor="#4F6544"
+        android:pathData="M 20.5,7.5 C 20.5,8.9 19.4,10 18,10 C 16.6,10 15.5,8.9 15.5,7.5 C 15.5,6.1 16.6,5 18,5 C 19.4,5 20.5,6.1 20.5,7.5 Z" />
+    <!-- Back Person Body -->
+    <path
+        android:fillColor="#4F6544"
+        android:pathData="M 22,20 V 19 C 22,17.3 20.7,16 19,16 H 18 V 20 Z" />
+    <!-- Front Person Head -->
+    <path
+        android:fillColor="#4F6544"
+        android:pathData="M 16,8 C 16,10.2 14.2,12 12,12 C 9.8,12 8,10.2 8,8 C 8,5.8 9.8,4 12,4 C 14.2,4 16,5.8 16,8 Z" />
+    <!-- Front Person Body -->
+    <path
+        android:fillColor="#4F6544"
+        android:pathData="M 7,20 V 19 C 7,17.3 8.3,16 10,16 H 14 C 15.7,16 17,17.3 17,19 V 20 Z" />
+</vector>
