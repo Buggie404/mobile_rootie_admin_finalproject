@@ -109,6 +109,7 @@ class FirebaseService {
 
                     OrderEntity(
                         orderId = doc.id,
+                        userId = doc.getString("userId") ?: "",
                         orderDate = doc.getString("orderDate") ?: "",
                         orderTime = doc.getString("orderTime") ?: "",
                         status = doc.getString("status") ?: "",
@@ -158,7 +159,21 @@ class FirebaseService {
                         name = doc.getString("username") ?: "",
                         email = doc.getString("email") ?: "",
                         phone = doc.getString("phone") ?: "",
-                        address = doc.getString("address") ?: ""
+                        address = doc.getString("address") ?: "",
+                        avatar = doc.getString("avatar") ?: "",
+                        spending = doc.getLong("spending") ?: 0L,
+                        tier = doc.getString("tier") ?: "Thường",
+                        lastActive = doc.getString("last_active") ?: "",
+                        notes = doc.getString("notes") ?: "",
+                        role = doc.getString("role") ?: "customer",
+                        birthday = doc.getString("birthday") ?: "",
+                        region = doc.getString("region") ?: "",
+                        joinYear = doc.getLong("join_year")?.toInt() ?: 1,
+                        orderCount = doc.getLong("order_count")?.toInt() ?: 0,
+                        recentPurchase = doc.getString("recent_purchase") ?: "",
+                        spendingYear = doc.getLong("spending_year") ?: 0L,
+                        spendingMonth = doc.getLong("spending_month") ?: 0L,
+                        points = doc.getLong("points")?.toInt() ?: 0
                     )
                 }
                 continuation.resume(list)

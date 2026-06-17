@@ -16,6 +16,9 @@ interface OrderDao {
     @Query("SELECT * FROM orders WHERE orderId = :orderId")
     fun getByIdSync(orderId: String): OrderEntity?
 
+    @Query("SELECT * FROM orders WHERE userId = :userId")
+    fun getOrdersForUserSync(userId: String): List<OrderEntity>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertSync(order: OrderEntity)
 

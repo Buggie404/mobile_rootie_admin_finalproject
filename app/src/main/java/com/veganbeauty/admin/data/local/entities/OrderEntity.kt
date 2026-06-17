@@ -14,6 +14,7 @@ data class OrderItem(
 @Entity(tableName = "orders")
 data class OrderEntity(
     @PrimaryKey val orderId: String,
+    val userId: String = "",
     val orderDate: String,
     val orderTime: String,
     val status: String,

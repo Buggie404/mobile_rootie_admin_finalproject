@@ -1,0 +1,644 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FEFBF4">
+
+    <!-- 1. Header Toolbar -->
+    <RelativeLayout
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:background="#FEFBF4"
+        android:paddingHorizontal="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Back Button -->
+        <ImageView
+            android:id="@+id/btn_back"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Back"
+            android:padding="8dp"
+            android:src="@drawable/ic_arrow_back"
+            app:tint="#3E4D44" />
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/txt_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="Hồ sơ khách hàng"
+            android:textColor="#3E4D44"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/be_vietnam_pro" />
+
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/header_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#E5E8DA"
+        app:layout_constraintTop_toBottomOf="@id/toolbar" />
+
+    <!-- Scrollable Content -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/header_divider"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="40dp">
+
+            <!-- 2. Profile Area -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_marginBottom="24dp">
+
+                <!-- Avatar and Badge Container -->
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/img_avatar"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/imv_avatar"
+                        app:shapeAppearanceOverlay="@style/CircleImageView"
+                        android:layout_centerInParent="true" />
+
+                    <!-- Tier Badge (e.g. VIP/Vàng/Bạc/Thường) -->
+                    <TextView
+                        android:id="@+id/txt_tier_badge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBottom="@id/img_avatar"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginBottom="1dp"
+                        android:background="@drawable/bg_nav_pill"
+                        android:backgroundTint="#2C3B2D"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="3dp"
+                        android:text="VIP"
+                        android:textColor="#FFFFFF"
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
+
+                </RelativeLayout>
+
+                <!-- Customer Name -->
+                <TextView
+                    android:id="@+id/txt_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Nguyễn Minh Quân"
+                    android:textColor="#3E4D44"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/be_vietnam_pro"
+                    android:layout_marginTop="16dp" />
+
+                <!-- Subtitle: Member duration -->
+                <TextView
+                    android:id="@+id/txt_customer_since"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Khách hàng từ 3 năm trước"
+                    android:textColor="#7E8A83"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/be_vietnam_pro"
+                    android:layout_marginTop="4dp" />
+
+                <!-- Ghi chú tư vấn Button -->
+                <TextView
+                    android:id="@+id/btn_consultation_notes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ghi chú tư vấn"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/be_vietnam_pro"
+                    android:background="@drawable/bg_nav_pill"
+                    android:backgroundTint="#2C3B2D"
+                    android:paddingHorizontal="32dp"
+                    android:paddingVertical="10dp"
+                    android:gravity="center"
+                    android:layout_marginTop="16dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground" />
+
+            </LinearLayout>
+
+            <!-- 3. Metrics Cards (Row of 3) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="24dp">
+
+                <!-- Card 1: Orders -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_rounded_white_card"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:paddingVertical="14dp"
+                    android:layout_marginEnd="6dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Đơn hàng"
+                        android:textColor="#7E8A83"
+                        android:textSize="11sp"
+                        android:fontFamily="@font/be_vietnam_pro" />
+
+                    <TextView
+                        android:id="@+id/txt_metric_orders"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="42"
+                        android:textColor="#3E4D44"
+                        android:textSize="22sp"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/be_vietnam_pro"
+                        android:layout_marginTop="4dp" />
+
+                </LinearLayout>
+
+                <!-- Card 2: Recent Purchase -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1.2"
+                    android:background="@drawable/bg_rounded_white_card"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:paddingVertical="14dp"
+                    android:layout_marginHorizontal="2dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Mua gần đây"
+                        android:textColor="#7E8A83"
+                        android:textSize="11sp"
+                        android:fontFamily="@font/be_vietnam_pro" />
+
+                    <TextView
+                        android:id="@+id/txt_metric_recent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="2 ngày trước"
+                        android:textColor="#3E4D44"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/be_vietnam_pro"
+                        android:layout_marginTop="6dp" />
+
+                </LinearLayout>
+
+                <!-- Card 3: Spending -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_rounded_white_card"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:paddingVertical="14dp"
+                    android:layout_marginStart="6dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Chi tiêu"
+                        android:textColor="#7E8A83"
+                        android:textSize="11sp"
+                        android:fontFamily="@font/be_vietnam_pro" />
+
+                    <TextView
+                        android:id="@+id/txt_metric_spending"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="12.5M"
+                        android:textColor="#3E4D44"
+                        android:textSize="22sp"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/be_vietnam_pro"
+                        android:layout_marginTop="4dp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- 4. Spending Analysis Title Section -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Phân tích chi tiêu"
+                    android:textColor="#3E4D44"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/be_vietnam_pro"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true" />
+
+                <TextView
+                    android:id="@+id/btn_spending_detail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Xem chi tiết >"
+                    android:textColor="#7E8A83"
+                    android:textSize="12sp"
+                    android:fontFamily="@font/be_vietnam_pro"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+            </RelativeLayout>
+
+            <!-- Spending Analysis Cards (Row of 2) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="24dp">
+
+                <!-- Card 1: Year -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_spending_card"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:layout_marginEnd="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Năm nay"
+                        android:textColor="#7E8A83"
+                        android:textSize="12sp"
+                        android:fontFamily="@font/be_vietnam_pro" />
+
+                    <TextView
+                        android:id="@+id/txt_spending_year"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="4.800.000đ"
+                        android:textColor="#3E4D44"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/be_vietnam_pro"
+                        android:layout_marginTop="8dp" />
+
+                    <TextView
+                        android:id="@+id/txt_spending_year_trend"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="↓ -12%"
+                        android:textColor="#D32F2F"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/be_vietnam_pro"
+                        android:layout_marginTop="4dp" />
+
+                </LinearLayout>
+
+                <!-- Card 2: Month -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_spending_card"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:layout_marginStart="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tháng này"
+                        android:textColor="#7E8A83"
+                        android:textSize="12sp"
+                        android:fontFamily="@font/be_vietnam_pro" />
+
+                    <TextView
+                        android:id="@+id/txt_spending_month"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="850.000đ"
+                        android:textColor="#3E4D44"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/be_vietnam_pro"
+                        android:layout_marginTop="8dp" />
+
+                    <TextView
+                        android:id="@+id/txt_spending_month_trend"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="↑ +5%"
+                        android:textColor="#388E3C"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/be_vietnam_pro"
+                        android:layout_marginTop="4dp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- 5. Member Info Card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_rounded_white_card"
+                android:orientation="vertical"
+                android:layout_marginBottom="24dp">
+
+                <!-- Card Header -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#FEF7ED"
+                    android:padding="16dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Thông tin thành viên"
+                        android:textColor="#3E4D44"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/be_vietnam_pro" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#E5E8DA" />
+
+                <!-- Row 1: Membership Tier -->
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="14dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Hạng thành viên"
+                        android:textColor="#7E8A83"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/be_vietnam_pro"
+                        android:layout_alignParentStart="true" />
+
+                    <TextView
+                        android:id="@+id/txt_info_tier"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="VIP"
+                        android:textColor="#3E4D44"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/be_vietnam_pro"
+                        android:layout_alignParentEnd="true" />
+
+                </RelativeLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#F0F2EA"
+                    android:layout_marginHorizontal="16dp" />
+
+                <!-- Row 2: Accumulated Points -->
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="14dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Điểm tích lũy"
+                        android:textColor="#7E8A83"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/be_vietnam_pro"
+                        android:layout_alignParentStart="true" />
+
+                    <TextView
+                        android:id="@+id/txt_info_points"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="2,450 xu"
+                        android:textColor="#3E4D44"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/be_vietnam_pro"
+                        android:layout_alignParentEnd="true" />
+
+                </RelativeLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#F0F2EA"
+                    android:layout_marginHorizontal="16dp" />
+
+                <!-- Row 3: Birthday -->
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="14dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Ngày sinh"
+                        android:textColor="#7E8A83"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/be_vietnam_pro"
+                        android:layout_alignParentStart="true" />
+
+                    <TextView
+                        android:id="@+id/txt_info_birthday"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="15/08/1992"
+                        android:textColor="#3E4D44"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/be_vietnam_pro"
+                        android:layout_alignParentEnd="true" />
+
+                </RelativeLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#F0F2EA"
+                    android:layout_marginHorizontal="16dp" />
+
+                <!-- Row 4: Region -->
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="14dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Khu vực"
+                        android:textColor="#7E8A83"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/be_vietnam_pro"
+                        android:layout_alignParentStart="true" />
+
+                    <TextView
+                        android:id="@+id/txt_info_region"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Quận 1, TP. HCM"
+                        android:textColor="#3E4D44"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/be_vietnam_pro"
+                        android:layout_alignParentEnd="true" />
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+            <!-- 6. Quick Action 1: Purchase History -->
+            <LinearLayout
+                android:id="@+id/btn_purchase_history"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:background="@drawable/bg_rounded_white_card"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="16dp"
+                android:layout_marginBottom="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground">
+
+                <!-- History Icon -->
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/bg_search_bar"
+                    android:backgroundTint="#F0F2EA"
+                    android:padding="10dp"
+                    android:src="@drawable/ic_history"
+                    app:tint="#677559" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Lịch sử mua hàng"
+                    android:textColor="#3E4D44"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/be_vietnam_pro"
+                    android:layout_marginStart="16dp" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_arrow_forward"
+                    app:tint="#7E8A83" />
+
+            </LinearLayout>
+
+            <!-- Quick Action 2: Spending Chart -->
+            <LinearLayout
+                android:id="@+id/btn_spending_chart"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:background="@drawable/bg_rounded_white_card"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground">
+
+                <!-- Chart Icon -->
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/bg_search_bar"
+                    android:backgroundTint="#F0F2EA"
+                    android:padding="10dp"
+                    android:src="@drawable/ic_chart"
+                    app:tint="#677559" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Xem biểu đồ chi tiêu"
+                    android:textColor="#3E4D44"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/be_vietnam_pro"
+                    android:layout_marginStart="16dp" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_arrow_forward"
+                    app:tint="#7E8A83" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

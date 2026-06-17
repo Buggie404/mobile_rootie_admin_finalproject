@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginVertical="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="#FFFFFF">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <!-- 1. Avatar Container -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/avatar_container"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="0dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <ImageView
+                android:id="@+id/img_avatar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/imv_avatar" />
+        </androidx.cardview.widget.CardView>
+
+        <!-- 2. Customer Name -->
+        <TextView
+            android:id="@+id/txt_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="Nguyễn Văn An"
+            android:textColor="#3E4D44"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/be_vietnam_pro"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintTop_toTopOf="@id/avatar_container"
+            app:layout_constraintStart_toEndOf="@id/avatar_container"
+            app:layout_constraintEnd_toStartOf="@id/badge_tier"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintHorizontal_chainStyle="packed" />
+
+        <!-- 3. Tier Badge -->
+        <TextView
+            android:id="@+id/badge_tier"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_nav_pill"
+            android:backgroundTint="#E5E8DA"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="2dp"
+            android:text="VIP"
+            android:textColor="#4F6544"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/be_vietnam_pro"
+            app:layout_constraintBottom_toBottomOf="@id/txt_name"
+            app:layout_constraintTop_toTopOf="@id/txt_name"
+            app:layout_constraintStart_toEndOf="@id/txt_name"
+            app:layout_constraintEnd_toStartOf="@id/btn_detail" />
+
+        <!-- 4. Spending and Last Active Date -->
+        <TextView
+            android:id="@+id/txt_spending_info"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Chi tiêu: 24.5M • Cuối: 12/10/23"
+            android:textColor="#677559"
+            android:textSize="13sp"
+            android:fontFamily="@font/be_vietnam_pro"
+            app:layout_constraintTop_toBottomOf="@id/txt_name"
+            app:layout_constraintStart_toStartOf="@id/txt_name"
+            app:layout_constraintEnd_toStartOf="@id/btn_detail" />
+
+        <!-- 5. Detail Button -->
+        <TextView
+            android:id="@+id/btn_detail"
+            android:layout_width="80dp"
+            android:layout_height="32dp"
+            android:background="@drawable/bg_search_bar"
+            android:gravity="center"
+            android:text="Chi tiết"
+            android:textColor="#3E4D44"
+            android:textSize="12sp"
+            android:fontFamily="@font/be_vietnam_pro"
+            android:clickable="true"
+            android:focusable="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- 6. Note Button -->
+        <LinearLayout
+            android:id="@+id/btn_note"
+            android:layout_width="80dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/bg_search_bar"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:clickable="true"
+            android:focusable="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btn_detail">
+
+            <ImageView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:src="@drawable/ic_pencil"
+                app:tint="#3E4D44" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:text="Ghi chú"
+                android:textColor="#3E4D44"
+                android:textSize="12sp"
+                android:fontFamily="@font/be_vietnam_pro" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>

@@ -26,15 +26,17 @@ object BottomNavHelper {
             R.id.nav_menu
         )
 
+        val navRoot = activity.findViewById<View>(R.id.bottom_nav) ?: root
+
         tabs.forEach { viewId ->
-            root.findViewById<ViewGroup>(viewId)?.setOnClickListener {
+            navRoot.findViewById<ViewGroup>(viewId)?.setOnClickListener {
                 if (viewId != activeTabId) {
                     onTabSelected(viewId)
                 }
             }
         }
 
-        highlightTab(root, activeTabId)
+        highlightTab(navRoot, activeTabId)
     }
 
     fun highlightTab(root: View, activeTabId: Int) {
@@ -82,7 +84,7 @@ object BottomNavHelper {
         val target = when (tabId) {
             R.id.nav_home -> HomeFragment()
             R.id.nav_product -> PlaceholderFragment.newInstance("Sản Phẩm")
-            R.id.nav_customer -> PlaceholderFragment.newInstance("Khách Hàng")
+            R.id.nav_customer -> com.veganbeauty.admin.features.customer.CustomerAdminFragment()
             R.id.nav_order -> PlaceholderFragment.newInstance("Đơn Hàng")
             R.id.nav_menu -> PlaceholderFragment.newInstance("Khác")
             else -> null

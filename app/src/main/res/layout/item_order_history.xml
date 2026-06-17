@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="0dp"
+    app:cardBackgroundColor="#E5E8DA">
+
+    <!-- Thin border card -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="1dp"
+        app:cardCornerRadius="11dp"
+        app:cardElevation="0dp"
+        app:cardBackgroundColor="#FFFFFF">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Top Row: Order ID & Status Badge -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp">
+
+                <TextView
+                    android:id="@+id/txt_order_id"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="#ORD-99210"
+                    android:textColor="#3E4D44"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/be_vietnam_pro"
+                    android:layout_alignParentStart="true" />
+
+                <TextView
+                    android:id="@+id/badge_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_nav_pill"
+                    android:backgroundTint="#E5E8DA"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp"
+                    android:text="HOÀN THÀNH"
+                    android:textColor="#4F6544"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/be_vietnam_pro"
+                    android:layout_alignParentEnd="true" />
+
+            </RelativeLayout>
+
+            <!-- Second Row: Time & Date -->
+            <TextView
+                android:id="@+id/txt_order_datetime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="14:20, 20 Th10 2025"
+                android:textColor="#7E8A83"
+                android:textSize="13sp"
+                android:fontFamily="@font/be_vietnam_pro"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Divider line -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E5E8DA"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Bottom Row: Products Count & Total Amount -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/txt_products_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="03 Sản phẩm"
+                    android:textColor="#7E8A83"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/be_vietnam_pro"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true" />
+
+                <TextView
+                    android:id="@+id/txt_total_amount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="1,250,000đ"
+                    android:textColor="#3E4D44"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/be_vietnam_pro"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true" />
+
+            </RelativeLayout>
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+</androidx.cardview.widget.CardView>
