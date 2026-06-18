@@ -26,7 +26,8 @@ file_mapping = {
     'users.json': 'users',
     'vouchers.json': 'vouchers',
     'skin_bookings.json': 'bookings',
-    'admins.json': 'admins'
+    'admins.json': 'admins',
+    'chat_message.json': 'chats'
 }
 
 def upload_file(filename, collection_name):
