@@ -88,6 +88,29 @@ class HomeFragment : RootieAdminFragment() {
         binding.fabAdd.setOnClickListener {
             Toast.makeText(requireContext(), "Thêm mới", Toast.LENGTH_SHORT).show()
         }
+
+        // Bind header message icon
+        setupHeaderMessageButton(binding.header.homeHeaderMessageBtn)
+
+        // Set role switcher on avatar click
+        binding.header.homeHeaderAvatarContainer.setOnClickListener {
+            val context = requireContext()
+            val currentRole = com.veganbeauty.admin.core.base.UserSession.getRole(context)
+            val roles = arrayOf("admin", "staff")
+            val checkedItem = if (currentRole == "admin") 0 else 1
+
+            androidx.appcompat.app.AlertDialog.Builder(context)
+                .setTitle("Chọn Role để Test")
+                .setSingleChoiceItems(roles, checkedItem) { dialog, which ->
+                    val selectedRole = roles[which]
+                    com.veganbeauty.admin.core.base.UserSession.setRole(context, selectedRole)
+                    Toast.makeText(context, "Đã chuyển sang role: $selectedRole", Toast.LENGTH_SHORT).show()
+                    dialog.dismiss()
+                    activity?.recreate()
+                }
+                .setNegativeButton("Hủy", null)
+                .show()
+        }
     }
 
     override fun onDestroyView() {

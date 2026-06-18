@@ -156,6 +156,9 @@ class ProductAddFragment : RootieAdminFragment() {
 
         // Render initial empty images list
         renderImages()
+
+        // Bind message button in header
+        setupHeaderMessageButton(binding.btnMessage)
     }
 
     private var selectedCategoryName: String = ""

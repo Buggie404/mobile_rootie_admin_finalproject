@@ -43,6 +43,25 @@
         android:contentDescription="Rootie Logo Text"
         android:src="@drawable/imv_logo_text" />
 
+    <!-- Message Button -->
+    <FrameLayout
+        android:id="@+id/home_header_message_btn"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_toStartOf="@id/home_header_notification_btn"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="4dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_gravity="center"
+            android:contentDescription="Messages"
+            android:src="@drawable/ic_message" />
+    </FrameLayout>
+
     <!-- Notification Button (Right) -->
     <FrameLayout
         android:id="@+id/home_header_notification_btn"

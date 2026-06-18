@@ -40,6 +40,25 @@
             android:textStyle="bold"
             android:fontFamily="@font/be_vietnam_pro" />
 
+        <!-- Message Button -->
+        <FrameLayout
+            android:id="@+id/btn_message"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_toStartOf="@id/btn_notification"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="4dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_message"
+                android:contentDescription="Tin nhắn" />
+        </FrameLayout>
+
         <!-- Notification Button (Right) -->
         <FrameLayout
             android:id="@+id/btn_notification"

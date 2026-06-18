@@ -1,0 +1,110 @@
+[
+  {
+    "id": "msg_baonguyen_1",
+    "senderId": "48228004",
+    "senderName": "Bảo Nguyên",
+    "senderAvatar": "https://i.pinimg.com/736x/ab/32/b1/ab32b13edefed48f94d93ee4b6f12f6b.jpg",
+    "receiverId": "admin_rootie",
+    "receiverName": "Quản trị viên Rootie",
+    "receiverAvatar": "https://i.pinimg.com/736x/1a/d8/4b/1ad84b9ab4a1e2ab17c7aab37fcff0a5.jpg",
+    "content": "Chào chị, em muốn tìm hiểu sáp dưỡng ẩm sen.",
+    "timestamp": 1718366400000,
+    "isRead": false
+  },
+  {
+    "id": "msg_baonguyen_2",
+    "senderId": "48228004",
+    "senderName": "Bảo Nguyên",
+    "senderAvatar": "https://i.pinimg.com/736x/ab/32/b1/ab32b13edefed48f94d93ee4b6f12f6b.jpg",
+    "receiverId": "admin_rootie",
+    "receiverName": "Quản trị viên Rootie",
+    "receiverAvatar": "https://i.pinimg.com/736x/1a/d8/4b/1ad84b9ab4a1e2ab17c7aab37fcff0a5.jpg",
+    "content": "Sản phẩm này có dùng được cho da nhạy cảm không ạ?",
+    "timestamp": 1718366460000,
+    "isRead": false
+  },
+  {
+    "id": "msg_baonguyen_3",
+    "senderId": "48228004",
+    "senderName": "Bảo Nguyên",
+    "senderAvatar": "https://i.pinimg.com/736x/ab/32/b1/ab32b13edefed48f94d93ee4b6f12f6b.jpg",
+    "receiverId": "admin_rootie",
+    "receiverName": "Quản trị viên Rootie",
+    "receiverAvatar": "https://i.pinimg.com/736x/1a/d8/4b/1ad84b9ab4a1e2ab17c7aab37fcff0a5.jpg",
+    "content": "Và em muốn mua kèm nước sen Hậu Giang.",
+    "timestamp": 1718366520000,
+    "isRead": false
+  },
+  {
+    "id": "msg_baonguyen_4",
+    "senderId": "48228004",
+    "senderName": "Bảo Nguyên",
+    "senderAvatar": "https://i.pinimg.com/736x/ab/32/b1/ab32b13edefed48f94d93ee4b6f12f6b.jpg",
+    "receiverId": "admin_rootie",
+    "receiverName": "Quản trị viên Rootie",
+    "receiverAvatar": "https://i.pinimg.com/736x/1a/d8/4b/1ad84b9ab4a1e2ab17c7aab37fcff0a5.jpg",
+    "content": "Shop tư vấn giúp em nhé!",
+    "timestamp": 1718366580000,
+    "isRead": false
+  },
+  {
+    "id": "msg_quynhnhu_1",
+    "senderId": "quynh_nhu_user",
+    "senderName": "Quỳnh Như",
+    "senderAvatar": "https://i.pinimg.com/736x/b6/d7/cc/b6d7ccd0c1e842825d1976a4ba25df8e.jpg",
+    "receiverId": "admin_rootie",
+    "receiverName": "Quản trị viên Rootie",
+    "receiverAvatar": "https://i.pinimg.com/736x/1a/d8/4b/1ad84b9ab4a1e2ab17c7aab37fcff0a5.jpg",
+    "content": "Em cảm ơn chị nhiều",
+    "timestamp": 1717848000000,
+    "isRead": true
+  },
+  {
+    "id": "msg_khanhxuan_1",
+    "senderId": "68751659",
+    "senderName": "Khánh Xuân",
+    "senderAvatar": "https://i1-c.pinimg.com/736x/4d/fe/b7/4dfeb7f781432e75e270d3bf70f494e4.jpg",
+    "receiverId": "admin_rootie",
+    "receiverName": "Quản trị viên Rootie",
+    "receiverAvatar": "https://i.pinimg.com/736x/1a/d8/4b/1ad84b9ab4a1e2ab17c7aab37fcff0a5.jpg",
+    "content": "Dạ em nhận được hàng rồi ạ.",
+    "timestamp": 1718452800000,
+    "isRead": true
+  },
+  {
+    "id": "msg_khanhxuan_2",
+    "senderId": "68751659",
+    "senderName": "Khánh Xuân",
+    "senderAvatar": "https://i1-c.pinimg.com/736x/4d/fe/b7/4dfeb7f781432e75e270d3bf70f494e4.jpg",
+    "receiverId": "admin_rootie",
+    "receiverName": "Quản trị viên Rootie",
+    "receiverAvatar": "https://i.pinimg.com/736x/1a/d8/4b/1ad84b9ab4a1e2ab17c7aab37fcff0a5.jpg",
+    "content": "Cảm ơn shop nhiều nha, sản phẩm rất ưng ý.",
+    "timestamp": 1718453400000,
+    "isRead": true
+  },
+  {
+    "id": "msg_khanhbinh_1",
+    "senderId": "87962440",
+    "senderName": "Khánh Bình",
+    "senderAvatar": "https://i1-c.pinimg.com/736x/9e/12/94/9e1294132dbb8f12c70f31058b98bdb1.jpg",
+    "receiverId": "admin_rootie",
+    "receiverName": "Quản trị viên Rootie",
+    "receiverAvatar": "https://i.pinimg.com/736x/1a/d8/4b/1ad84b9ab4a1e2ab17c7aab37fcff0a5.jpg",
+    "content": "Đơn hàng của em đã được gửi đi chưa ạ?",
+    "timestamp": 1718625600000,
+    "isRead": true
+  },
+  {
+    "id": "msg_maianh_1",
+    "senderId": "85097162",
+    "senderName": "Mai Anh",
+    "senderAvatar": "https://i.pinimg.com/736x/87/1c/91/871c91ffb39c0fc6a44c77f0a905a396.jpg",
+    "receiverId": "admin_rootie",
+    "receiverName": "Quản trị viên Rootie",
+    "receiverAvatar": "https://i.pinimg.com/736x/1a/d8/4b/1ad84b9ab4a1e2ab17c7aab37fcff0a5.jpg",
+    "content": "Giao giúp em sang địa chỉ cũ nhé.",
+    "timestamp": 1718280000000,
+    "isRead": true
+  }
+]

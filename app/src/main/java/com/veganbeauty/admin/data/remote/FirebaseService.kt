@@ -278,4 +278,64 @@ class FirebaseService {
                 continuation.resume(emptyList())
             }
     }
+
+    suspend fun fetchChatMessages(): List<ChatMessage> = suspendCancellableCoroutine { continuation ->
+        val firestore = db
+        if (firestore == null) {
+            continuation.resume(emptyList())
+            return@suspendCancellableCoroutine
+        }
+        firestore.collection("chats").get()
+            .addOnSuccessListener { snapshot ->
+                val list = snapshot.documents.mapNotNull { doc ->
+                    try {
+                        ChatMessage(
+                            id = doc.id,
+                            senderId = doc.getString("senderId") ?: "",
+                            senderName = doc.getString("senderName") ?: "",
+                            senderAvatar = doc.getString("senderAvatar") ?: "",
+                            receiverId = doc.getString("receiverId") ?: "",
+                            receiverName = doc.getString("receiverName") ?: "",
+                            receiverAvatar = doc.getString("receiverAvatar") ?: "",
+                            content = doc.getString("content") ?: "",
+                            timestamp = doc.getLong("timestamp") ?: 0L,
+                            isRead = doc.getBoolean("isRead") ?: false
+                        )
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        null
+                    }
+                }
+                continuation.resume(list)
+            }
+            .addOnFailureListener {
+                continuation.resume(emptyList())
+            }
+    }
+
+    suspend fun saveChatMessage(message: ChatMessage): Boolean = suspendCancellableCoroutine { continuation ->
+        val firestore = db
+        if (firestore == null) {
+            continuation.resume(false)
+            return@suspendCancellableCoroutine
+        }
+        val data = hashMapOf(
+            "senderId" to message.senderId,
+            "senderName" to message.senderName,
+            "senderAvatar" to message.senderAvatar,
+            "receiverId" to message.receiverId,
+            "receiverName" to message.receiverName,
+            "receiverAvatar" to message.receiverAvatar,
+            "content" to message.content,
+            "timestamp" to message.timestamp,
+            "isRead" to message.isRead
+        )
+        firestore.collection("chats").document(message.id).set(data)
+            .addOnSuccessListener {
+                continuation.resume(true)
+            }
+            .addOnFailureListener {
+                continuation.resume(false)
+            }
+    }
 }

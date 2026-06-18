@@ -110,6 +110,9 @@ class ProductListFragment : RootieAdminFragment() {
 
         // Sync and observe data
         viewModel.syncFromFirebase()
+
+        // Bind message button in header
+        setupHeaderMessageButton(binding.btnMessage)
     }
 
     override fun observeViewModel() {

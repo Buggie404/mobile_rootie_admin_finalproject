@@ -69,6 +69,9 @@ class CustomerStaffFragment : RootieAdminFragment() {
         setupRecyclerView()
         setupListeners()
         loadData()
+
+        // Bind message button in header
+        setupHeaderMessageButton(binding.btnMessage)
     }
 
     private fun setupRecyclerView() {
