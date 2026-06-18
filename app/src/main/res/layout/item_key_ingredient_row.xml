@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp"
+    android:layout_marginBottom="8dp"
+    android:background="@drawable/bg_input_field">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hoạt chất"
+            android:textColor="#3E4D44"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/be_vietnam_pro" />
+
+        <ImageView
+            android:id="@+id/btn_delete_ingredient"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/ic_close_circle"
+            android:contentDescription="Xóa hoạt chất"
+            android:clickable="true"
+            android:focusable="true" />
+    </RelativeLayout>
+
+    <EditText
+        android:id="@+id/edt_ingredient_name"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/bg_input_field"
+        android:paddingHorizontal="12dp"
+        android:hint="Tên hoạt chất (ví dụ: Vitamin B3)"
+        android:textColor="#3E4D44"
+        android:textColorHint="#97A49C"
+        android:textSize="13sp"
+        android:singleLine="true"
+        android:inputType="text"
+        android:fontFamily="@font/be_vietnam_pro" />
+
+    <EditText
+        android:id="@+id/edt_ingredient_desc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="60dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_input_field"
+        android:padding="10dp"
+        android:hint="Mô tả tác dụng hoạt chất..."
+        android:textColor="#3E4D44"
+        android:textColorHint="#97A49C"
+        android:textSize="13sp"
+        android:gravity="top|start"
+        android:inputType="textMultiLine"
+        android:fontFamily="@font/be_vietnam_pro" />
+
+</LinearLayout>

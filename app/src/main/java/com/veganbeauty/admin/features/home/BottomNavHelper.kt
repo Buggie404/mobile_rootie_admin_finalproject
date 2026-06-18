@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import com.veganbeauty.admin.MainActivity
 import com.veganbeauty.admin.R
+import com.veganbeauty.admin.features.product.list.ProductListFragment
 
 object BottomNavHelper {
 
@@ -15,7 +16,6 @@ object BottomNavHelper {
     fun setup(
         activity: MainActivity,
         root: View,
-        activeTabId: Int,
         onTabSelected: (Int) -> Unit
     ) {
         val tabs = listOf(
@@ -29,14 +29,10 @@ object BottomNavHelper {
         val navRoot = activity.findViewById<View>(R.id.bottom_nav) ?: root
 
         tabs.forEach { viewId ->
-            navRoot.findViewById<ViewGroup>(viewId)?.setOnClickListener {
-                if (viewId != activeTabId) {
-                    onTabSelected(viewId)
-                }
+            root.findViewById<ViewGroup>(viewId)?.setOnClickListener {
+                onTabSelected(viewId)
             }
         }
-
-        highlightTab(navRoot, activeTabId)
     }
 
     fun highlightTab(root: View, activeTabId: Int) {
@@ -83,7 +79,7 @@ object BottomNavHelper {
     fun navigate(activity: MainActivity, tabId: Int) {
         val target = when (tabId) {
             R.id.nav_home -> HomeFragment()
-            R.id.nav_product -> PlaceholderFragment.newInstance("Sản Phẩm")
+            R.id.nav_product -> ProductListFragment()
             R.id.nav_customer -> com.veganbeauty.admin.features.customer.CustomerAdminFragment()
             R.id.nav_order -> PlaceholderFragment.newInstance("Đơn Hàng")
             R.id.nav_menu -> PlaceholderFragment.newInstance("Khác")
@@ -92,6 +88,10 @@ object BottomNavHelper {
 
         target?.let {
             activity.loadFragment(it)
+            val bottomNav = activity.findViewById<View>(R.id.bottom_nav)
+            if (bottomNav != null) {
+                highlightTab(bottomNav, tabId)
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.veganbeauty.admin
 
 import android.os.Bundle
+import android.view.View
 import androidx.fragment.app.Fragment
 import com.veganbeauty.admin.core.base.RootieAdminActivity
 import com.veganbeauty.admin.databinding.ActivityMainBinding
@@ -21,13 +22,21 @@ class MainActivity : RootieAdminActivity() {
         }
     }
 
+    private var currentTabId: Int = R.id.nav_home
+
     override fun setupUI() {
-        BottomNavHelper.setup(
-            activity = this,
-            root = binding.root,
-            activeTabId = binding.bottomNav.navHome.id
-        ) { tabId ->
-            BottomNavHelper.navigate(this, tabId)
+        val bottomNav = findViewById<View>(R.id.bottom_nav)
+        if (bottomNav != null) {
+            BottomNavHelper.setup(
+                activity = this,
+                root = bottomNav
+            ) { tabId ->
+                if (tabId != currentTabId) {
+                    currentTabId = tabId
+                    BottomNavHelper.navigate(this, tabId)
+                }
+            }
+            BottomNavHelper.highlightTab(bottomNav, currentTabId)
         }
     }
 

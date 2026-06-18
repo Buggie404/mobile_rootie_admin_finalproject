@@ -26,16 +26,6 @@ class HomeFragment : RootieAdminFragment() {
     }
 
     override fun setupUI(view: View) {
-        val mainActivity = activity as? MainActivity
-        if (mainActivity != null) {
-            BottomNavHelper.setup(
-                activity = mainActivity,
-                root = binding.root,
-                activeTabId = R.id.nav_home
-            ) { tabId ->
-                BottomNavHelper.navigate(mainActivity, tabId)
-            }
-        }
 
         // Bind sparkline data points
         // Custom points to reflect the beautiful trend graphs in the screenshot

@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@drawable/bg_bottom_sheet">
+
+    <!-- Header Row -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp">
+        <TextView
+            android:id="@+id/tvFilterTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="Bộ lọc sản phẩm"
+            android:textColor="#3E4D44"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/be_vietnam_pro" />
+        <ImageView
+            android:id="@+id/ivClose"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_close"
+            app:tint="#3E4D44" />
+    </RelativeLayout>
+
+    <!-- Scrollable Content -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:scrollbars="none"
+        android:overScrollMode="never">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Section 1: Categories & Subcategories -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Theo danh mục"
+                android:textColor="#3E4D44"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="@font/be_vietnam_pro" />
+
+            <LinearLayout
+                android:id="@+id/layoutCategoriesContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E0E4E2"
+                android:layout_marginVertical="16dp" />
+
+            <!-- Section 2: Stock Status -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Trạng thái kho"
+                android:textColor="#3E4D44"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="@font/be_vietnam_pro" />
+
+            <RadioGroup
+                android:id="@+id/rgStockStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/rbStockAll"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tất cả"
+                    android:textColor="#3E4D44"
+                    android:textSize="14sp"
+                    android:buttonTint="#3E4D44"
+                    android:checked="true"
+                    android:layout_marginEnd="16dp"
+                    android:fontFamily="@font/be_vietnam_pro" />
+
+                <RadioButton
+                    android:id="@+id/rbStockIn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Còn hàng"
+                    android:textColor="#3E4D44"
+                    android:textSize="14sp"
+                    android:buttonTint="#3E4D44"
+                    android:layout_marginEnd="16dp"
+                    android:fontFamily="@font/be_vietnam_pro" />
+
+                <RadioButton
+                    android:id="@+id/rbStockOut"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Hết hàng"
+                    android:textColor="#3E4D44"
+                    android:textSize="14sp"
+                    android:buttonTint="#3E4D44"
+                    android:fontFamily="@font/be_vietnam_pro" />
+            </RadioGroup>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E0E4E2"
+                android:layout_marginVertical="16dp" />
+
+            <!-- Section 3: Visibility Status -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Trạng thái hiển thị"
+                android:textColor="#3E4D44"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="@font/be_vietnam_pro" />
+
+            <RadioGroup
+                android:id="@+id/rgVisibilityStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/rbVisibilityAll"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tất cả"
+                    android:textColor="#3E4D44"
+                    android:textSize="14sp"
+                    android:buttonTint="#3E4D44"
+                    android:checked="true"
+                    android:layout_marginEnd="16dp"
+                    android:fontFamily="@font/be_vietnam_pro" />
+
+                <RadioButton
+                    android:id="@+id/rbVisibilityVisible"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Đang hiện"
+                    android:textColor="#3E4D44"
+                    android:textSize="14sp"
+                    android:buttonTint="#3E4D44"
+                    android:layout_marginEnd="16dp"
+                    android:fontFamily="@font/be_vietnam_pro" />
+
+                <RadioButton
+                    android:id="@+id/rbVisibilityHidden"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Đã ẩn"
+                    android:textColor="#3E4D44"
+                    android:textSize="14sp"
+                    android:buttonTint="#3E4D44"
+                    android:fontFamily="@font/be_vietnam_pro" />
+            </RadioGroup>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="24dp" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Footer Action Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="16dp"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/btnReset"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="Thiết lập lại"
+            android:textColor="#3E4D44"
+            app:strokeColor="#3E4D44"
+            android:layout_marginEnd="8dp"
+            android:fontFamily="@font/be_vietnam_pro" />
+
+        <Button
+            android:id="@+id/btnConfirm"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="Áp dụng"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#3E4D44"
+            android:layout_marginStart="8dp"
+            android:fontFamily="@font/be_vietnam_pro" />
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="6dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    app:cardBackgroundColor="#FFFFFF">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Image Container -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="160dp">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/imv_product"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:background="#E0E4E2"
+                android:layout_margin="8dp"
+                app:shapeAppearanceOverlay="@style/RoundedSquareImageView" />
+
+            <ImageView
+                android:id="@+id/btn_delete"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="top|end"
+                android:layout_marginTop="2dp"
+                android:layout_marginEnd="2dp"
+                android:src="@drawable/ic_close_circle"
+                android:contentDescription="Xóa sản phẩm"
+                android:clickable="true"
+                android:focusable="true" />
+        </FrameLayout>
+
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/txt_product_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginTop="4dp"
+            android:text="Gel tắm đường thốt nốt An Giang 500ml"
+            android:textColor="#3E4D44"
+            android:textSize="13sp"
+            android:textStyle="normal"
+            android:minLines="2"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:fontFamily="@font/be_vietnam_pro" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginTop="6dp"
+            android:gravity="bottom">
+
+            <TextView
+                android:id="@+id/txt_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="241.000đ"
+                android:textColor="#C62828"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/be_vietnam_pro" />
+
+            <TextView
+                android:id="@+id/txt_original_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:text="325.000đ"
+                android:textColor="#7E8A83"
+                android:textSize="10sp"
+                android:fontFamily="@font/be_vietnam_pro" />
+        </LinearLayout>
+
+        <!-- Tags Row -->
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none"
+            android:overScrollMode="never"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginTop="6dp">
+
+            <LinearLayout
+                android:id="@+id/layout_tags"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical" />
+        </HorizontalScrollView>
+
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#E0E4E2"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginTop="8dp" />
+
+        <!-- Bottom Action Row -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="8dp">
+
+            <!-- Stock badge -->
+            <LinearLayout
+                android:id="@+id/badge_stock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@drawable/bg_stock_normal"
+                android:paddingHorizontal="6dp"
+                android:paddingVertical="4dp"
+                android:gravity="center_vertical"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true">
+
+                <ImageView
+                    android:id="@+id/imv_stock_icon"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:src="@drawable/ic_warehouse"
+                    app:tint="#FFFFFF"
+                    android:contentDescription="Kho" />
+
+                <TextView
+                    android:id="@+id/txt_stock_quantity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:text="Kho: 42"
+                    android:textColor="#FFFFFF"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/be_vietnam_pro" />
+            </LinearLayout>
+
+            <!-- Actions container -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:id="@+id/btn_view"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_eye"
+                    app:tint="#677559"
+                    android:layout_marginEnd="10dp"
+                    android:contentDescription="Xem chi tiết"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+                <ImageView
+                    android:id="@+id/btn_edit"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_pencil"
+                    app:tint="#677559"
+                    android:contentDescription="Chỉnh sửa"
+                    android:clickable="true"
+                    android:focusable="true" />
+            </LinearLayout>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

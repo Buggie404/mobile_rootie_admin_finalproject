@@ -22,18 +22,14 @@ class ProductRepository(
     }
 
     suspend fun saveProduct(product: ProductEntity): Boolean = withContext(Dispatchers.IO) {
+        productDao.insertSync(product)
         val success = firebaseService.saveProduct(product)
-        if (success) {
-            productDao.insertSync(product)
-        }
         success
     }
 
     suspend fun deleteProduct(product: ProductEntity): Boolean = withContext(Dispatchers.IO) {
+        productDao.deleteSync(product)
         val success = firebaseService.deleteProduct(product.id)
-        if (success) {
-            productDao.deleteSync(product)
-        }
         success
     }
 }
