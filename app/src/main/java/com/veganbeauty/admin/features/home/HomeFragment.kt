@@ -332,9 +332,9 @@ class HomeFragment : RootieAdminFragment() {
     }
 
     private fun buildSkinChart(products: List<JSONObject>) {
-        val skinMap = mutableMapOf(
-            "Da thường" to 0, "Da dầu" to 0, "Da khô" to 0,
-            "Da hỗn hợp" to 0, "Da nhạy cảm" to 0, "Mọi loại da" to 0
+        val skinMap = linkedMapOf(
+            "Da dầu" to 0, "Da hỗn hợp" to 0, "Da khô" to 0,
+            "Da thường" to 0, "Da nhạy cảm" to 0, "Mọi loại da" to 0
         )
         products.forEach { p ->
             val suitable = p.optString("suitableFor", "")
@@ -343,83 +343,155 @@ class HomeFragment : RootieAdminFragment() {
             }
         }
         val total = skinMap.values.sum().coerceAtLeast(1)
-        val colors = listOf("#4F6544", "#59AE7B", "#677559", "#95A192", "#E65100", "#0D47A1")
+        // Màu đồng bộ với color palette của app
+        val barColors = listOf("#4F6544", "#677559", "#59AE7B", "#95A192", "#AACFAA", "#3A5234")
+        val skinEmojis = mapOf(
+            "Da dầu" to "💧", "Da hỗn hợp" to "🌿", "Da khô" to "🌵",
+            "Da thường" to "✨", "Da nhạy cảm" to "🌸", "Mọi loại da" to "🌍"
+        )
 
         binding.llSkinChart.removeAllViews()
-        skinMap.entries
-            .sortedByDescending { it.value }
-            .forEachIndexed { idx, (label, count) ->
-                val pct = count.toFloat() / total
-                val row = LinearLayout(requireContext()).apply {
-                    orientation = LinearLayout.VERTICAL
-                    layoutParams = LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                    ).also { it.bottomMargin = dpToPx(10) }
-                }
-                // Label + count
-                val labelView = TextView(requireContext()).apply {
-                    text = "$label  ($count sản phẩm)"
-                    textSize = 12f
-                    setTextColor(Color.parseColor("#7E8A83"))
-                    typeface = Typeface.DEFAULT
-                    layoutParams = LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                    ).also { it.bottomMargin = dpToPx(4) }
-                }
-                // Bar track
-                val track = LinearLayout(requireContext()).apply {
-                    layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dpToPx(10))
-                    background = android.graphics.drawable.GradientDrawable().also {
-                        it.shape = android.graphics.drawable.GradientDrawable.RECTANGLE
-                        it.cornerRadius = dpToPx(5).toFloat()
-                        it.setColor(Color.parseColor("#E5E8DA"))
-                    }
-                }
-                val fill = View(requireContext()).apply {
-                    val barWidth = (resources.displayMetrics.widthPixels * 0.75f * pct).toInt()
-                    layoutParams = LinearLayout.LayoutParams(barWidth.coerceAtLeast(dpToPx(4)), LinearLayout.LayoutParams.MATCH_PARENT)
-                    background = android.graphics.drawable.GradientDrawable().also {
-                        it.shape = android.graphics.drawable.GradientDrawable.RECTANGLE
-                        it.cornerRadius = dpToPx(5).toFloat()
-                        it.setColor(Color.parseColor(colors[idx % colors.size]))
-                    }
-                }
-                track.addView(fill)
-                row.addView(labelView)
-                row.addView(track)
-                binding.llSkinChart.addView(row)
+        // Header
+        val header = LinearLayout(requireContext()).apply {
+            orientation = LinearLayout.HORIZONTAL
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
+            ).also { it.bottomMargin = dpToPx(16) }
+        }
+        val hLabel = TextView(requireContext()).apply {
+            text = "Loại da"
+            textSize = 11f
+            setTypeface(null, Typeface.BOLD)
+            setTextColor(Color.parseColor("#95A192"))
+            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+        }
+        val hCount = TextView(requireContext()).apply {
+            text = "SP tương thích"
+            textSize = 11f
+            setTypeface(null, Typeface.BOLD)
+            setTextColor(Color.parseColor("#95A192"))
+        }
+        header.addView(hLabel); header.addView(hCount)
+        binding.llSkinChart.addView(header)
+
+        skinMap.entries.sortedByDescending { it.value }.forEachIndexed { idx, (label, count) ->
+            val pct = count.toFloat() / total
+            val emoji = skinEmojis[label] ?: "•"
+            val color = barColors[idx % barColors.size]
+
+            val rowWrap = LinearLayout(requireContext()).apply {
+                orientation = LinearLayout.VERTICAL
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
+                ).also { it.bottomMargin = dpToPx(14) }
             }
+            // Top row: label + count
+            val topRow = LinearLayout(requireContext()).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = android.view.Gravity.CENTER_VERTICAL
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
+                ).also { it.bottomMargin = dpToPx(6) }
+            }
+            val labelTv = TextView(requireContext()).apply {
+                text = "$emoji  $label"
+                textSize = 13f
+                setTypeface(null, Typeface.BOLD)
+                setTextColor(Color.parseColor("#3E4D44"))
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+            }
+            val pctTv = TextView(requireContext()).apply {
+                text = "$count SP  (${"%.0f".format(pct * 100)}%)"
+                textSize = 11f
+                setTextColor(Color.parseColor(color))
+                setTypeface(null, Typeface.BOLD)
+            }
+            topRow.addView(labelTv); topRow.addView(pctTv)
+
+            // Bar track
+            val track = android.widget.FrameLayout(requireContext()).apply {
+                layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dpToPx(8))
+                background = android.graphics.drawable.GradientDrawable().also {
+                    it.shape = android.graphics.drawable.GradientDrawable.RECTANGLE
+                    it.cornerRadius = dpToPx(4).toFloat()
+                    it.setColor(Color.parseColor("#EEF0E8"))
+                }
+            }
+            val fill = View(requireContext()).apply {
+                val maxWidth = (resources.displayMetrics.widthPixels * 0.72f).toInt()
+                val barWidth = (maxWidth * pct).toInt().coerceAtLeast(dpToPx(6))
+                layoutParams = android.widget.FrameLayout.LayoutParams(barWidth, android.widget.FrameLayout.LayoutParams.MATCH_PARENT)
+                background = android.graphics.drawable.GradientDrawable().also {
+                    it.shape = android.graphics.drawable.GradientDrawable.RECTANGLE
+                    it.cornerRadius = dpToPx(4).toFloat()
+                    it.setColor(Color.parseColor(color))
+                }
+            }
+            track.addView(fill)
+            rowWrap.addView(topRow)
+            rowWrap.addView(track)
+            binding.llSkinChart.addView(rowWrap)
+        }
     }
 
     private fun buildFaqSection() {
+        // Câu hỏi thực tế dựa trên ghi chú khách hàng (users.json) và sản phẩm thực (products.json)
+        data class FaqItem(val tag: String, val tagColor: String, val question: String)
         val faqs = listOf(
-            "Da dầu nên dùng sản phẩm nào của Rootie?",
-            "Serum nghệ có phù hợp với da nhạy cảm không?",
-            "Tôi bị mụn ẩn, cần routine như thế nào?",
-            "Kem chống nắng bí đao dùng được cho da khô không?",
-            "Chu trình chăm sóc da tối giản cho người mới bắt đầu?"
+            FaqItem("Da dầu mụn", "#4F6544",
+                "Da dầu có mụn ẩn nên dùng Combo chăm sóc da mụn bí đao toàn diện hay Tinh chất bí đao 70ml đơn lẻ?"),
+            FaqItem("Da nhạy cảm", "#677559",
+                "Tinh chất bí đao có chứa Tràm trà và BHA 0.8%, da nhạy cảm dùng có bị kích ứng không?"),
+            FaqItem("Da xỉn màu", "#59AE7B",
+                "Serum nghệ Hưng Yên curcumin cao gấp 3 lần có để lại màu vàng trên da không?"),
+            FaqItem("Quà tặng", "#95A192",
+                "GiftBox \"Rootie đã có mặt tại Pháp\" có thể làm quà sinh nhật không? Gồm những sản phẩm gì?"),
+            FaqItem("Chống nắng", "#E65100",
+                "Sữa chống nắng bí đao Cocoon SPF có dùng được cho da khô hay chỉ phù hợp da dầu?"),
+            FaqItem("Routine", "#0D47A1",
+                "Nước sen Hậu Giang (toner) dùng bước nào trong routine sáng và tối?")
         )
         binding.llFaq.removeAllViews()
-        faqs.forEach { question ->
+        faqs.forEach { faq ->
             val card = androidx.cardview.widget.CardView(requireContext()).apply {
-                radius = dpToPx(12).toFloat()
-                cardElevation = dpToPx(1).toFloat()
-                setCardBackgroundColor(Color.parseColor("#FFFFFF"))
+                radius = dpToPx(14).toFloat()
+                cardElevation = dpToPx(2).toFloat()
+                setCardBackgroundColor(Color.WHITE)
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 ).also { it.bottomMargin = dpToPx(10) }
             }
-            val tv = TextView(requireContext()).apply {
-                text = "💬  $question"
+            val inner = LinearLayout(requireContext()).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(dpToPx(16), dpToPx(14), dpToPx(16), dpToPx(14))
+            }
+            val tagView = TextView(requireContext()).apply {
+                text = faq.tag
+                textSize = 10f
+                setTypeface(null, Typeface.BOLD)
+                setTextColor(Color.WHITE)
+                background = android.graphics.drawable.GradientDrawable().also {
+                    it.shape = android.graphics.drawable.GradientDrawable.RECTANGLE
+                    it.cornerRadius = dpToPx(6).toFloat()
+                    it.setColor(Color.parseColor(faq.tagColor))
+                }
+                setPadding(dpToPx(8), dpToPx(3), dpToPx(8), dpToPx(3))
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).also { it.bottomMargin = dpToPx(8) }
+            }
+            val questionView = TextView(requireContext()).apply {
+                text = "💬  ${faq.question}"
                 textSize = 13f
                 setTextColor(Color.parseColor("#3E4D44"))
-                setPadding(dpToPx(16), dpToPx(14), dpToPx(16), dpToPx(14))
-                setLineSpacing(0f, 1.3f)
+                setLineSpacing(0f, 1.4f)
+                maxLines = 3
             }
-            card.addView(tv)
+            inner.addView(tagView)
+            inner.addView(questionView)
+            card.addView(inner)
             binding.llFaq.addView(card)
         }
     }
@@ -438,6 +510,29 @@ class HomeFragment : RootieAdminFragment() {
     }
 
     private fun buildRankRow(rank: Int, name: String, subtitle: String, accentColor: String): View {
+        // Màu nền của badge theo rank
+        val badgeBgColor = when (rank) {
+            1 -> "#FFF3CD"; 2 -> "#E5E8DA"; 3 -> "#F2F4EB"; else -> "#F5F5F5"
+        }
+        val rankEmoji = when (rank) { 1 -> "🥇"; 2 -> "🥈"; 3 -> "🥉"; else -> "#$rank" }
+
+        // Divider trên cùng (trừ item đầu)
+        val wrapper = LinearLayout(requireContext()).apply {
+            orientation = LinearLayout.VERTICAL
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+        }
+        if (rank > 1) {
+            val divider = View(requireContext()).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, 1
+                ).also { it.bottomMargin = dpToPx(12); it.topMargin = dpToPx(0) }
+                setBackgroundColor(Color.parseColor("#F0F2EC"))
+            }
+            wrapper.addView(divider)
+        }
+
         val row = LinearLayout(requireContext()).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = android.view.Gravity.CENTER_VERTICAL
@@ -447,16 +542,18 @@ class HomeFragment : RootieAdminFragment() {
         }
 
         val rankBadge = TextView(requireContext()).apply {
-            text = "#$rank"
-            textSize = 11f
-            setTypeface(null, Typeface.BOLD)
+            text = rankEmoji
+            textSize = if (rank <= 3) 20f else 11f
+            if (rank > 3) setTypeface(null, Typeface.BOLD)
             setTextColor(Color.parseColor(accentColor))
-            background = android.graphics.drawable.GradientDrawable().also {
-                it.shape = android.graphics.drawable.GradientDrawable.RECTANGLE
-                it.cornerRadius = dpToPx(8).toFloat()
-                it.setColor(Color.parseColor("#E5E8DA"))
+            if (rank > 3) {
+                background = android.graphics.drawable.GradientDrawable().also {
+                    it.shape = android.graphics.drawable.GradientDrawable.RECTANGLE
+                    it.cornerRadius = dpToPx(8).toFloat()
+                    it.setColor(Color.parseColor(badgeBgColor))
+                }
+                setPadding(dpToPx(8), dpToPx(4), dpToPx(8), dpToPx(4))
             }
-            setPadding(dpToPx(8), dpToPx(4), dpToPx(8), dpToPx(4))
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT
             ).also { it.marginEnd = dpToPx(12) }
@@ -468,7 +565,7 @@ class HomeFragment : RootieAdminFragment() {
         }
 
         val nameView = TextView(requireContext()).apply {
-            text = if (name.length > 50) name.take(50) + "…" else name
+            text = if (name.length > 55) name.take(55) + "…" else name
             textSize = 13f
             setTypeface(null, Typeface.BOLD)
             setTextColor(Color.parseColor("#3E4D44"))
@@ -477,17 +574,18 @@ class HomeFragment : RootieAdminFragment() {
         val subView = TextView(requireContext()).apply {
             text = subtitle
             textSize = 12f
-            setTextColor(Color.parseColor("#7E8A83"))
+            setTextColor(Color.parseColor(accentColor))
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT
-            ).also { it.topMargin = dpToPx(2) }
+            ).also { it.topMargin = dpToPx(3) }
         }
         info.addView(nameView)
         info.addView(subView)
 
         row.addView(rankBadge)
         row.addView(info)
-        return row
+        wrapper.addView(row)
+        return wrapper
     }
 
     private fun buildInfoText(text: String, color: String): TextView {

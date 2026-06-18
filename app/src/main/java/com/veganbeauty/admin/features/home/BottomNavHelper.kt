@@ -80,20 +80,17 @@ object BottomNavHelper {
     }
     fun navigate(activity: MainActivity, tabId: Int) {
         val target = when (tabId) {
-            R.id.nav_home -> HomeFragment()
-            R.id.nav_product -> ProductListFragment()
+            R.id.nav_home     -> HomeFragment()
+            R.id.nav_product  -> ProductListFragment()
             R.id.nav_customer -> com.veganbeauty.admin.features.customer.CustomerAdminFragment()
-            R.id.nav_order -> com.veganbeauty.admin.features.order.list.OrderListFragment()
-            R.id.nav_menu -> com.veganbeauty.admin.features.profile.ProfileFragment()
-            else -> null
-        }
+            R.id.nav_order    -> com.veganbeauty.admin.features.order.list.OrderListFragment()
+            R.id.nav_menu     -> com.veganbeauty.admin.features.profile.ProfileFragment()
+            else              -> null
+        } ?: return
 
-        target?.let {
-            activity.currentTabId = tabId
-            activity.loadFragment(it)
-            val bottomNav = activity.findViewById<View>(R.id.bottom_nav)
-            if (bottomNav != null) {
-                highlightTab(bottomNav, tabId)
-            }
-        }
+        // Luôn cập nhật tab hiện tại và navigate
+        activity.currentTabId = tabId
+        activity.loadFragment(target)
+        val bottomNav = activity.findViewById<View>(R.id.bottom_nav) ?: return
+        highlightTab(bottomNav, tabId)
     }}

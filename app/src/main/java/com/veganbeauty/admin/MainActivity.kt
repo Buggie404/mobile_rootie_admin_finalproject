@@ -35,6 +35,7 @@ class MainActivity : RootieAdminActivity() {
         }
     }
     var currentTabId: Int = R.id.nav_home
+
     override fun setupUI() {
         val sessionManager = SessionManager(this)
         val role = sessionManager.getRole() ?: "admin"
@@ -53,13 +54,21 @@ class MainActivity : RootieAdminActivity() {
                 activity = this,
                 root = bottomNav
             ) { tabId ->
-                if (tabId != currentTabId) {
-                    currentTabId = tabId
-                    BottomNavHelper.navigate(this, tabId)
-                }
+                // Luôn cho phép navigate về Home, dù đang ở Home hay không
+                BottomNavHelper.navigate(this, tabId)
             }
             BottomNavHelper.highlightTab(bottomNav, currentTabId)
         }
+    }
+
+    /**
+     * Được gọi bởi các fragment con khi tự điều hướng (không qua bottom nav)
+     * để đồng bộ trạng thái highlight của bottom nav.
+     */
+    fun syncTab(tabId: Int) {
+        currentTabId = tabId
+        val bottomNav = findViewById<View>(R.id.bottom_nav) ?: return
+        BottomNavHelper.highlightTab(bottomNav, tabId)
     }
 
     fun loadFragment(fragment: Fragment) {
