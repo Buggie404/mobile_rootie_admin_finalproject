@@ -16,6 +16,7 @@ object BottomNavHelper {
     fun setup(
         activity: MainActivity,
         root: View,
+        activeTabId: Int = R.id.nav_home,
         onTabSelected: (Int) -> Unit
     ) {
         val tabs = listOf(
@@ -29,10 +30,14 @@ object BottomNavHelper {
         val navRoot = activity.findViewById<View>(R.id.bottom_nav) ?: root
 
         tabs.forEach { viewId ->
-            root.findViewById<ViewGroup>(viewId)?.setOnClickListener {
-                onTabSelected(viewId)
+            navRoot.findViewById<ViewGroup>(viewId)?.setOnClickListener {
+                if (viewId != activeTabId) {
+                    onTabSelected(viewId)
+                }
             }
         }
+
+        highlightTab(navRoot, activeTabId)
     }
 
     fun highlightTab(root: View, activeTabId: Int) {

@@ -18,7 +18,7 @@ import com.veganbeauty.admin.data.local.entities.ProductEntity
         OrderEntity::class,
         CustomerEntity::class
     ],
-    version = 6
+    version = 7
 )
 @TypeConverters(OrderConverters::class, ProductConverters::class)
 abstract class RootieAdminDatabase : RoomDatabase() {

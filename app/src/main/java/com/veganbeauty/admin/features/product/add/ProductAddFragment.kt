@@ -1,6 +1,6 @@
 package com.veganbeauty.admin.features.product.add
 
-import android.app.AlertDialog
+import androidx.appcompat.app.AlertDialog
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle

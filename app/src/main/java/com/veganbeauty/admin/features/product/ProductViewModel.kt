@@ -46,7 +46,7 @@ class ProductViewModel(application: Application) : AndroidViewModel(application)
     fun syncFromFirebase() {
         viewModelScope.launch {
             try {
-                repository.syncFromFirebase()
+                repository.checkAndSeedProducts(getApplication())
             } catch (e: Exception) {
                 e.printStackTrace()
             }

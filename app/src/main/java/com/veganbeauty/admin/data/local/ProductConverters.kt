@@ -15,9 +15,14 @@ class ProductConverters {
     fun toStringList(value: String?): List<String> {
         if (value.isNullOrEmpty()) return emptyList()
         val list = mutableListOf<String>()
-        val array = JSONArray(value)
-        for (i in 0 until array.length()) {
-            list.add(array.getString(i))
+        try {
+            val array = JSONArray(value)
+            for (i in 0 until array.length()) {
+                list.add(array.getString(i))
+            }
+        } catch (e: Exception) {
+            // Handle cases where the value is a simple comma-separated string instead of a JSON array
+            return value.split(",").map { it.trim() }.filter { it.isNotEmpty() }
         }
         return list
     }
@@ -39,15 +44,19 @@ class ProductConverters {
     fun toKeyIngredients(value: String?): List<KeyIngredient> {
         if (value.isNullOrEmpty()) return emptyList()
         val list = mutableListOf<KeyIngredient>()
-        val array = JSONArray(value)
-        for (i in 0 until array.length()) {
-            val obj = array.getJSONObject(i)
-            list.add(
-                KeyIngredient(
-                    name = obj.getString("name"),
-                    description = obj.getString("description")
+        try {
+            val array = JSONArray(value)
+            for (i in 0 until array.length()) {
+                val obj = array.getJSONObject(i)
+                list.add(
+                    KeyIngredient(
+                        name = obj.optString("name", ""),
+                        description = obj.optString("description", "")
+                    )
                 )
-            )
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
         return list
     }
