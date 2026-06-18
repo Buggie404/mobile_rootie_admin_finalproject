@@ -1,0 +1,27 @@
+[
+  {
+    "username": "admin",
+    "password": "123456",
+    "fullName": "Administrator",
+    "role": "business",
+    "storeID": ""
+  },
+  {
+    "username": "staff1",
+    "password": "123456",
+    "fullName": "Rootie Staff 1",
+    "role": "nhân viên",
+    "storeID": "CH001",
+    "storeName": "Cửa hàng mỹ phẩm Rootie - Cơ sở 1",
+    "storeAddress": "235 Nguyễn Thị Minh Khai, P. Nguyễn Cư Trinh, Q.1, TP.HCM"
+  },
+  {
+    "username": "staff5",
+    "password": "123456",
+    "fullName": "Rootie Staff 5",
+    "role": "nhân viên",
+    "storeID": "CH005",
+    "storeName": "Cửa hàng mỹ phẩm Rootie - Cơ sở 5",
+    "storeAddress": "329 Hoàng Văn Thụ, P. Phường 10, Quận 3, Hồ Chí Minh"
+  }
+]

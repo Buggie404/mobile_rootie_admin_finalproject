@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@drawable/bg_dialog_confirm">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Hủy lịch hẹn Spa"
+        android:textColor="#3E4D44"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:fontFamily="@font/be_vietnam_pro" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Vui lòng chọn hoặc nhập lý do hủy lịch hẹn soi da này:"
+        android:textColor="#7E8A83"
+        android:textSize="13sp"
+        android:fontFamily="@font/be_vietnam_pro" />
+
+    <!-- Radio Options -->
+    <RadioGroup
+        android:id="@+id/rg_reasons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp">
+
+        <RadioButton
+            android:id="@+id/rb_no_show"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Khách hàng không đến (No-show)"
+            android:textColor="#3E4D44"
+            android:textSize="14sp"
+            android:buttonTint="#4F6544"
+            android:fontFamily="@font/be_vietnam_pro"
+            android:checked="true"
+            android:paddingVertical="6dp" />
+
+        <RadioButton
+            android:id="@+id/rb_customer_request"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Khách gọi điện yêu cầu hủy"
+            android:textColor="#3E4D44"
+            android:textSize="14sp"
+            android:buttonTint="#4F6544"
+            android:fontFamily="@font/be_vietnam_pro"
+            android:paddingVertical="6dp" />
+
+        <RadioButton
+            android:id="@+id/rb_store_issue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Cửa hàng bận đột xuất / Sự cố hệ thống"
+            android:textColor="#3E4D44"
+            android:textSize="14sp"
+            android:buttonTint="#4F6544"
+            android:fontFamily="@font/be_vietnam_pro"
+            android:paddingVertical="6dp" />
+
+        <RadioButton
+            android:id="@+id/rb_other"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Lý do khác"
+            android:textColor="#3E4D44"
+            android:textSize="14sp"
+            android:buttonTint="#4F6544"
+            android:fontFamily="@font/be_vietnam_pro"
+            android:paddingVertical="6dp" />
+
+    </RadioGroup>
+
+    <!-- Custom input edit text -->
+    <EditText
+        android:id="@+id/edt_cancel_reason"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/bg_rounded_white_card"
+        android:backgroundTint="#F2F4EB"
+        android:hint="Nhập lý do chi tiết..."
+        android:inputType="textMultiLine"
+        android:gravity="top|start"
+        android:padding="12dp"
+        android:textColor="#3E4D44"
+        android:textColorHint="#95A192"
+        android:textSize="13sp"
+        android:visibility="gone"
+        android:fontFamily="@font/be_vietnam_pro" />
+
+    <!-- Action Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="24dp"
+        android:gravity="end">
+
+        <Button
+            android:id="@+id/btn_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_nav_pill"
+            android:backgroundTint="#F2F4EB"
+            android:text="Bỏ qua"
+            android:textColor="#677559"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textAllCaps="false"
+            android:fontFamily="@font/be_vietnam_pro"
+            android:layout_marginEnd="12dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:paddingHorizontal="16dp" />
+
+        <Button
+            android:id="@+id/btn_confirm"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_nav_pill"
+            android:backgroundTint="#E74C3C"
+            android:text="Đồng ý hủy"
+            android:textColor="#FFFFFF"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textAllCaps="false"
+            android:fontFamily="@font/be_vietnam_pro"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:paddingHorizontal="16dp" />
+
+    </LinearLayout>
+
+</LinearLayout>

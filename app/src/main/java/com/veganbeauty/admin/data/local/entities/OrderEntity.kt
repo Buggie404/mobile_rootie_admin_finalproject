@@ -32,5 +32,7 @@ data class OrderEntity(
     val reviewText: String? = null,
     val reviewImage: String? = null,
     val isAnonymous: Boolean = false,
-    val recommendToFriends: Boolean = false
+    val recommendToFriends: Boolean = false,
+    val storeName: String = "",
+    val storeID: String = "" // foreign key to stores
 )

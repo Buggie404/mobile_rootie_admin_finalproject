@@ -20,24 +20,19 @@ class ProductRepository(
             productDao.insertAllSync(remoteList)
         }
     }
-
     suspend fun checkAndSeedProducts(context: android.content.Context) = withContext(Dispatchers.IO) {
-        val remoteList = firebaseService.fetchAllProducts()
-        if (remoteList.isEmpty()) {
+        val localCount = productDao.getAllSync().size
+        if (localCount < 5) {
             val localProducts = parseProductsFromAssets(context)
             if (localProducts.isNotEmpty()) {
-                // Upload to Firebase
-                for (product in localProducts) {
-                    firebaseService.saveProduct(product)
-                }
-                // Save to Local DB
                 productDao.insertAllSync(localProducts)
             }
-        } else {
+        }
+        val remoteList = firebaseService.fetchAllProducts()
+        if (remoteList.isNotEmpty()) {
             productDao.insertAllSync(remoteList)
         }
     }
-
     private fun parseProductsFromAssets(context: android.content.Context): List<ProductEntity> {
         return try {
             val jsonString = context.assets.open("products.json").bufferedReader().use { it.readText() }

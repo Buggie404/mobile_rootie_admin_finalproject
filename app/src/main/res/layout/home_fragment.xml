@@ -43,6 +43,7 @@
                 android:paddingEnd="24dp">
 
                 <TextView
+                    android:id="@+id/tv_greeting"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Chào buổi sáng, Xuân"
@@ -62,6 +63,76 @@
                     android:fontFamily="@font/be_vietnam_pro" />
 
             </LinearLayout>
+
+            <!-- SPA Booking Shortcut Card -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_spa_booking"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginHorizontal="24dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="#FFFFFF">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="16dp">
+
+                    <FrameLayout
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_nav_pill"
+                        android:backgroundTint="#E5E8DA">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_grid"
+                            app:tint="#4F6544" />
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="16dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Lịch hẹn Spa của khách"
+                            android:textColor="#3E4D44"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:fontFamily="@font/be_vietnam_pro" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Quản lý &amp; xác nhận cuộc hẹn soi da"
+                            android:textColor="#7E8A83"
+                            android:textSize="12sp"
+                            android:fontFamily="@font/be_vietnam_pro" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_friends"
+                        app:tint="#677559" />
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
             <!-- 2. Statistics Section (Horizontal Scroll) -->
             <HorizontalScrollView
@@ -299,6 +370,1248 @@
                 android:layout_marginTop="16dp"
                 android:nestedScrollingEnabled="false"
                 tools:listitem="@layout/item_recent_activity" />
+
+
+            <!-- ===== ADMIN DASHBOARD BLOCK ===== -->
+            <LinearLayout
+                android:id="@+id/ll_admin_dashboard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <!-- Section header -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="32dp"
+                    android:paddingHorizontal="24dp">
+
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="22dp"
+                        android:background="@drawable/bg_dashboard_green"
+                        android:layout_marginEnd="10dp" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Tổng quan kinh doanh"
+                        android:textColor="#3E4D44"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/be_vietnam_pro" />
+                </LinearLayout>
+
+                <!-- Hero Revenue Card (gradient) -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginHorizontal="24dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="6dp"
+                    app:cardBackgroundColor="#4F6544">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:background="@drawable/bg_dashboard_green"
+                        android:padding="24dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="DOANH THU"
+                            android:textColor="#AACFAA"
+                            android:textSize="11sp"
+                            android:letterSpacing="0.1"
+                            android:textStyle="bold"
+                            android:fontFamily="@font/be_vietnam_pro" />
+
+                        <!-- Tab chips doanh thu -->
+                        <LinearLayout
+                            android:id="@+id/ll_revenue_tabs"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="14dp"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/tab_revenue_today"
+                                android:layout_width="wrap_content"
+                                android:layout_height="28dp"
+                                android:gravity="center"
+                                android:text="Hôm nay"
+                                android:textSize="11sp"
+                                android:textStyle="bold"
+                                android:textColor="#3E4D44"
+                                android:background="@drawable/bg_nav_pill"
+                                android:backgroundTint="#FFFFFF"
+                                android:fontFamily="@font/be_vietnam_pro"
+                                android:paddingHorizontal="12dp"
+                                android:layout_marginEnd="8dp" />
+
+                            <TextView
+                                android:id="@+id/tab_revenue_week"
+                                android:layout_width="wrap_content"
+                                android:layout_height="28dp"
+                                android:gravity="center"
+                                android:text="Tuần"
+                                android:textSize="11sp"
+                                android:textColor="#AACFAA"
+                                android:background="@drawable/bg_nav_pill"
+                                android:backgroundTint="#3A5234"
+                                android:fontFamily="@font/be_vietnam_pro"
+                                android:paddingHorizontal="12dp"
+                                android:layout_marginEnd="8dp" />
+
+                            <TextView
+                                android:id="@+id/tab_revenue_month"
+                                android:layout_width="wrap_content"
+                                android:layout_height="28dp"
+                                android:gravity="center"
+                                android:text="Tháng"
+                                android:textSize="11sp"
+                                android:textColor="#AACFAA"
+                                android:background="@drawable/bg_nav_pill"
+                                android:backgroundTint="#3A5234"
+                                android:fontFamily="@font/be_vietnam_pro"
+                                android:paddingHorizontal="12dp"
+                                android:layout_marginEnd="8dp" />
+
+                            <TextView
+                                android:id="@+id/tab_revenue_quarter"
+                                android:layout_width="wrap_content"
+                                android:layout_height="28dp"
+                                android:gravity="center"
+                                android:text="Quý"
+                                android:textSize="11sp"
+                                android:textColor="#AACFAA"
+                                android:background="@drawable/bg_nav_pill"
+                                android:backgroundTint="#3A5234"
+                                android:fontFamily="@font/be_vietnam_pro"
+                                android:paddingHorizontal="12dp" />
+
+                        </LinearLayout>
+
+                        <!-- Revenue value -->
+                        <TextView
+                            android:id="@+id/tv_revenue_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="18dp"
+                            android:text="--"
+                            android:textColor="#FFFFFF"
+                            android:textSize="36sp"
+                            android:textStyle="bold"
+                            android:fontFamily="@font/be_vietnam_pro" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="đồng"
+                            android:textColor="#AACFAA"
+                            android:textSize="13sp"
+                            android:fontFamily="@font/be_vietnam_pro" />
+
+                        <!-- Divider -->
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="#3A5234"
+                            android:layout_marginTop="18dp"
+                            android:layout_marginBottom="16dp" />
+
+                        <!-- Tỷ lệ hủy/hoàn -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Tỷ lệ hủy / hoàn"
+                                    android:textColor="#AACFAA"
+                                    android:textSize="11sp"
+                                    android:fontFamily="@font/be_vietnam_pro" />
+                                <TextView
+                                    android:id="@+id/tv_cancel_rate"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:text="--%"
+                                    android:textColor="#FF8A65"
+                                    android:textSize="20sp"
+                                    android:textStyle="bold"
+                                    android:fontFamily="@font/be_vietnam_pro" />
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="1dp"
+                                android:layout_height="40dp"
+                                android:background="#3A5234" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:paddingStart="16dp">
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Giá trị TB/đơn"
+                                    android:textColor="#AACFAA"
+                                    android:textSize="11sp"
+                                    android:fontFamily="@font/be_vietnam_pro" />
+                                <TextView
+                                    android:id="@+id/tv_stat_avg_order_value"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:text="--"
+                                    android:textColor="#FFFFFF"
+                                    android:textSize="20sp"
+                                    android:textStyle="bold"
+                                    android:fontFamily="@font/be_vietnam_pro" />
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- 3 Stat Cards nhỏ -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginHorizontal="24dp"
+                    android:orientation="horizontal">
+
+                    <!-- Đơn mới -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="2dp"
+                        app:cardBackgroundColor="#FFFFFF">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+                            <FrameLayout
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:background="@drawable/bg_nav_pill"
+                                android:backgroundTint="#E5E8DA">
+                                <ImageView
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_bag"
+                                    app:tint="#4F6544" />
+                            </FrameLayout>
+                            <TextView
+                                android:id="@+id/tv_stat_new_orders"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="12dp"
+                                android:text="--"
+                                android:textColor="#3E4D44"
+                                android:textSize="24sp"
+                                android:textStyle="bold"
+                                android:fontFamily="@font/be_vietnam_pro" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="Đơn mới"
+                                android:textColor="#95A192"
+                                android:textSize="11sp"
+                                android:fontFamily="@font/be_vietnam_pro" />
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <!-- Chờ xác nhận -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="2dp"
+                        app:cardBackgroundColor="#FFFFFF">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+                            <FrameLayout
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:background="@drawable/bg_nav_pill"
+                                android:backgroundTint="#FFF0E0">
+                                <ImageView
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_history"
+                                    app:tint="#E65100" />
+                            </FrameLayout>
+                            <TextView
+                                android:id="@+id/tv_stat_pending_orders"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="12dp"
+                                android:text="--"
+                                android:textColor="#E65100"
+                                android:textSize="24sp"
+                                android:textStyle="bold"
+                                android:fontFamily="@font/be_vietnam_pro" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="Chờ XN"
+                                android:textColor="#95A192"
+                                android:textSize="11sp"
+                                android:fontFamily="@font/be_vietnam_pro" />
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <!-- Đang giao -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="2dp"
+                        app:cardBackgroundColor="#FFFFFF">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+                            <FrameLayout
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:background="@drawable/bg_nav_pill"
+                                android:backgroundTint="#E3F0FF">
+                                <ImageView
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_arrow_forward"
+                                    app:tint="#0D47A1" />
+                            </FrameLayout>
+                            <TextView
+                                android:id="@+id/tv_stat_shipping_orders"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="12dp"
+                                android:text="--"
+                                android:textColor="#0D47A1"
+                                android:textSize="24sp"
+                                android:textStyle="bold"
+                                android:fontFamily="@font/be_vietnam_pro" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="Đang giao"
+                                android:textColor="#95A192"
+                                android:textSize="11sp"
+                                android:fontFamily="@font/be_vietnam_pro" />
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                </LinearLayout>
+
+                <!-- Sản phẩm bán chạy header -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="28dp"
+                    android:paddingHorizontal="24dp">
+
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="22dp"
+                        android:background="@drawable/bg_dashboard_green"
+                        android:layout_marginEnd="10dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Sản phẩm bán chạy"
+                        android:textColor="#3E4D44"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/be_vietnam_pro" />
+                </LinearLayout>
+
+                <!-- Card bán chạy -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginHorizontal="24dp"
+                    android:layout_marginBottom="8dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="3dp"
+                    app:cardBackgroundColor="#FFFFFF">
+                    <LinearLayout
+                        android:id="@+id/ll_top_selling"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="20dp"
+                        android:paddingVertical="16dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Đang tải..."
+                            android:textColor="#95A192"
+                            android:textSize="13sp"
+                            android:fontFamily="@font/be_vietnam_pro" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+            </LinearLayout>
+            <!-- END ADMIN DASHBOARD BLOCK -->
+
+            <!-- ===== STAFF DASHBOARD BLOCK ===== -->
+            <LinearLayout
+                android:id="@+id/ll_staff_dashboard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <!-- Section: Phân tích sản phẩm -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="32dp"
+                    android:paddingHorizontal="24dp">
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="22dp"
+                        android:background="@drawable/bg_dashboard_green"
+                        android:layout_marginEnd="10dp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Phân tích sản phẩm"
+                        android:textColor="#3E4D44"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/be_vietnam_pro" />
+                </LinearLayout>
+
+                <!-- Top 5 quan tâm -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginStart="24dp"
+                    android:text="🔥  Top 5 được quan tâm nhiều nhất"
+                    android:textColor="#4F6544"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/be_vietnam_pro" />
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginHorizontal="24dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="3dp"
+                    app:cardBackgroundColor="#FFFFFF">
+                    <LinearLayout
+                        android:id="@+id/ll_top_viewed"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="20dp"
+                        android:paddingVertical="16dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Đang tải..."
+                            android:textColor="#95A192"
+                            android:textSize="13sp"
+                            android:fontFamily="@font/be_vietnam_pro" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Top 5 rating cao -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginStart="24dp"
+                    android:text="⭐  Top 5 sản phẩm rating cao nhất"
+                    android:textColor="#4F6544"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/be_vietnam_pro" />
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginHorizontal="24dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="3dp"
+                    app:cardBackgroundColor="#FFFFFF">
+                    <LinearLayout
+                        android:id="@+id/ll_top_rated"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="20dp"
+                        android:paddingVertical="16dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Đang tải..."
+                            android:textColor="#95A192"
+                            android:textSize="13sp"
+                            android:fontFamily="@font/be_vietnam_pro" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Phản hồi xấu -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginStart="24dp"
+                    android:text="⚠  Sản phẩm có phản hồi xấu"
+                    android:textColor="#B71C1C"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/be_vietnam_pro" />
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginHorizontal="24dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="3dp"
+                    app:cardBackgroundColor="#FFF5F5">
+                    <LinearLayout
+                        android:id="@+id/ll_bad_feedback"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="20dp"
+                        android:paddingVertical="16dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Đang tải..."
+                            android:textColor="#B71C1C"
+                            android:textSize="13sp"
+                            android:fontFamily="@font/be_vietnam_pro" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Section: Thống kê & Tư vấn -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="32dp"
+                    android:paddingHorizontal="24dp">
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="22dp"
+                        android:background="@drawable/bg_dashboard_green"
+                        android:layout_marginEnd="10dp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Thống kê &amp; Tư vấn"
+                        android:textColor="#3E4D44"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/be_vietnam_pro" />
+                </LinearLayout>
+
+                <!-- Biểu đồ loại da -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginStart="24dp"
+                    android:text="🌿  Thống kê loại da phổ biến"
+                    android:textColor="#4F6544"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/be_vietnam_pro" />
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginHorizontal="24dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="3dp"
+                    app:cardBackgroundColor="#FFFFFF">
+                    <LinearLayout
+                        android:id="@+id/ll_skin_chart"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="20dp"
+                        android:paddingVertical="20dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Đang tải..."
+                            android:textColor="#95A192"
+                            android:textSize="13sp"
+                            android:fontFamily="@font/be_vietnam_pro" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- FAQ tư vấn thường gặp -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginStart="24dp"
+                    android:text="💬  Câu hỏi tư vấn thường gặp"
+                    android:textColor="#4F6544"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/be_vietnam_pro" />
+
+                <LinearLayout
+                    android:id="@+id/ll_faq"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginHorizontal="24dp"
+                    android:layout_marginBottom="8dp">
+                </LinearLayout>
+
+            </LinearLayout>
+            <!-- END STAFF DASHBOARD BLOCK -->
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+            <LinearLayout
+                android:id="@+id/ll_admin_dashboard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <!-- Tiêu đề: Tổng quan kinh doanh -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp"
+                    android:layout_marginStart="24dp"
+                    android:text="Tổng quan kinh doanh"
+                    android:textColor="#3E4D44"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/be_vietnam_pro" />
+
+                <!-- 4 Stat Cards cuộn ngang -->
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:paddingStart="24dp"
+                    android:paddingEnd="24dp"
+                    android:clipToPadding="false"
+                    android:scrollbars="none">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <!-- Đơn mới -->
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="140dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="12dp"
+                            app:cardCornerRadius="16dp"
+                            app:cardElevation="2dp"
+                            app:cardBackgroundColor="#FFFFFF">
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:padding="16dp">
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Đơn mới"
+                                    android:textColor="#7E8A83"
+                                    android:textSize="12sp"
+                                    android:fontFamily="@font/be_vietnam_pro" />
+                                <TextView
+                                    android:id="@+id/tv_stat_new_orders"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="6dp"
+                                    android:text="--"
+                                    android:textColor="#3E4D44"
+                                    android:textSize="26sp"
+                                    android:textStyle="bold"
+                                    android:fontFamily="@font/be_vietnam_pro" />
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="đơn"
+                                    android:textColor="#95A192"
+                                    android:textSize="11sp"
+                                    android:fontFamily="@font/be_vietnam_pro" />
+                            </LinearLayout>
+                        </androidx.cardview.widget.CardView>
+
+                        <!-- Chờ xác nhận -->
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="140dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="12dp"
+                            app:cardCornerRadius="16dp"
+                            app:cardElevation="2dp"
+                            app:cardBackgroundColor="#FFF8F0">
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:padding="16dp">
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Chờ xác nhận"
+                                    android:textColor="#7E8A83"
+                                    android:textSize="12sp"
+                                    android:fontFamily="@font/be_vietnam_pro" />
+                                <TextView
+                                    android:id="@+id/tv_stat_pending_orders"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="6dp"
+                                    android:text="--"
+                                    android:textColor="#E65100"
+                                    android:textSize="26sp"
+                                    android:textStyle="bold"
+                                    android:fontFamily="@font/be_vietnam_pro" />
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="đơn"
+                                    android:textColor="#95A192"
+                                    android:textSize="11sp"
+                                    android:fontFamily="@font/be_vietnam_pro" />
+                            </LinearLayout>
+                        </androidx.cardview.widget.CardView>
+
+                        <!-- Đang giao -->
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="140dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="12dp"
+                            app:cardCornerRadius="16dp"
+                            app:cardElevation="2dp"
+                            app:cardBackgroundColor="#F0F4FF">
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:padding="16dp">
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Đang giao"
+                                    android:textColor="#7E8A83"
+                                    android:textSize="12sp"
+                                    android:fontFamily="@font/be_vietnam_pro" />
+                                <TextView
+                                    android:id="@+id/tv_stat_shipping_orders"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="6dp"
+                                    android:text="--"
+                                    android:textColor="#0D47A1"
+                                    android:textSize="26sp"
+                                    android:textStyle="bold"
+                                    android:fontFamily="@font/be_vietnam_pro" />
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="đơn"
+                                    android:textColor="#95A192"
+                                    android:textSize="11sp"
+                                    android:fontFamily="@font/be_vietnam_pro" />
+                            </LinearLayout>
+                        </androidx.cardview.widget.CardView>
+
+                        <!-- Giá trị TB -->
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="140dp"
+                            android:layout_height="wrap_content"
+                            app:cardCornerRadius="16dp"
+                            app:cardElevation="2dp"
+                            app:cardBackgroundColor="#F2F9F4">
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:padding="16dp">
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Giá trị TB đơn"
+                                    android:textColor="#7E8A83"
+                                    android:textSize="12sp"
+                                    android:fontFamily="@font/be_vietnam_pro" />
+                                <TextView
+                                    android:id="@+id/tv_stat_avg_order_value"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="6dp"
+                                    android:text="--"
+                                    android:textColor="#1B5E20"
+                                    android:textSize="18sp"
+                                    android:textStyle="bold"
+                                    android:fontFamily="@font/be_vietnam_pro" />
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="đồng/đơn"
+                                    android:textColor="#95A192"
+                                    android:textSize="11sp"
+                                    android:fontFamily="@font/be_vietnam_pro" />
+                            </LinearLayout>
+                        </androidx.cardview.widget.CardView>
+
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+                <!-- Section Doanh thu theo kỳ -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginHorizontal="24dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="#FFFFFF">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Doanh thu"
+                            android:textColor="#3E4D44"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:fontFamily="@font/be_vietnam_pro" />
+
+                        <!-- Tab chips -->
+                        <LinearLayout
+                            android:id="@+id/ll_revenue_tabs"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/tab_revenue_today"
+                                android:layout_width="0dp"
+                                android:layout_height="32dp"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:text="Hôm nay"
+                                android:textSize="12sp"
+                                android:textStyle="bold"
+                                android:textColor="#FFFFFF"
+                                android:background="@drawable/bg_nav_pill"
+                                android:backgroundTint="#4F6544"
+                                android:fontFamily="@font/be_vietnam_pro"
+                                android:layout_marginEnd="4dp" />
+
+                            <TextView
+                                android:id="@+id/tab_revenue_week"
+                                android:layout_width="0dp"
+                                android:layout_height="32dp"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:text="Tuần"
+                                android:textSize="12sp"
+                                android:textColor="#677559"
+                                android:background="@drawable/bg_nav_pill"
+                                android:backgroundTint="#F2F4EB"
+                                android:fontFamily="@font/be_vietnam_pro"
+                                android:layout_marginEnd="4dp" />
+
+                            <TextView
+                                android:id="@+id/tab_revenue_month"
+                                android:layout_width="0dp"
+                                android:layout_height="32dp"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:text="Tháng"
+                                android:textSize="12sp"
+                                android:textColor="#677559"
+                                android:background="@drawable/bg_nav_pill"
+                                android:backgroundTint="#F2F4EB"
+                                android:fontFamily="@font/be_vietnam_pro"
+                                android:layout_marginEnd="4dp" />
+
+                            <TextView
+                                android:id="@+id/tab_revenue_quarter"
+                                android:layout_width="0dp"
+                                android:layout_height="32dp"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:text="Quý"
+                                android:textSize="12sp"
+                                android:textColor="#677559"
+                                android:background="@drawable/bg_nav_pill"
+                                android:backgroundTint="#F2F4EB"
+                                android:fontFamily="@font/be_vietnam_pro" />
+
+                        </LinearLayout>
+
+                        <!-- Giá trị doanh thu -->
+                        <TextView
+                            android:id="@+id/tv_revenue_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:text="--"
+                            android:textColor="#3E4D44"
+                            android:textSize="32sp"
+                            android:textStyle="bold"
+                            android:fontFamily="@font/be_vietnam_pro" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="đồng"
+                            android:textColor="#7E8A83"
+                            android:textSize="13sp"
+                            android:fontFamily="@font/be_vietnam_pro" />
+
+                        <!-- Tỷ lệ hủy/hoàn -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:padding="12dp"
+                            android:background="@drawable/bg_rounded_white_card"
+                            android:backgroundTint="#FFEBEE"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Tỷ lệ hủy / hoàn đơn"
+                                android:textColor="#B71C1C"
+                                android:textSize="13sp"
+                                android:fontFamily="@font/be_vietnam_pro" />
+                            <TextView
+                                android:id="@+id/tv_cancel_rate"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="--%"
+                                android:textColor="#B71C1C"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:fontFamily="@font/be_vietnam_pro" />
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Section Sản phẩm bán chạy -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="28dp"
+                    android:layout_marginStart="24dp"
+                    android:text="Sản phẩm bán chạy"
+                    android:textColor="#3E4D44"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/be_vietnam_pro" />
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginHorizontal="24dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="#FFFFFF">
+                    <LinearLayout
+                        android:id="@+id/ll_top_selling"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+                        <!-- Các dòng top sản phẩm sẽ được thêm động bằng code -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Đang tải..."
+                            android:textColor="#95A192"
+                            android:textSize="13sp"
+                            android:fontFamily="@font/be_vietnam_pro" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+            </LinearLayout>
+            <!-- END ADMIN DASHBOARD BLOCK -->
+
+            <!-- ===== STAFF DASHBOARD BLOCK ===== -->
+            <LinearLayout
+                android:id="@+id/ll_staff_dashboard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <!-- Tiêu đề: Phân tích sản phẩm -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp"
+                    android:layout_marginStart="24dp"
+                    android:text="Phân tích sản phẩm"
+                    android:textColor="#3E4D44"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/be_vietnam_pro" />
+
+                <!-- Top sản phẩm được quan tâm -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginStart="24dp"
+                    android:text="Top 5 sản phẩm được quan tâm nhiều"
+                    android:textColor="#4F6544"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/be_vietnam_pro" />
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginHorizontal="24dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="#FFFFFF">
+                    <LinearLayout
+                        android:id="@+id/ll_top_viewed"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Đang tải..."
+                            android:textColor="#95A192"
+                            android:textSize="13sp"
+                            android:fontFamily="@font/be_vietnam_pro" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Top sản phẩm rating cao -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginStart="24dp"
+                    android:text="Top 5 sản phẩm rating cao nhất"
+                    android:textColor="#4F6544"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/be_vietnam_pro" />
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginHorizontal="24dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="#FFFFFF">
+                    <LinearLayout
+                        android:id="@+id/ll_top_rated"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Đang tải..."
+                            android:textColor="#95A192"
+                            android:textSize="13sp"
+                            android:fontFamily="@font/be_vietnam_pro" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Sản phẩm phản hồi xấu -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginStart="24dp"
+                    android:text="Sản phẩm có phản hồi xấu"
+                    android:textColor="#B71C1C"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/be_vietnam_pro" />
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginHorizontal="24dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="#FFEBEE">
+                    <LinearLayout
+                        android:id="@+id/ll_bad_feedback"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Đang tải..."
+                            android:textColor="#B71C1C"
+                            android:textSize="13sp"
+                            android:fontFamily="@font/be_vietnam_pro" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Tiêu đề: Thống kê và Tư vấn -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp"
+                    android:layout_marginStart="24dp"
+                    android:text="Thống kê &amp; Tư vấn"
+                    android:textColor="#3E4D44"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/be_vietnam_pro" />
+
+                <!-- Biểu đồ loại da -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginStart="24dp"
+                    android:text="Thống kê loại da phổ biến"
+                    android:textColor="#4F6544"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/be_vietnam_pro" />
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginHorizontal="24dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="#FFFFFF">
+                    <LinearLayout
+                        android:id="@+id/ll_skin_chart"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+                        <!-- Các dòng bar chart được thêm động -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Đang tải..."
+                            android:textColor="#95A192"
+                            android:textSize="13sp"
+                            android:fontFamily="@font/be_vietnam_pro" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- FAQ tư vấn thường gặp -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginStart="24dp"
+                    android:text="Câu hỏi tư vấn thường gặp"
+                    android:textColor="#4F6544"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/be_vietnam_pro" />
+
+                <LinearLayout
+                    android:id="@+id/ll_faq"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginHorizontal="24dp">
+                    <!-- FAQ cards được thêm động -->
+                </LinearLayout>
+
+            </LinearLayout>
+            <!-- END STAFF DASHBOARD BLOCK -->
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

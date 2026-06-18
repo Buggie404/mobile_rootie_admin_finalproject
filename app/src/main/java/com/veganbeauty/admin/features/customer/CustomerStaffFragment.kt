@@ -57,12 +57,8 @@ class CustomerStaffFragment : RootieAdminFragment() {
     override fun setupUI(view: View) {
         val mainActivity = activity as? MainActivity
         if (mainActivity != null) {
-            BottomNavHelper.setup(
-                activity = mainActivity,
-                root = binding.root,
-                activeTabId = R.id.nav_customer
-            ) { tabId ->
-                BottomNavHelper.navigate(mainActivity, tabId)
+            mainActivity.findViewById<View>(R.id.bottom_nav)?.let {
+                BottomNavHelper.highlightTab(it, R.id.nav_customer)
             }
         }
 
