@@ -382,12 +382,8 @@ class ProductAddFragment : RootieAdminFragment() {
             binding.layoutImagesContainer.addView(itemView)
         }
 
-        // Limit maximum 5 images
-        if (selectedImages.size >= 5) {
-            binding.btnAddImage.visibility = View.GONE
-        } else {
-            binding.btnAddImage.visibility = View.VISIBLE
-        }
+        // Always show the Add Image button
+        binding.btnAddImage.visibility = View.VISIBLE
     }
 
     private fun saveProduct() {

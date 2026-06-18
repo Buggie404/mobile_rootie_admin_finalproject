@@ -145,21 +145,27 @@ class ProductListFragment : RootieAdminFragment() {
     }
 
     private fun showProductDetails(product: ProductEntity) {
-        val details = """
-            Mã sản phẩm: ${product.sku}
-            Danh mục: ${product.category}
-            Thương hiệu: ${product.brand}
-            Số lượng kho: ${product.stock}
-            Nguồn gốc: ${product.origin}
-            Hạn sử dụng: ${product.expiryDate}
-            Mô tả: ${product.description}
-        """.trimIndent()
+        val view = LayoutInflater.from(context).inflate(R.layout.dialog_product_detail, null)
+        val tvName = view.findViewById<android.widget.TextView>(R.id.tvProductName)
+        val tvPrice = view.findViewById<android.widget.TextView>(R.id.tvProductPrice)
+        val tvStock = view.findViewById<android.widget.TextView>(R.id.tvProductStock)
+        val tvSku = view.findViewById<android.widget.TextView>(R.id.tvProductSku)
 
-        AlertDialog.Builder(requireContext())
-            .setTitle(product.name)
-            .setMessage(details)
-            .setPositiveButton("Đóng", null)
-            .show()
+        tvName.text = product.name
+        val formatter = java.text.DecimalFormat("#,###")
+        tvPrice.text = "Giá bán: ${formatter.format(product.price)}đ"
+        tvStock.text = "Số lượng kho: ${product.stock}"
+        tvSku.text = "Mã sản phẩm (SKU): ${product.sku}"
+
+        val dialog = AlertDialog.Builder(requireContext(), R.style.CustomDialogTheme)
+            .setView(view)
+            .create()
+
+        view.findViewById<View>(R.id.btnClose).setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     override fun onResume() {
