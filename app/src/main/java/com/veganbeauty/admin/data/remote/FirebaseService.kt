@@ -1,6 +1,11 @@
 package com.veganbeauty.admin.data.remote
 
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.SetOptions
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import com.veganbeauty.admin.data.local.entities.CustomerEntity
 import com.veganbeauty.admin.data.local.entities.BookingEntity
 import com.veganbeauty.admin.data.local.entities.OrderEntity
@@ -424,31 +429,78 @@ class FirebaseService {
             }
     }
 
+    private fun parseIsoString(isoStr: String): Long {
+        return try {
+            val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
+            format.timeZone = java.util.TimeZone.getTimeZone("UTC")
+            format.parse(isoStr)?.time ?: System.currentTimeMillis()
+        } catch (e: Exception) {
+            System.currentTimeMillis()
+        }
+    }
+    
+    private fun formatTime(timestamp: Long): String {
+        return SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(timestamp))
+    }
+    
+    private fun getCurrentTimeString(): String {
+        val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
+        format.timeZone = java.util.TimeZone.getTimeZone("UTC")
+        return format.format(Date())
+    }
+
     suspend fun fetchChatMessages(): List<ChatMessage> = suspendCancellableCoroutine { continuation ->
         val firestore = db
         if (firestore == null) {
             continuation.resume(emptyList())
             return@suspendCancellableCoroutine
         }
-        firestore.collection("chats").get()
+        firestore.collection("community_message").get()
             .addOnSuccessListener { snapshot ->
-                val list = snapshot.documents.mapNotNull { doc ->
+                val list = mutableListOf<ChatMessage>()
+                for (doc in snapshot.documents) {
                     try {
-                        ChatMessage(
-                            id = doc.id,
-                            senderId = doc.getString("senderId") ?: "",
-                            senderName = doc.getString("senderName") ?: "",
-                            senderAvatar = doc.getString("senderAvatar") ?: "",
-                            receiverId = doc.getString("receiverId") ?: "",
-                            receiverName = doc.getString("receiverName") ?: "",
-                            receiverAvatar = doc.getString("receiverAvatar") ?: "",
-                            content = doc.getString("content") ?: "",
-                            timestamp = doc.getLong("timestamp") ?: 0L,
-                            isRead = doc.getBoolean("isRead") ?: false
-                        )
+                        @Suppress("UNCHECKED_CAST")
+                        val members = doc.get("members") as? List<String> ?: emptyList()
+                        if (!members.contains("rootie_vn")) continue
+                        
+                        val userId = members.firstOrNull { it != "rootie_vn" } ?: continue
+                        
+                        @Suppress("UNCHECKED_CAST")
+                        val memberInfo = doc.get("member_info") as? Map<String, Map<String, Any>> ?: emptyMap()
+                        val partnerInfo = memberInfo[userId]
+                        val username = partnerInfo?.get("name")?.toString() ?: "User"
+                        val avatar = partnerInfo?.get("avatar")?.toString() ?: ""
+                        
+                        @Suppress("UNCHECKED_CAST")
+                        val messagesRaw = doc.get("messages") as? List<Map<String, Any>> ?: emptyList()
+                        
+                        for (msgMap in messagesRaw) {
+                            val senderId = msgMap["sender_id"]?.toString() ?: ""
+                            val text = msgMap["text"]?.toString() ?: ""
+                            val sentAt = msgMap["sent_at"]?.toString() ?: ""
+                            
+                            val isAgent = senderId == "rootie_vn"
+                            val timestamp = parseIsoString(sentAt)
+                            val msgId = msgMap["id"]?.toString() ?: "msg_${userId}_${timestamp}"
+                            
+                            list.add(
+                                ChatMessage(
+                                    id = msgId,
+                                    senderId = if (isAgent) "rootie_vn" else userId,
+                                    senderName = if (isAgent) "Rootie VietNam" else username,
+                                    senderAvatar = if (isAgent) "https://res.cloudinary.com/dpjkzxjl2/image/upload/v1780560866/Rootie_logo.png" else avatar,
+                                    receiverId = if (isAgent) userId else "rootie_vn",
+                                    receiverName = if (isAgent) username else "Rootie VietNam",
+                                    receiverAvatar = if (isAgent) avatar else "https://res.cloudinary.com/dpjkzxjl2/image/upload/v1780560866/Rootie_logo.png",
+                                    content = text,
+                                    timestamp = timestamp,
+                                    isRead = isAgent || (msgMap["seen_at"] != null)
+                                )
+                            )
+                        }
                     } catch (e: Exception) {
                         e.printStackTrace()
-                        null
                     }
                 }
                 continuation.resume(list)
@@ -461,26 +513,110 @@ class FirebaseService {
     suspend fun saveChatMessage(message: ChatMessage): Boolean = suspendCancellableCoroutine { continuation ->
         val firestore = db
         if (firestore == null) {
+            android.util.Log.e("FirebaseService", "db is null!")
             continuation.resume(false)
             return@suspendCancellableCoroutine
         }
-        val data = hashMapOf(
-            "senderId" to message.senderId,
-            "senderName" to message.senderName,
-            "senderAvatar" to message.senderAvatar,
-            "receiverId" to message.receiverId,
-            "receiverName" to message.receiverName,
-            "receiverAvatar" to message.receiverAvatar,
-            "content" to message.content,
-            "timestamp" to message.timestamp,
-            "isRead" to message.isRead
+        
+        val customerId = if (message.senderId == "rootie_vn") message.receiverId else message.senderId
+        if (customerId.isBlank()) {
+            android.util.Log.e("FirebaseService", "customerId is blank! senderId=${message.senderId}, receiverId=${message.receiverId}")
+            continuation.resume(false)
+            return@suspendCancellableCoroutine
+        }
+        
+        val customerName = if (message.senderId == "rootie_vn") message.receiverName else message.senderName
+        val customerAvatar = if (message.senderId == "rootie_vn") message.receiverAvatar else message.senderAvatar
+        
+        val convId = "chat_rootie_vn_${customerId}"
+        val timeStr = getCurrentTimeString()
+        val msgId = if (message.id.isNotBlank()) message.id else ("m_" + java.util.UUID.randomUUID().toString().take(8))
+        
+        val msgMap = hashMapOf(
+            "id" to msgId,
+            "sender_id" to message.senderId,
+            "text" to message.content,
+            "sent_at" to timeStr,
+            "delivered_at" to timeStr,
+            "seen_at" to if (message.senderId == "rootie_vn") null else timeStr
         )
-        firestore.collection("chats").document(message.id).set(data)
+        
+        android.util.Log.d("FirebaseService", "Saving message: convId=$convId, msgId=$msgId, sender=${message.senderId}, text=${message.content}")
+        val docRef = firestore.collection("community_message").document(convId)
+        
+        val data = hashMapOf(
+            "id" to convId,
+            "chat_type" to "private",
+            "members" to listOf(customerId, "rootie_vn"),
+            "member_info" to hashMapOf(
+                "rootie_vn" to hashMapOf("name" to "Rootie VietNam", "avatar" to "https://res.cloudinary.com/dpjkzxjl2/image/upload/v1780560866/Rootie_logo.png"),
+                customerId to hashMapOf("name" to customerName, "avatar" to customerAvatar)
+            ),
+            "last_message" to message.content,
+            "last_message_at" to timeStr,
+            "updated_at" to timeStr,
+            "unread_by" to FieldValue.arrayUnion(customerId),
+            "messages" to FieldValue.arrayUnion(msgMap)
+        )
+        
+        docRef.set(data, SetOptions.merge())
             .addOnSuccessListener {
+                android.util.Log.d("FirebaseService", "Successfully saved message: convId=$convId")
                 continuation.resume(true)
             }
-            .addOnFailureListener {
+            .addOnFailureListener { e ->
+                android.util.Log.e("FirebaseService", "saveChatMessage failed: ${e.message}", e)
                 continuation.resume(false)
             }
     }
+
+    suspend fun markConversationAsRead(customerId: String): Boolean = suspendCancellableCoroutine { continuation ->
+        val firestore = db
+        if (firestore == null) {
+            continuation.resume(false)
+            return@suspendCancellableCoroutine
+        }
+        val convId = "chat_rootie_vn_${customerId}"
+        val docRef = firestore.collection("community_message").document(convId)
+        
+        docRef.get().addOnSuccessListener { snapshot ->
+            if (snapshot.exists()) {
+                val timeStr = getCurrentTimeString()
+                @Suppress("UNCHECKED_CAST")
+                val unreadBy = snapshot.get("unread_by") as? List<String> ?: emptyList()
+                val updatedUnread = unreadBy.filter { it != "rootie_vn" }
+                
+                @Suppress("UNCHECKED_CAST")
+                val messagesRaw = snapshot.get("messages") as? List<Map<String, Any>> ?: emptyList()
+                val updatedMessages = messagesRaw.map { msgMap ->
+                    val senderId = msgMap["sender_id"]?.toString() ?: ""
+                    if (senderId != "rootie_vn" && msgMap["seen_at"] == null) {
+                        val newMap = HashMap(msgMap)
+                        newMap["seen_at"] = timeStr
+                        newMap
+                    } else {
+                        msgMap
+                    }
+                }
+                
+                val updates = hashMapOf<String, Any>(
+                    "unread_by" to updatedUnread,
+                    "messages" to updatedMessages
+                )
+                
+                docRef.update(updates)
+                    .addOnSuccessListener {
+                        continuation.resume(true)
+                    }
+                    .addOnFailureListener {
+                        continuation.resume(false)
+                    }
+            } else {
+                continuation.resume(true)
+            }
+        }.addOnFailureListener {
+            continuation.resume(false)
+        }
+    }
 }
+

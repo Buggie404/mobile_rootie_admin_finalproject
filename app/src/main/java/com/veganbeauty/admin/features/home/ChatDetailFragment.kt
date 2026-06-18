@@ -31,6 +31,7 @@ class ChatDetailFragment : RootieAdminFragment() {
     private val binding get() = _binding!!
 
     private val firebaseService = FirebaseService()
+    private var firestoreListener: com.google.firebase.firestore.ListenerRegistration? = null
     private val allMessages = mutableListOf<ChatMessage>()
     private val filteredMessages = mutableListOf<ChatMessage>()
 
@@ -93,6 +94,7 @@ class ChatDetailFragment : RootieAdminFragment() {
 
         setupRecyclerView()
         loadConversation()
+        startFirestoreListener()
     }
 
     private fun setupRecyclerView() {
@@ -115,19 +117,18 @@ class ChatDetailFragment : RootieAdminFragment() {
             // Mark incoming messages as read
             var updatedAny = false
             for (msg in allMessages) {
-                if (msg.senderId == userId && msg.receiverId == "admin_rootie" && !msg.isRead) {
+                if (msg.senderId == userId && msg.receiverId == "rootie_vn" && !msg.isRead) {
                     msg.isRead = true
                     updatedAny = true
-                    // Sync unread status change to firebase
-                    launch {
-                        firebaseService.saveChatMessage(msg)
-                    }
                 }
             }
 
             if (updatedAny) {
                 withContext(Dispatchers.IO) {
                     saveLocalMessages(allMessages)
+                }
+                launch {
+                    firebaseService.markConversationAsRead(userId)
                 }
             }
 
@@ -139,8 +140,8 @@ class ChatDetailFragment : RootieAdminFragment() {
         filteredMessages.clear()
         // Filter messages between admin and this specific user
         val filtered = allMessages.filter {
-            (it.senderId == userId && it.receiverId == "admin_rootie") ||
-                    (it.senderId == "admin_rootie" && it.receiverId == userId)
+            (it.senderId == userId && it.receiverId == "rootie_vn") ||
+                    (it.senderId == "rootie_vn" && it.receiverId == userId)
         }
         filteredMessages.addAll(filtered)
         chatAdapter.notifyDataSetChanged()
@@ -154,10 +155,10 @@ class ChatDetailFragment : RootieAdminFragment() {
         if (text.isEmpty()) return
 
         val newMessage = ChatMessage(
-            id = UUID.randomUUID().toString(),
-            senderId = "admin_rootie",
-            senderName = "Quản trị viên Rootie",
-            senderAvatar = "https://i.pinimg.com/736x/1a/d8/4b/1ad84b9ab4a1e2ab17c7aab37fcff0a5.jpg",
+            id = "m_" + UUID.randomUUID().toString().take(8),
+            senderId = "rootie_vn",
+            senderName = "Rootie VietNam",
+            senderAvatar = "https://res.cloudinary.com/dpjkzxjl2/image/upload/v1780560866/Rootie_logo.png",
             receiverId = userId,
             receiverName = username,
             receiverAvatar = avatar,
@@ -190,31 +191,28 @@ class ChatDetailFragment : RootieAdminFragment() {
     private fun loadLocalMessages(): List<ChatMessage> {
         val list = mutableListOf<ChatMessage>()
         try {
-            val localFile = File(requireContext().filesDir, "chat_message.json")
-            val jsonString = if (localFile.exists()) {
-                localFile.readText()
-            } else {
-                requireContext().assets.open("chat_message.json").bufferedReader().use { it.readText() }
-            }
-
-            if (jsonString.isNotBlank()) {
-                val jsonArray = JSONArray(jsonString)
-                for (i in 0 until jsonArray.length()) {
-                    val obj = jsonArray.getJSONObject(i)
-                    list.add(
-                        ChatMessage(
-                            id = obj.optString("id"),
-                            senderId = obj.optString("senderId"),
-                            senderName = obj.optString("senderName"),
-                            senderAvatar = obj.optString("senderAvatar"),
-                            receiverId = obj.optString("receiverId"),
-                            receiverName = obj.optString("receiverName"),
-                            receiverAvatar = obj.optString("receiverAvatar"),
-                            content = obj.optString("content"),
-                            timestamp = obj.optLong("timestamp"),
-                            isRead = obj.optBoolean("isRead", false)
+            val localFile = File(requireContext().filesDir, "community_message.json")
+            if (localFile.exists()) {
+                val jsonString = localFile.readText()
+                if (jsonString.isNotBlank()) {
+                    val jsonArray = JSONArray(jsonString)
+                    for (i in 0 until jsonArray.length()) {
+                        val obj = jsonArray.getJSONObject(i)
+                        list.add(
+                            ChatMessage(
+                                id = obj.optString("id"),
+                                senderId = obj.optString("senderId"),
+                                senderName = obj.optString("senderName"),
+                                senderAvatar = obj.optString("senderAvatar"),
+                                receiverId = obj.optString("receiverId"),
+                                receiverName = obj.optString("receiverName"),
+                                receiverAvatar = obj.optString("receiverAvatar"),
+                                content = obj.optString("content"),
+                                timestamp = obj.optLong("timestamp"),
+                                isRead = obj.optBoolean("isRead", false)
+                            )
                         )
-                    )
+                    }
                 }
             }
         } catch (e: Exception) {
@@ -225,7 +223,7 @@ class ChatDetailFragment : RootieAdminFragment() {
 
     private fun saveLocalMessages(messages: List<ChatMessage>) {
         try {
-            val localFile = File(requireContext().filesDir, "chat_message.json")
+            val localFile = File(requireContext().filesDir, "community_message.json")
             val jsonArray = JSONArray()
             for (msg in messages) {
                 val obj = JSONObject()
@@ -247,8 +245,109 @@ class ChatDetailFragment : RootieAdminFragment() {
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
+    private fun startFirestoreListener() {
+        if (userId.isBlank()) return
+        
+        val firestore = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+        firestoreListener = firestore.collection("community_message").document("chat_rootie_vn_${userId}")
+            .addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    e.printStackTrace()
+                    return@addSnapshotListener
+                }
+                
+                if (snapshot != null && snapshot.exists()) {
+                    val members = snapshot.get("members") as? List<String> ?: emptyList()
+                    if (!members.contains("rootie_vn")) return@addSnapshotListener
+                    
+                    val memberInfo = snapshot.get("member_info") as? Map<String, Map<String, Any>> ?: emptyMap()
+                    val partnerInfo = memberInfo[userId]
+                    val username = partnerInfo?.get("name")?.toString() ?: "User"
+                    val avatar = partnerInfo?.get("avatar")?.toString() ?: ""
+                    
+                    val messagesRaw = snapshot.get("messages") as? List<Map<String, Any>> ?: emptyList()
+                    val remoteList = messagesRaw.map { msgMap ->
+                        val senderId = msgMap["sender_id"]?.toString() ?: ""
+                        val text = msgMap["text"]?.toString() ?: ""
+                        val sentAt = msgMap["sent_at"]?.toString() ?: ""
+                        
+                        val isAgent = senderId == "rootie_vn"
+                        val timestamp = parseIsoString(sentAt)
+                        val msgId = msgMap["id"]?.toString() ?: "msg_${userId}_${timestamp}"
+                        
+                        ChatMessage(
+                            id = msgId,
+                            senderId = if (isAgent) "rootie_vn" else userId,
+                            senderName = if (isAgent) "Rootie VietNam" else username,
+                            senderAvatar = if (isAgent) "https://res.cloudinary.com/dpjkzxjl2/image/upload/v1780560866/Rootie_logo.png" else avatar,
+                            receiverId = if (isAgent) userId else "rootie_vn",
+                            receiverName = if (isAgent) username else "Rootie VietNam",
+                            receiverAvatar = if (isAgent) avatar else "https://res.cloudinary.com/dpjkzxjl2/image/upload/v1780560866/Rootie_logo.png",
+                            content = text,
+                            timestamp = timestamp,
+                            isRead = isAgent || (msgMap["seen_at"] != null)
+                        )
+                    }
+                    
+                    val merged = mergeMessages(allMessages, remoteList)
+                    if (isDifferent(allMessages, merged)) {
+                        allMessages.clear()
+                        allMessages.addAll(merged)
+                        
+                        var hasUnreadIncoming = false
+                        for (msg in allMessages) {
+                            if (msg.senderId == userId && msg.receiverId == "rootie_vn" && !msg.isRead) {
+                                msg.isRead = true
+                                hasUnreadIncoming = true
+                            }
+                        }
+                        
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            saveLocalMessages(allMessages)
+                        }
+                        filterAndBindMessages()
+                        
+                        if (hasUnreadIncoming) {
+                            lifecycleScope.launch {
+                                firebaseService.markConversationAsRead(userId)
+                            }
+                        }
+                    }
+                }
+            }
+    }
+    
+    private fun parseIsoString(isoStr: String): Long {
+        return try {
+            val format = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.getDefault())
+            format.timeZone = java.util.TimeZone.getTimeZone("UTC")
+            format.parse(isoStr)?.time ?: System.currentTimeMillis()
+        } catch (e: Exception) {
+            System.currentTimeMillis()
+        }
+    }
+    
+    private fun mergeMessages(local: List<ChatMessage>, remote: List<ChatMessage>): List<ChatMessage> {
+        val map = (local + remote).associateBy { it.id }.toMutableMap()
+        return map.values.sortedBy { it.timestamp }
+    }
+    
+    private fun isDifferent(local: List<ChatMessage>, remote: List<ChatMessage>): Boolean {
+        if (local.size != remote.size) return true
+        for (i in local.indices) {
+            if (local[i].senderId != remote[i].senderId ||
+                local[i].content != remote[i].content ||
+                local[i].timestamp != remote[i].timestamp) {
+                return true
+            }
+        }
+        return false
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
+        firestoreListener?.remove()
         _binding = null
     }
 
@@ -265,7 +364,7 @@ class ChatDetailFragment : RootieAdminFragment() {
 
         override fun getItemViewType(position: Int): Int {
             val item = list[position]
-            return if (item.senderId == "admin_rootie") VIEW_TYPE_OUTGOING else VIEW_TYPE_INCOMING
+            return if (item.senderId == "rootie_vn") VIEW_TYPE_OUTGOING else VIEW_TYPE_INCOMING
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
