@@ -1,0 +1,473 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/neutral">
+
+    <!-- Header Toolbar -->
+    <RelativeLayout
+        android:id="@+id/layout_header"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:background="#FFFFFF"
+        android:elevation="1dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Back Button -->
+        <ImageView
+            android:id="@+id/btn_back"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Back"
+            android:padding="8dp"
+            android:src="@drawable/ic_arrow_back"
+            app:tint="#3E4D44" />
+
+        <!-- Title (Center) -->
+        <TextView
+            android:id="@+id/txt_order_code_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="Đơn hàng ORD-123456"
+            android:textColor="#3E4D44"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/be_vietnam_pro" />
+
+        <!-- Notification Button (Right) -->
+        <FrameLayout
+            android:id="@+id/btn_notification"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackgroundBorderless">
+
+            <ImageView
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_notification"
+                android:contentDescription="Thông báo" />
+
+            <TextView
+                android:id="@+id/notification_badge"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_gravity="top|end"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="4dp"
+                android:background="@drawable/bg_notification_badge"
+                android:gravity="center"
+                android:text="1"
+                android:textColor="@color/white"
+                android:textSize="8sp"
+                android:textStyle="bold" />
+        </FrameLayout>
+    </RelativeLayout>
+
+    <!-- Scrollable Content -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/layout_header"
+        app:layout_constraintBottom_toTopOf="@id/layout_actions_bar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- 1. Trạng thái hiện tại Section -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:background="#FFFFFF">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:text="Trạng thái hiện tại"
+                    android:textColor="#3E4D44"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/be_vietnam_pro" />
+
+                <TextView
+                    android:id="@+id/txt_status_val"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:text="Chờ xác nhận"
+                    android:textColor="#4F6544"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/be_vietnam_pro" />
+            </RelativeLayout>
+
+            <!-- Section Divider / Header label: Thông tin khách hàng -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#FEF7ED"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="10dp"
+                android:text="Thông tin khách hàng"
+                android:textColor="#7E8A83"
+                android:textSize="13sp"
+                android:textStyle="normal"
+                android:fontFamily="@font/be_vietnam_pro" />
+
+            <!-- Customer Details Block -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="#FFFFFF"
+                android:padding="16dp">
+
+                <!-- Name Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_search_bar"
+                        android:backgroundTint="#F0F2EA"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_customer"
+                        app:tint="#677559"
+                        android:contentDescription="Customer Name" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginStart="12dp">
+
+                        <TextView
+                            android:id="@+id/txt_shipping_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Bảo Nguyên"
+                            android:textColor="#3E4D44"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:fontFamily="@font/be_vietnam_pro" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="4dp"
+                            android:gravity="center_vertical">
+
+                            <ImageView
+                                android:layout_width="14dp"
+                                android:layout_height="14dp"
+                                android:src="@drawable/ic_clock"
+                                app:tint="#677559"
+                                android:contentDescription="Phone Icon"
+                                android:rotation="-90" />
+
+                            <TextView
+                                android:id="@+id/txt_shipping_phone"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="6dp"
+                                android:text="0123 456 789"
+                                android:textColor="#677559"
+                                android:textSize="13sp"
+                                android:fontFamily="@font/be_vietnam_pro" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Address Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="top">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_search_bar"
+                        android:backgroundTint="#F0F2EA"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_home"
+                        app:tint="#677559"
+                        android:contentDescription="Address Icon" />
+
+                    <TextView
+                        android:id="@+id/txt_shipping_address"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginTop="8dp"
+                        android:text="123 Lê Lợi, phường 5, quận 1, Hồ Chí Minh"
+                        android:textColor="#3E4D44"
+                        android:textSize="14sp"
+                        android:lineSpacingExtra="3sp"
+                        android:fontFamily="@font/be_vietnam_pro" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Section Divider / Header label: Danh sách sản phẩm -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#FEF7ED"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="10dp"
+                android:text="Danh sách sản phẩm"
+                android:textColor="#7E8A83"
+                android:textSize="13sp"
+                android:textStyle="normal"
+                android:fontFamily="@font/be_vietnam_pro" />
+
+            <!-- Products List Block -->
+            <LinearLayout
+                android:id="@+id/layout_products_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="#FFFFFF"
+                android:paddingHorizontal="16dp"
+                android:paddingBottom="8dp" />
+
+            <!-- Section Divider / Header label: Thanh toán -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#FEF7ED"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="10dp"
+                android:text="Thanh toán"
+                android:textColor="#7E8A83"
+                android:textSize="13sp"
+                android:textStyle="normal"
+                android:fontFamily="@font/be_vietnam_pro" />
+
+            <!-- Payment Calculation details -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="#FFFFFF"
+                android:padding="16dp">
+
+                <!-- subtotal -->
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:text="Tổng tiền"
+                        android:textColor="#677559"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/be_vietnam_pro" />
+                    <TextView
+                        android:id="@+id/txt_subtotal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:text="325.000đ"
+                        android:textColor="#3E4D44"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/be_vietnam_pro" />
+                </RelativeLayout>
+
+                <!-- Direct discount (calculated totalAmount - subtotal - voucher) -->
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:text="Giảm giá trực tiếp"
+                        android:textColor="#677559"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/be_vietnam_pro" />
+                    <TextView
+                        android:id="@+id/txt_direct_discount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:text="-81.000đ"
+                        android:textColor="#677559"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/be_vietnam_pro" />
+                </RelativeLayout>
+
+                <!-- Voucher Discount -->
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:text="Giảm giá voucher"
+                        android:textColor="#677559"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/be_vietnam_pro" />
+                    <TextView
+                        android:id="@+id/txt_voucher_discount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:text="0đ"
+                        android:textColor="#677559"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/be_vietnam_pro" />
+                </RelativeLayout>
+
+                <!-- Shipping Fee -->
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:text="Phí vận chuyển"
+                        android:textColor="#677559"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/be_vietnam_pro" />
+                    <TextView
+                        android:id="@+id/txt_shipping_cost"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:text="Miễn phí"
+                        android:textColor="#677559"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/be_vietnam_pro" />
+                </RelativeLayout>
+
+                <!-- divider -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#E5E8DA"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Total Row -->
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="6dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:text="Tổng cộng"
+                        android:textColor="#3E4D44"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/be_vietnam_pro" />
+                    <TextView
+                        android:id="@+id/txt_total_val"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:text="241.000đ"
+                        android:textColor="#C92F2F"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/be_vietnam_pro" />
+                </RelativeLayout>
+
+                <!-- Payment Method description -->
+                <TextView
+                    android:id="@+id/txt_payment_method"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:text="(Thanh toán khi nhận hàng COD)"
+                    android:textColor="#677559"
+                    android:textSize="12sp"
+                    android:fontFamily="@font/be_vietnam_pro" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Bottom Actions Bar -->
+    <LinearLayout
+        android:id="@+id/layout_actions_bar"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:orientation="horizontal"
+        android:background="#FFFFFF"
+        android:elevation="8dp"
+        android:paddingHorizontal="16dp"
+        android:gravity="center_vertical"
+        android:weightSum="2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <Button
+            android:id="@+id/btn_cancel"
+            android:layout_width="0dp"
+            android:layout_height="46dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_order_btn_outline"
+            app:backgroundTint="@null"
+            android:text="Hủy"
+            android:textColor="#3E4D44"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/be_vietnam_pro" />
+
+        <Button
+            android:id="@+id/btn_approve"
+            android:layout_width="0dp"
+            android:layout_height="46dp"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_order_btn_solid"
+            app:backgroundTint="@null"
+            android:text="Xác nhận"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/be_vietnam_pro" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

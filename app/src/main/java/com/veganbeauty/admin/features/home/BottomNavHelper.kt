@@ -83,7 +83,7 @@ object BottomNavHelper {
             R.id.nav_home -> HomeFragment()
             R.id.nav_product -> ProductListFragment()
             R.id.nav_customer -> com.veganbeauty.admin.features.customer.CustomerAdminFragment()
-            R.id.nav_order -> com.veganbeauty.admin.features.order.list.OrderListFragment()
+            R.id.nav_order -> com.veganbeauty.admin.features.order.OrderListFragment()
             R.id.nav_menu -> com.veganbeauty.admin.features.profile.ProfileFragment()
             else -> null
         }

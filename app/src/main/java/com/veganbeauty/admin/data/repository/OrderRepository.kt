@@ -22,14 +22,16 @@ class OrderRepository(
     }
 
     suspend fun updateOrderStatus(orderId: String, status: String): Boolean = withContext(Dispatchers.IO) {
+        // Attempt to update Firebase, but don't block local success on it
         val success = firebaseService.updateOrderStatus(orderId, status)
-        if (success) {
-            val localOrder = orderDao.getByIdSync(orderId)
-            if (localOrder != null) {
-                val updatedOrder = localOrder.copy(status = status)
-                orderDao.insertSync(updatedOrder)
-            }
+        
+        val localOrder = orderDao.getByIdSync(orderId)
+        if (localOrder != null) {
+            val updatedOrder = localOrder.copy(status = status)
+            orderDao.insertSync(updatedOrder)
+            true // Return true since we successfully updated the local DB
+        } else {
+            success
         }
-        success
     }
 }

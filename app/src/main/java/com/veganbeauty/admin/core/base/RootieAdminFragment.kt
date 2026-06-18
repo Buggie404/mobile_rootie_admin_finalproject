@@ -5,11 +5,13 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import com.veganbeauty.admin.MainActivity
 import com.veganbeauty.admin.features.home.HomeMessageFragment
+import com.veganbeauty.admin.core.utils.KeyboardUtils
 
 abstract class RootieAdminFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        KeyboardUtils.setupKeyboardAutoHiding(view, activity)
         setupUI(view)
         observeViewModel()
     }
