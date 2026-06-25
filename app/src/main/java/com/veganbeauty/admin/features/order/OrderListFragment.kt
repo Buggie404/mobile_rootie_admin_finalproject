@@ -46,6 +46,7 @@ class OrderListFragment : RootieAdminFragment() {
     private val filterPaymentMethods = mutableSetOf<String>()
     private val filterPriceRanges = mutableSetOf<String>()
     private val filterRegions = mutableSetOf<String>()
+    private var firestoreListener: com.google.firebase.firestore.ListenerRegistration? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -72,10 +73,23 @@ class OrderListFragment : RootieAdminFragment() {
         val database = RootieAdminDatabase.getDatabase(requireContext().applicationContext)
         repository = OrderRepository(database.orderDao(), FirebaseService())
 
+        // Observe local database updates
+        repository.allOrders.observe(viewLifecycleOwner) { localOrders ->
+            if (localOrders.isNotEmpty()) {
+                allOrdersList.clear()
+                allOrdersList.addAll(localOrders)
+                applyFilters()
+            } else {
+                loadData()
+            }
+        }
+
+        // Start listening to Firestore remote changes in real-time
+        firestoreListener = repository.startRealtimeSync()
+
         setupRecyclerView()
         setupListeners()
         selectTab("tất cả", binding.tabAll)
-        loadData()
     }
 
     private fun setupRecyclerView() {
@@ -554,6 +568,7 @@ class OrderListFragment : RootieAdminFragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        firestoreListener?.remove()
         _binding = null
     }
 }
