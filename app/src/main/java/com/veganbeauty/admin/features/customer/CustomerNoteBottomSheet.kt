@@ -13,6 +13,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.veganbeauty.admin.R
 import com.veganbeauty.admin.data.local.RootieAdminDatabase
 import com.veganbeauty.admin.data.local.entities.CustomerEntity
+import com.veganbeauty.admin.data.local.entities.copy
 import com.veganbeauty.admin.databinding.CustomerNoteBottomSheetBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

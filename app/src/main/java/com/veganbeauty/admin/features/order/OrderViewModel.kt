@@ -11,6 +11,8 @@ import com.veganbeauty.admin.data.local.entities.OrderEntity
 import com.veganbeauty.admin.data.remote.FirebaseService
 import com.veganbeauty.admin.data.repository.OrderRepository
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers
 
 class OrderViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -36,7 +38,9 @@ class OrderViewModel(application: Application) : AndroidViewModel(application) {
     fun syncFromFirebase() {
         viewModelScope.launch {
             try {
-                repository.syncFromFirebase()
+                withContext(Dispatchers.IO) {
+                    repository.syncFromFirebase()
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -46,7 +50,9 @@ class OrderViewModel(application: Application) : AndroidViewModel(application) {
     fun updateOrderStatus(orderId: String, status: String) {
         viewModelScope.launch {
             try {
-                repository.updateOrderStatus(orderId, status)
+                withContext(Dispatchers.IO) {
+                    repository.updateOrderStatus(orderId, status)
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
             }

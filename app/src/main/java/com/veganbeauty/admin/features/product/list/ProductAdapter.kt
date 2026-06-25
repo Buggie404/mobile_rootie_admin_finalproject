@@ -41,8 +41,9 @@ class ProductAdapter(
             txtPrice.text = "${formatter.format(product.price)}đ"
 
             // Strike-through original price for visuals
-            val originalPrice = if (product.originalPrice != null && product.originalPrice > 0) {
-                product.originalPrice
+            val origPrice = product.originalPrice
+            val originalPrice = if (origPrice != null && origPrice > 0) {
+                origPrice
             } else {
                 (product.price * 1.35).toLong()
             }

@@ -8,9 +8,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.veganbeauty.admin.data.local.RootieAdminDatabase
 import com.veganbeauty.admin.data.local.entities.ProductEntity
+import com.veganbeauty.admin.data.local.entities.copy
 import com.veganbeauty.admin.data.remote.FirebaseService
 import com.veganbeauty.admin.data.repository.ProductRepository
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers
 
 class ProductViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -46,7 +49,9 @@ class ProductViewModel(application: Application) : AndroidViewModel(application)
     fun syncFromFirebase() {
         viewModelScope.launch {
             try {
-                repository.checkAndSeedProducts(getApplication())
+                withContext(Dispatchers.IO) {
+                    repository.checkAndSeedProducts(getApplication())
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -56,7 +61,9 @@ class ProductViewModel(application: Application) : AndroidViewModel(application)
     fun deleteProduct(product: ProductEntity) {
         viewModelScope.launch {
             try {
-                repository.deleteProduct(product)
+                withContext(Dispatchers.IO) {
+                    repository.deleteProduct(product)
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -66,7 +73,9 @@ class ProductViewModel(application: Application) : AndroidViewModel(application)
     fun saveProduct(product: ProductEntity) {
         viewModelScope.launch {
             try {
-                repository.saveProduct(product)
+                withContext(Dispatchers.IO) {
+                    repository.saveProduct(product)
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
             }

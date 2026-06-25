@@ -12,6 +12,8 @@ import com.veganbeauty.admin.data.local.entities.BookingEntity
 import com.veganbeauty.admin.data.remote.FirebaseService
 import com.veganbeauty.admin.data.repository.BookingRepository
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers
 
 class BookingViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -37,7 +39,9 @@ class BookingViewModel(application: Application) : AndroidViewModel(application)
     fun syncFromFirebase() {
         viewModelScope.launch {
             try {
-                repository.syncFromFirebase()
+                withContext(Dispatchers.IO) {
+                    repository.syncFromFirebase()
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -47,7 +51,9 @@ class BookingViewModel(application: Application) : AndroidViewModel(application)
     fun updateBookingStatus(bookingId: String, status: String, cancelReason: String = "") {
         viewModelScope.launch {
             try {
-                repository.updateBookingStatus(bookingId, status, cancelReason)
+                withContext(Dispatchers.IO) {
+                    repository.updateBookingStatus(bookingId, status, cancelReason)
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
             }
