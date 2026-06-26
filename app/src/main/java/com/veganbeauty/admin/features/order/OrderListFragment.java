@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.google.firebase.firestore.ListenerRegistration;
 import com.veganbeauty.admin.MainActivity;
 import com.veganbeauty.admin.R;
 import com.veganbeauty.admin.core.base.RootieAdminFragment;
@@ -60,6 +61,7 @@ public class OrderListFragment extends RootieAdminFragment {
     private final Set<String> filterPaymentMethods = new HashSet<>();
     private final Set<String> filterPriceRanges = new HashSet<>();
     private final Set<String> filterRegions = new HashSet<>();
+    private ListenerRegistration firestoreListener = null;
 
     @Nullable
     @Override
@@ -84,10 +86,23 @@ public class OrderListFragment extends RootieAdminFragment {
         RootieAdminDatabase database = RootieAdminDatabase.getDatabase(requireContext().getApplicationContext());
         repository = new OrderRepository(database.orderDao(), new FirebaseService());
 
+        // Observe local database updates
+        repository.getAllOrders().observe(getViewLifecycleOwner(), localOrders -> {
+            if (localOrders != null && !localOrders.isEmpty()) {
+                allOrdersList.clear();
+                allOrdersList.addAll(localOrders);
+                applyFilters();
+            } else {
+                loadData();
+            }
+        });
+
+        // Start listening to Firestore remote changes in real-time
+        firestoreListener = repository.startRealtimeSync();
+
         setupRecyclerView();
         setupListeners();
         selectTab("tất cả", binding.tabAll);
-        loadData();
     }
 
     private void setupRecyclerView() {
@@ -547,7 +562,6 @@ public class OrderListFragment extends RootieAdminFragment {
                         Toast.makeText(requireContext(), "Cập nhật thành công. Thất bại " + finalFailCount + " đơn.", Toast.LENGTH_SHORT).show();
                     }
                     selectedOrderIds.clear();
-                    // Reload all from database to get fresh sync
                     loadData();
                 });
             } catch (Exception e) {
@@ -645,6 +659,9 @@ public class OrderListFragment extends RootieAdminFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        if (firestoreListener != null) {
+            firestoreListener.remove();
+        }
         binding = null;
     }
 }
