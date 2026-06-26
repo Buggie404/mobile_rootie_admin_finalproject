@@ -117,4 +117,37 @@ public class BookingEntity {
 
     public String getCancelReason() { return cancelReason; }
     public void setCancelReason(String cancelReason) { this.cancelReason = cancelReason; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BookingEntity that = (BookingEntity) o;
+        return java.util.Objects.equals(id, that.id) &&
+                java.util.Objects.equals(userId, that.userId) &&
+                java.util.Objects.equals(userName, that.userName) &&
+                java.util.Objects.equals(userPhone, that.userPhone) &&
+                java.util.Objects.equals(userEmail, that.userEmail) &&
+                java.util.Objects.equals(serviceName, that.serviceName) &&
+                java.util.Objects.equals(dateDisplay, that.dateDisplay) &&
+                java.util.Objects.equals(monthDisplay, that.monthDisplay) &&
+                java.util.Objects.equals(dayOfWeek, that.dayOfWeek) &&
+                java.util.Objects.equals(time, that.time) &&
+                java.util.Objects.equals(duration, that.duration) &&
+                java.util.Objects.equals(storeName, that.storeName) &&
+                java.util.Objects.equals(storeAddress, that.storeAddress) &&
+                java.util.Objects.equals(storePhone, that.storePhone) &&
+                java.util.Objects.equals(storeImage, that.storeImage) &&
+                java.util.Objects.equals(storeID, that.storeID) &&
+                java.util.Objects.equals(note, that.note) &&
+                java.util.Objects.equals(status, that.status) &&
+                java.util.Objects.equals(createdAt, that.createdAt) &&
+                java.util.Objects.equals(consultantName, that.consultantName) &&
+                java.util.Objects.equals(cancelReason, that.cancelReason);
+    }
+
+    @Override
+    public int hashCode() {
+        return java.util.Objects.hash(id, userId, userName, userPhone, userEmail, serviceName, dateDisplay, monthDisplay, dayOfWeek, time, duration, storeName, storeAddress, storePhone, storeImage, storeID, note, status, createdAt, consultantName, cancelReason);
+    }
 }
