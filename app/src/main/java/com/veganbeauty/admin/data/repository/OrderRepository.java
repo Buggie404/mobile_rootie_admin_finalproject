@@ -38,4 +38,14 @@ public class OrderRepository {
             return success;
         }
     }
+
+    public com.google.firebase.firestore.ListenerRegistration startRealtimeSync() {
+        return firebaseService.listenToOrders(orders -> {
+            if (orders != null && !orders.isEmpty()) {
+                new Thread(() -> {
+                    orderDao.insertAllSync(orders);
+                }).start();
+            }
+        });
+    }
 }

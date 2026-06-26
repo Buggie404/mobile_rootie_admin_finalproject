@@ -309,6 +309,112 @@ public class FirebaseService {
         }
     }
 
+    public interface OrderListener {
+        void onOrdersUpdated(List<OrderEntity> orders);
+    }
+
+    public com.google.firebase.firestore.ListenerRegistration listenToOrders(final OrderListener listener) {
+        if (db == null) {
+            return null;
+        }
+        return db.collection("orders").addSnapshotListener((snapshot, e) -> {
+            if (e != null) {
+                e.printStackTrace();
+                return;
+            }
+            if (snapshot != null) {
+                List<OrderEntity> list = new ArrayList<>();
+                for (DocumentSnapshot doc : snapshot.getDocuments()) {
+                    try {
+                        OrderEntity oe = parseOrderFromDoc(doc);
+                        list.add(oe);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+                listener.onOrdersUpdated(list);
+            }
+        });
+    }
+
+    public OrderEntity parseOrderFromDoc(DocumentSnapshot doc) {
+        List<OrderItem> orderItems = new ArrayList<>();
+        Object itemsRawObj = doc.get("items");
+        if (itemsRawObj instanceof List) {
+            List<?> itemsRaw = (List<?>) itemsRawObj;
+            for (Object item : itemsRaw) {
+                if (item instanceof Map) {
+                    Map<?, ?> map = (Map<?, ?>) item;
+                    Object prodId = map.get("productId");
+                    Object prodName = map.get("productName");
+                    Object prodImg = map.get("productImage");
+                    Object qty = map.get("quantity");
+                    Object prc = map.get("price");
+
+                    OrderItem orderItem = new OrderItem();
+                    orderItem.setProductId(prodId != null ? prodId.toString() : "");
+                    orderItem.setProductName(prodName != null ? prodName.toString() : "");
+                    orderItem.setProductImage(prodImg != null ? prodImg.toString() : "");
+                    orderItem.setQuantity(qty != null ? toInt(qty) : 0);
+                    orderItem.setPrice(prc != null ? toLong(prc) : 0L);
+                    orderItems.add(orderItem);
+                }
+            }
+        }
+
+        String orderId = doc.getId();
+        String storeName = doc.getString("storeName");
+        if (storeName == null) {
+            int lastDigit = 0;
+            try {
+                lastDigit = Integer.parseInt(orderId.substring(orderId.length() - 1));
+            } catch (Exception ignored) {
+            }
+            if (lastDigit % 2 == 1) {
+                storeName = "Cửa hàng mỹ phẩm Rootie - Cơ sở 1";
+            } else {
+                storeName = "Cửa hàng mỹ phẩm Rootie - Cơ sở 5";
+            }
+        }
+
+        String storeID = doc.getString("storeID");
+        if (storeID == null) {
+            storeID = doc.getString("storeId");
+        }
+        if (storeID == null) {
+            if (storeName.toLowerCase().contains("cơ sở 1")) {
+                storeID = "CH001";
+            } else {
+                storeID = "CH005";
+            }
+        }
+
+        OrderEntity oe = new OrderEntity();
+        oe.setOrderId(orderId);
+        oe.setUserId(doc.getString("userId") != null ? doc.getString("userId") : "");
+        oe.setOrderDate(doc.getString("orderDate") != null ? doc.getString("orderDate") : "");
+        oe.setOrderTime(doc.getString("orderTime") != null ? doc.getString("orderTime") : "");
+        oe.setStatus(doc.getString("status") != null ? doc.getString("status") : "");
+        oe.setTotalAmount(toLong(doc.get("totalAmount")));
+        oe.setItems(orderItems);
+        oe.setShippingName(doc.getString("shippingName") != null ? doc.getString("shippingName") : "");
+        oe.setShippingPhone(doc.getString("shippingPhone") != null ? doc.getString("shippingPhone") : "");
+        oe.setShippingAddress(doc.getString("shippingAddress") != null ? doc.getString("shippingAddress") : "");
+        oe.setShippingCost(toLong(doc.get("shippingCost")));
+        oe.setVoucherDiscount(toLong(doc.get("voucherDiscount")));
+        oe.setPaymentMethod(doc.getString("paymentMethod") != null ? doc.getString("paymentMethod") : "");
+        oe.setExpectedDeliveryTime(doc.getString("expectedDeliveryTime"));
+        oe.setHasReview(toBoolean(doc.get("hasReview")));
+        oe.setReviewStars(toInt(doc.get("reviewStars")));
+        oe.setReviewText(doc.getString("reviewText"));
+        oe.setReviewImage(doc.getString("reviewImage"));
+        oe.setAnonymous(toBoolean(doc.get("isAnonymous")));
+        oe.setRecommendToFriends(toBoolean(doc.get("recommendToFriends")));
+        oe.setStoreName(storeName);
+        oe.setStoreID(storeID);
+        return oe;
+    }
+
     public List<OrderEntity> fetchAllOrders() {
         if (db == null) {
             return Collections.emptyList();
@@ -318,80 +424,7 @@ public class FirebaseService {
             List<OrderEntity> list = new ArrayList<>();
             for (DocumentSnapshot doc : snapshot.getDocuments()) {
                 try {
-                    List<OrderItem> orderItems = new ArrayList<>();
-                    Object itemsRawObj = doc.get("items");
-                    if (itemsRawObj instanceof List) {
-                        List<?> itemsRaw = (List<?>) itemsRawObj;
-                        for (Object item : itemsRaw) {
-                            if (item instanceof Map) {
-                                Map<?, ?> map = (Map<?, ?>) item;
-                                Object prodId = map.get("productId");
-                                Object prodName = map.get("productName");
-                                Object prodImg = map.get("productImage");
-                                Object qty = map.get("quantity");
-                                Object prc = map.get("price");
-
-                                OrderItem orderItem = new OrderItem();
-                                orderItem.setProductId(prodId != null ? prodId.toString() : "");
-                                orderItem.setProductName(prodName != null ? prodName.toString() : "");
-                                orderItem.setProductImage(prodImg != null ? prodImg.toString() : "");
-                                orderItem.setQuantity(qty != null ? toInt(qty) : 0);
-                                orderItem.setPrice(prc != null ? toLong(prc) : 0L);
-                                orderItems.add(orderItem);
-                            }
-                        }
-                    }
-
-                    String orderId = doc.getId();
-                    String storeName = doc.getString("storeName");
-                    if (storeName == null) {
-                        int lastDigit = 0;
-                        try {
-                            lastDigit = Integer.parseInt(orderId.substring(orderId.length() - 1));
-                        } catch (Exception ignored) {
-                        }
-                        if (lastDigit % 2 == 1) {
-                            storeName = "Cửa hàng mỹ phẩm Rootie - Cơ sở 1";
-                        } else {
-                            storeName = "Cửa hàng mỹ phẩm Rootie - Cơ sở 5";
-                        }
-                    }
-
-                    String storeID = doc.getString("storeID");
-                    if (storeID == null) {
-                        storeID = doc.getString("storeId");
-                    }
-                    if (storeID == null) {
-                        if (storeName.toLowerCase().contains("cơ sở 1")) {
-                            storeID = "CH001";
-                        } else {
-                            storeID = "CH005";
-                        }
-                    }
-
-                    OrderEntity oe = new OrderEntity();
-                    oe.setOrderId(orderId);
-                    oe.setUserId(doc.getString("userId") != null ? doc.getString("userId") : "");
-                    oe.setOrderDate(doc.getString("orderDate") != null ? doc.getString("orderDate") : "");
-                    oe.setOrderTime(doc.getString("orderTime") != null ? doc.getString("orderTime") : "");
-                    oe.setStatus(doc.getString("status") != null ? doc.getString("status") : "");
-                    oe.setTotalAmount(toLong(doc.get("totalAmount")));
-                    oe.setItems(orderItems);
-                    oe.setShippingName(doc.getString("shippingName") != null ? doc.getString("shippingName") : "");
-                    oe.setShippingPhone(doc.getString("shippingPhone") != null ? doc.getString("shippingPhone") : "");
-                    oe.setShippingAddress(doc.getString("shippingAddress") != null ? doc.getString("shippingAddress") : "");
-                    oe.setShippingCost(toLong(doc.get("shippingCost")));
-                    oe.setVoucherDiscount(toLong(doc.get("voucherDiscount")));
-                    oe.setPaymentMethod(doc.getString("paymentMethod") != null ? doc.getString("paymentMethod") : "");
-                    oe.setExpectedDeliveryTime(doc.getString("expectedDeliveryTime"));
-                    oe.setHasReview(toBoolean(doc.get("hasReview")));
-                    oe.setReviewStars(toInt(doc.get("reviewStars")));
-                    oe.setReviewText(doc.getString("reviewText"));
-                    oe.setReviewImage(doc.getString("reviewImage"));
-                    oe.setAnonymous(toBoolean(doc.get("isAnonymous")));
-                    oe.setRecommendToFriends(toBoolean(doc.get("recommendToFriends")));
-                    oe.setStoreName(storeName);
-                    oe.setStoreID(storeID);
+                    OrderEntity oe = parseOrderFromDoc(doc);
                     list.add(oe);
                 } catch (Exception e) {
                     e.printStackTrace();
