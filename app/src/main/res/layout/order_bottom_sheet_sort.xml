@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@drawable/bg_bottom_sheet">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="Sắp xếp đơn hàng"
+            android:textColor="#3E4D44"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/be_vietnam_pro" />
+        <ImageView
+            android:id="@+id/ivClose"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_close"
+            app:tint="#3E4D44" />
+    </RelativeLayout>
+
+    <!-- Option: Default -->
+    <LinearLayout
+        android:id="@+id/layoutSortDefault"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingVertical="16dp"
+        android:gravity="center_vertical"
+        android:clickable="true"
+        android:focusable="true">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Mặc định"
+            android:textColor="#3E4D44"
+            android:textSize="16sp"
+            android:fontFamily="@font/be_vietnam_pro" />
+        <ImageView
+            android:id="@+id/ivRadioDefault"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_radio_primary_unchecked" />
+    </LinearLayout>
+
+    <!-- Option: Date Desc -->
+    <LinearLayout
+        android:id="@+id/layoutSortDateDesc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingVertical="16dp"
+        android:gravity="center_vertical"
+        android:clickable="true"
+        android:focusable="true">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Ngày đặt: Mới nhất trước"
+            android:textColor="#3E4D44"
+            android:textSize="16sp"
+            android:fontFamily="@font/be_vietnam_pro" />
+        <ImageView
+            android:id="@+id/ivRadioDateDesc"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_radio_primary_unchecked" />
+    </LinearLayout>
+
+    <!-- Option: Date Asc -->
+    <LinearLayout
+        android:id="@+id/layoutSortDateAsc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingVertical="16dp"
+        android:gravity="center_vertical"
+        android:clickable="true"
+        android:focusable="true">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Ngày đặt: Cũ nhất trước"
+            android:textColor="#3E4D44"
+            android:textSize="16sp"
+            android:fontFamily="@font/be_vietnam_pro" />
+        <ImageView
+            android:id="@+id/ivRadioDateAsc"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_radio_primary_unchecked" />
+    </LinearLayout>
+
+    <!-- Option: Price Desc -->
+    <LinearLayout
+        android:id="@+id/layoutSortPriceDesc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingVertical="16dp"
+        android:gravity="center_vertical"
+        android:clickable="true"
+        android:focusable="true">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Tổng tiền: Cao đến Thấp"
+            android:textColor="#3E4D44"
+            android:textSize="16sp"
+            android:fontFamily="@font/be_vietnam_pro" />
+        <ImageView
+            android:id="@+id/ivRadioPriceDesc"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_radio_primary_unchecked" />
+    </LinearLayout>
+
+    <!-- Option: Price Asc -->
+    <LinearLayout
+        android:id="@+id/layoutSortPriceAsc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingVertical="16dp"
+        android:gravity="center_vertical"
+        android:clickable="true"
+        android:focusable="true">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Tổng tiền: Thấp đến Cao"
+            android:textColor="#3E4D44"
+            android:textSize="16sp"
+            android:fontFamily="@font/be_vietnam_pro" />
+        <ImageView
+            android:id="@+id/ivRadioPriceAsc"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_radio_primary_unchecked" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="24dp" />
+</LinearLayout>

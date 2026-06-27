@@ -386,6 +386,46 @@ class FirebaseService {
             }
     }
 
+    suspend fun uploadBooking(booking: BookingEntity): Boolean = suspendCancellableCoroutine { continuation ->
+        val firestore = db
+        if (firestore == null) {
+            continuation.resume(false)
+            return@suspendCancellableCoroutine
+        }
+        val bookingMap = hashMapOf(
+            "id" to booking.id,
+            "userId" to booking.userId,
+            "userName" to booking.userName,
+            "userPhone" to booking.userPhone,
+            "userEmail" to booking.userEmail,
+            "serviceName" to booking.serviceName,
+            "dateDisplay" to booking.dateDisplay,
+            "monthDisplay" to booking.monthDisplay,
+            "dayOfWeek" to booking.dayOfWeek,
+            "time" to booking.time,
+            "duration" to booking.duration,
+            "storeName" to booking.storeName,
+            "storeAddress" to booking.storeAddress,
+            "storePhone" to booking.storePhone,
+            "storeImage" to booking.storeImage,
+            "status" to booking.status,
+            "note" to booking.note,
+            "createdAt" to booking.createdAt,
+            "consultantName" to booking.consultantName,
+            "cancelReason" to booking.cancelReason,
+            "storeID" to booking.storeID,
+            "storeId" to booking.storeID
+        )
+        firestore.collection("bookings").document(booking.id).set(bookingMap)
+            .addOnSuccessListener {
+                continuation.resume(true)
+            }
+            .addOnFailureListener {
+                continuation.resume(false)
+            }
+    }
+
+
     suspend fun fetchAllCustomers(): List<CustomerEntity> = suspendCancellableCoroutine { continuation ->
         val firestore = db
         if (firestore == null) {

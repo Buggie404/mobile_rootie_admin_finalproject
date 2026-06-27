@@ -92,7 +92,7 @@
             android:textColor="@color/white"
             android:textSize="8sp"
             android:textStyle="bold"
-            android:visibility="visible" />
+            android:visibility="gone" />
 
     </FrameLayout>
 

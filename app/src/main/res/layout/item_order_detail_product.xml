@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingVertical="12dp"
+    android:gravity="center_vertical"
+    android:background="#FFFFFF">
+
+    <!-- Product Image -->
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/img_product"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/nuoc_sen_hau_giang"
+        app:shapeAppearanceOverlay="@style/RoundedSquareImageView" />
+
+    <!-- Details Container -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:layout_marginStart="12dp">
+
+        <!-- Product Name -->
+        <TextView
+            android:id="@+id/txt_product_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Gel tắm đường thốt nốt An Giang 500ml"
+            android:textColor="#3E4D44"
+            android:textSize="14sp"
+            android:textStyle="normal"
+            android:fontFamily="@font/be_vietnam_pro"
+            android:maxLines="2"
+            android:ellipsize="end" />
+
+        <!-- Price Details Row -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_alignParentStart="true">
+
+                <!-- Current Price -->
+                <TextView
+                    android:id="@+id/txt_product_price"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="241.000đ"
+                    android:textColor="#C92F2F"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/be_vietnam_pro" />
+
+                <!-- Original Price ( crossed out if discounted, optional ) -->
+                <TextView
+                    android:id="@+id/txt_original_price"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="325.000đ"
+                    android:textColor="#7E8A83"
+                    android:textSize="12sp"
+                    android:fontFamily="@font/be_vietnam_pro"
+                    android:visibility="gone"/>
+            </LinearLayout>
+
+            <!-- Quantity -->
+            <TextView
+                android:id="@+id/txt_product_quantity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:text="x1"
+                android:textColor="#7E8A83"
+                android:textSize="13sp"
+                android:fontFamily="@font/be_vietnam_pro" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

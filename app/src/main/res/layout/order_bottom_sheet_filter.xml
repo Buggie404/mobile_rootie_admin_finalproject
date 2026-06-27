@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@drawable/bg_bottom_sheet">
+
+    <!-- Header Row -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="Bộ lọc đơn hàng"
+            android:textColor="#3E4D44"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/be_vietnam_pro" />
+        <ImageView
+            android:id="@+id/ivClose"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_close"
+            app:tint="#3E4D44" />
+    </RelativeLayout>
+
+    <!-- Scrollable Content -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:scrollbars="none"
+        android:overScrollMode="never">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Section 1: Payment Method -->
+            <LinearLayout
+                android:id="@+id/layoutPaymentHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingVertical="12dp"
+                android:gravity="center_vertical"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Phương thức thanh toán"
+                    android:textColor="#3E4D44"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/be_vietnam_pro" />
+
+                <ImageView
+                    android:id="@+id/ivPaymentChevron"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_chevron_down"
+                    app:tint="#3E4D44" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutPaymentContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingStart="16dp"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <CheckBox
+                        android:id="@+id/cbPaymentCOD"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="COD"
+                        android:textColor="#3E4D44"
+                        android:textSize="14sp"
+                        android:buttonTint="#3E4D44"
+                        android:fontFamily="@font/be_vietnam_pro" />
+
+                    <CheckBox
+                        android:id="@+id/cbPaymentATM"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ATM Banking"
+                        android:textColor="#3E4D44"
+                        android:textSize="14sp"
+                        android:buttonTint="#3E4D44"
+                        android:fontFamily="@font/be_vietnam_pro" />
+
+                    <CheckBox
+                        android:id="@+id/cbPaymentMoMo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Ví MoMo"
+                        android:textColor="#3E4D44"
+                        android:textSize="14sp"
+                        android:buttonTint="#3E4D44"
+                        android:fontFamily="@font/be_vietnam_pro" />
+
+                    <CheckBox
+                        android:id="@+id/cbPaymentVNPay"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Ví VNPay"
+                        android:textColor="#3E4D44"
+                        android:textSize="14sp"
+                        android:buttonTint="#3E4D44"
+                        android:fontFamily="@font/be_vietnam_pro" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E0E4E2" />
+
+            <!-- Section 2: Order Value Range -->
+            <LinearLayout
+                android:id="@+id/layoutPriceHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingVertical="12dp"
+                android:gravity="center_vertical"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Giá trị đơn hàng"
+                    android:textColor="#3E4D44"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/be_vietnam_pro" />
+
+                <ImageView
+                    android:id="@+id/ivPriceChevron"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_chevron_down"
+                    app:tint="#3E4D44" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutPriceContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingStart="16dp"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <CheckBox
+                        android:id="@+id/cbPriceUnder500k"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Dưới 500k"
+                        android:textColor="#3E4D44"
+                        android:textSize="14sp"
+                        android:buttonTint="#3E4D44"
+                        android:fontFamily="@font/be_vietnam_pro" />
+
+                    <CheckBox
+                        android:id="@+id/cbPrice500kTo1500k"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Từ 500k đến 1.5M"
+                        android:textColor="#3E4D44"
+                        android:textSize="14sp"
+                        android:buttonTint="#3E4D44"
+                        android:fontFamily="@font/be_vietnam_pro" />
+
+                    <CheckBox
+                        android:id="@+id/cbPriceOver1500k"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Trên 1.5M"
+                        android:textColor="#3E4D44"
+                        android:textSize="14sp"
+                        android:buttonTint="#3E4D44"
+                        android:fontFamily="@font/be_vietnam_pro" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E0E4E2" />
+
+            <!-- Section 3: Region -->
+            <LinearLayout
+                android:id="@+id/layoutRegionHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingVertical="12dp"
+                android:gravity="center_vertical"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Khu vực giao hàng"
+                    android:textColor="#3E4D44"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/be_vietnam_pro" />
+
+                <ImageView
+                    android:id="@+id/ivRegionChevron"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_chevron_down"
+                    app:tint="#3E4D44" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutRegionContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingStart="16dp"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <CheckBox
+                        android:id="@+id/cbRegionHCMC"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="TP. Hồ Chí Minh"
+                        android:textColor="#3E4D44"
+                        android:textSize="14sp"
+                        android:buttonTint="#3E4D44"
+                        android:fontFamily="@font/be_vietnam_pro" />
+
+                    <CheckBox
+                        android:id="@+id/cbRegionHN"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Hà Nội"
+                        android:textColor="#3E4D44"
+                        android:textSize="14sp"
+                        android:buttonTint="#3E4D44"
+                        android:fontFamily="@font/be_vietnam_pro" />
+
+                    <CheckBox
+                        android:id="@+id/cbRegionOthers"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tỉnh thành khác"
+                        android:textColor="#3E4D44"
+                        android:textSize="14sp"
+                        android:buttonTint="#3E4D44"
+                        android:fontFamily="@font/be_vietnam_pro" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="8dp" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Footer Action Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="16dp"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/btnReset"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="Thiết lập lại"
+            android:textColor="#3E4D44"
+            app:strokeColor="#3E4D44"
+            android:layout_marginEnd="8dp"
+            android:fontFamily="@font/be_vietnam_pro" />
+
+        <Button
+            android:id="@+id/btnConfirm"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="Áp dụng"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#3E4D44"
+            android:layout_marginStart="8dp"
+            android:fontFamily="@font/be_vietnam_pro" />
+    </LinearLayout>
+</LinearLayout>

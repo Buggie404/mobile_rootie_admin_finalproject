@@ -68,6 +68,7 @@ class CustomerAdminFragment : RootieAdminFragment() {
 
         // Bind message button in header
         setupHeaderMessageButton(binding.btnMessage)
+        setupHeaderNotification(binding.btnNotification, null)
     }
 
     private fun setupRecyclerView() {
@@ -99,10 +100,7 @@ class CustomerAdminFragment : RootieAdminFragment() {
             }
         }
 
-        // Notification Button
-        binding.btnNotification.setOnClickListener {
-            Toast.makeText(requireContext(), "Mở thông báo", Toast.LENGTH_SHORT).show()
-        }
+
 
         // Create Campaign Button
         binding.btnCreateCampaign.setOnClickListener {

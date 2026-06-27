@@ -25,6 +25,9 @@ interface BookingDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertSync(booking: BookingEntity)
 
+    @Query("DELETE FROM bookings WHERE id = :id")
+    fun deleteByIdSync(id: String)
+
     @Query("DELETE FROM bookings")
     fun clearAllSync()
 }

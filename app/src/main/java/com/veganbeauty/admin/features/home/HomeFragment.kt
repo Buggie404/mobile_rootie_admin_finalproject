@@ -116,6 +116,7 @@ class HomeFragment : RootieAdminFragment() {
 
         // Bind header message icon
         setupHeaderMessageButton(binding.header.homeHeaderMessageBtn)
+        setupHeaderNotification(binding.header.homeHeaderNotificationBtn, binding.header.homeHeaderNotificationBadge)
 
         // Role switcher (test)
         binding.header.homeHeaderAvatarContainer.setOnClickListener {

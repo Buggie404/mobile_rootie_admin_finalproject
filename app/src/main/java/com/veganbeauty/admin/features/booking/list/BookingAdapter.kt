@@ -95,10 +95,6 @@ class BookingAdapter(
         }
 
         private fun setupActions(booking: BookingEntity) {
-            if (isAdmin) {
-                binding.llActions.visibility = View.GONE
-                return
-            }
             val isPending = booking.status.equals("Chờ xác nhận", ignoreCase = true) || booking.status.equals("pending", ignoreCase = true)
             val isUpcoming = booking.status.equals("Sắp diễn ra", ignoreCase = true) || 
                              booking.status.equals("confirmed", ignoreCase = true) || 

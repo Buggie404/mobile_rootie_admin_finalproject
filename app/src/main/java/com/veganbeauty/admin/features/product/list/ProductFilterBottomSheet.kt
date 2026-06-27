@@ -4,13 +4,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.veganbeauty.admin.R
 import com.veganbeauty.admin.features.product.ProductViewModel
@@ -35,6 +38,12 @@ class ProductFilterBottomSheet : BottomSheetDialogFragment() {
     ): View? {
         viewModel = ViewModelProvider(requireParentFragment())[ProductViewModel::class.java]
         return inflater.inflate(R.layout.product_bottom_sheet_filter, container, false)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val dialog = dialog as? BottomSheetDialog
+        dialog?.behavior?.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -79,6 +88,7 @@ class ProductFilterBottomSheet : BottomSheetDialogFragment() {
             }
         }
 
+        // Setup Categories Spinner
         // Dynamic categories & subcategories setup
         setupCategoriesContainer(view)
 

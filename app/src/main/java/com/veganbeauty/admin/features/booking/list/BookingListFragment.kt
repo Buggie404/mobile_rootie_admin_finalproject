@@ -46,6 +46,8 @@ class BookingListFragment : RootieAdminFragment() {
 
         // Sync initially
         viewModel.syncFromFirebase()
+
+        setupHeaderNotification(binding.btnNotification, binding.notificationBadge)
     }
 
     private fun setupBranchTitle() {

@@ -44,6 +44,14 @@ class BookingViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
+    fun startRealtimeSync(onNewBooking: (BookingEntity) -> Unit) {
+        repository.startRealtimeSync(onNewBooking)
+    }
+
+    fun stopRealtimeSync() {
+        repository.stopRealtimeSync()
+    }
+
     fun updateBookingStatus(bookingId: String, status: String, cancelReason: String = "") {
         viewModelScope.launch {
             try {

@@ -21,6 +21,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+import com.veganbeauty.admin.core.utils.KeyboardUtils
+
 class CustomerNoteBottomSheet : BottomSheetDialogFragment() {
 
     private var _binding: CustomerNoteBottomSheetBinding? = null
@@ -48,6 +50,7 @@ class CustomerNoteBottomSheet : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        KeyboardUtils.setupKeyboardAutoHiding(view, activity)
         setupListeners()
         loadCustomerData()
     }

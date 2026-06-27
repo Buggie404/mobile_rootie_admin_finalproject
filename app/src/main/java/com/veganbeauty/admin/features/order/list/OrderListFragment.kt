@@ -37,10 +37,12 @@ class OrderListFragment : RootieAdminFragment() {
 
         setupRecyclerView()
         setupTabs()
-        setupSwipeRefresh()
+        // setupSwipeRefresh() // Disabled as swipeRefresh is missing in layout
 
         // Sync data initially
         viewModel.syncFromFirebase()
+
+        setupHeaderNotification(binding.btnNotification, binding.notificationBadge)
     }
 
     private fun setupRecyclerView() {
@@ -56,8 +58,8 @@ class OrderListFragment : RootieAdminFragment() {
         val tabs = mapOf(
             "ALL" to binding.tabAll,
             "PENDING" to binding.tabPending,
-            "PROCESSING" to binding.tabProcessing,
-            "SHIPPING" to binding.tabShipping,
+            "PROCESSING" to binding.tabPreparing,
+            "SHIPPING" to binding.tabDelivering,
             "COMPLETED" to binding.tabCompleted,
             "CANCELLED" to binding.tabCancelled
         )
@@ -69,25 +71,25 @@ class OrderListFragment : RootieAdminFragment() {
         }
     }
 
-    private fun setupSwipeRefresh() {
+    /* private fun setupSwipeRefresh() {
         binding.swipeRefresh.setColorSchemeColors(Color.parseColor("#4F6544"))
         binding.swipeRefresh.setOnRefreshListener {
             viewModel.syncFromFirebase()
         }
-    }
+    } */
 
     override fun observeViewModel() {
         viewModel.filteredOrders.observe(viewLifecycleOwner) { orders ->
-            binding.swipeRefresh.isRefreshing = false
+            // binding.swipeRefresh.isRefreshing = false
             adapter.submitList(orders)
             
-            if (orders.isEmpty()) {
+            /* if (orders.isEmpty()) {
                 binding.llEmpty.visibility = View.VISIBLE
                 binding.rvOrders.visibility = View.GONE
             } else {
                 binding.llEmpty.visibility = View.GONE
                 binding.rvOrders.visibility = View.VISIBLE
-            }
+            } */
         }
 
         viewModel.activeTabStatus.observe(viewLifecycleOwner) { activeKey ->
@@ -99,8 +101,8 @@ class OrderListFragment : RootieAdminFragment() {
         val tabs = mapOf(
             "ALL" to binding.tabAll,
             "PENDING" to binding.tabPending,
-            "PROCESSING" to binding.tabProcessing,
-            "SHIPPING" to binding.tabShipping,
+            "PROCESSING" to binding.tabPreparing,
+            "SHIPPING" to binding.tabDelivering,
             "COMPLETED" to binding.tabCompleted,
             "CANCELLED" to binding.tabCancelled
         )

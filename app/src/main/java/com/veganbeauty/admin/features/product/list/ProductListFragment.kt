@@ -113,6 +113,7 @@ class ProductListFragment : RootieAdminFragment() {
 
         // Bind message button in header
         setupHeaderMessageButton(binding.btnMessage)
+        setupHeaderNotification(binding.btnNotification, binding.notificationBadge)
     }
 
     override fun observeViewModel() {

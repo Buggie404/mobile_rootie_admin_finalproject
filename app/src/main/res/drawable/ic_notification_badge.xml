@@ -1,19 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="9dp"
-    android:height="9dp"
-    android:viewportWidth="9"
-    android:viewportHeight="9">
-    <!-- Yellow circle base (SVG 3) -->
-    <path
-        android:fillColor="#FFCC00"
-        android:pathData="M4.5,4.5m-4.5,0a4.5,4.5 0,1 1,9 0a4.5,4.5 0,1 1,-9 0" />
-    <!-- White number 1 path (SVG 1), translated to center -->
-    <group
-        android:translateX="3.45"
-        android:translateY="1.9">
-        <path
-            android:fillColor="#FFFFFF"
-            android:pathData="M2.07905,5.36442e-05V5.18005H1.00105V1.47005L5.47096e-05,1.47705V0.826053L0.161055,0.777054C0.455055,0.693054 0.693055,0.597387 0.875055,0.490054C1.05705,0.38272 1.23205,0.240387 1.40005,0.0630537L1.44905,5.36442e-05H2.07905Z" />
-    </group>
-</vector>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="#FFCC00" />
+    <size android:width="14dp" android:height="14dp" />
+</shape>
