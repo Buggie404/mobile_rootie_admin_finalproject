@@ -22,7 +22,18 @@ import com.veganbeauty.admin.core.base.UserSession;
 import com.veganbeauty.admin.data.local.RootieAdminDatabase;
 import com.veganbeauty.admin.data.local.SessionManager;
 import com.veganbeauty.admin.data.local.entities.OrderEntity;
+import com.veganbeauty.admin.core.utils.ImageUtils;
+import com.veganbeauty.admin.data.local.entities.OrderItem;
+import com.veganbeauty.admin.data.local.entities.ProductEntity;
+import com.veganbeauty.admin.data.remote.FirebaseService;
+import com.veganbeauty.admin.data.repository.OrderRepository;
+import com.veganbeauty.admin.data.repository.ProductRepository;
 import com.veganbeauty.admin.databinding.HomeFragmentBinding;
+import com.veganbeauty.admin.databinding.HomeItemTopSellingBinding;
+import com.veganbeauty.admin.features.order.OrderDetailFragment;
+import com.veganbeauty.admin.features.order.OrderListFragment;
+import com.veganbeauty.admin.features.product.add.ProductAddFragment;
+import com.veganbeauty.admin.features.product.list.ProductListFragment;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -41,6 +52,7 @@ import java.util.Locale;
 public class HomeFragment extends RootieAdminFragment {
 
     private HomeFragmentBinding binding;
+    private RecentActivityAdapter recentActivityAdapter;
     private final NumberFormat vndFormat = NumberFormat.getNumberInstance(new Locale("vi", "VN"));
 
     private interface DateFilter {
@@ -70,67 +82,29 @@ public class HomeFragment extends RootieAdminFragment {
             }
         });
 
-        // Bind sparkline data points
-        binding.sparklineRevenue.setData(Arrays.asList(35f, 25f, 28f, 32f, 28f, 30f, 40f, 36f, 45f));
         binding.sparklineRevenue.setLineColor(0xFF677559);
-
-        binding.sparklineOrders.setData(Arrays.asList(10f, 11f, 13f, 15f, 16f, 20f, 25f));
         binding.sparklineOrders.setLineColor(0xFF677559);
 
-        // Build recent activities list
-        List<RecentActivity> activities = Arrays.asList(
-            new RecentActivity(
-                "Nước sen Hậu Giang 140ml",
-                "9283",
-                "2 phút trước",
-                "$45.00",
-                "HOÀN THÀNH",
-                R.drawable.nuoc_sen_hau_giang,
-                null
-            ),
-            new RecentActivity(
-                "Sáp dưỡng ẩm đa năng sen Hậu Giang 30ml",
-                "9282",
-                "15 phút trước",
-                "$82.50",
-                "HOÀN THÀNH",
-                R.drawable.sap_duong_am_sen_hau_giang,
-                null
-            ),
-            new RecentActivity(
-                "Serum nghệ Hưng Yên",
-                "9281",
-                "1 giờ trước",
-                "$120.00",
-                "HOÀN THÀNH"
-            ),
-            new RecentActivity(
-                "Tư vấn da",
-                "9280",
-                "2 giờ trước",
-                "$15.00",
-                "HOÀN THÀNH"
-            )
+        recentActivityAdapter = new RecentActivityAdapter(
+                new ArrayList<>(),
+                activityItem -> {
+                    MainActivity mainActivity = (MainActivity) getActivity();
+                    if (mainActivity != null) {
+                        mainActivity.loadFragment(OrderDetailFragment.newInstance(activityItem.getOrderId()));
+                    }
+                }
         );
-
-        RecentActivityAdapter adapter = new RecentActivityAdapter(activities, activityItem -> 
-            Toast.makeText(
-                requireContext(),
-                "Chi tiết đơn hàng #" + activityItem.getOrderId(),
-                Toast.LENGTH_SHORT
-            ).show()
-        );
-
         binding.rvRecentActivities.setLayoutManager(new LinearLayoutManager(requireContext()));
-        binding.rvRecentActivities.setAdapter(adapter);
+        binding.rvRecentActivities.setAdapter(recentActivityAdapter);
 
-        binding.btnSeeAll.setOnClickListener(v -> 
-            Toast.makeText(requireContext(), "Xem tất cả hoạt động", Toast.LENGTH_SHORT).show()
-        );
+        binding.btnSeeAll.setOnClickListener(v -> openOrdersWithTab(OrderListFragment.TAB_ALL));
 
-        binding.fabAdd.setOnClickListener(v -> 
-            Toast.makeText(requireContext(), "Thêm mới", Toast.LENGTH_SHORT).show()
-        );
+        setupSparklineCardClicks();
+        setupAdminStatCardClicks();
+
+        binding.btnSeeAllTopSelling.setOnClickListener(v -> openProductList());
+
+        binding.fabAdd.setOnClickListener(v -> openProductList());
 
         // Bind header message icon
         setupHeaderMessageButton(binding.header.homeHeaderMessageBtn);
@@ -158,79 +132,181 @@ public class HomeFragment extends RootieAdminFragment {
         });
 
         // === DASHBOARD THEO ROLE ===
-        setupDashboardByRole(sessionManager);
+        // Data loaded in onResume()
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadHomeData(new SessionManager(requireContext()));
+    }
+
+    private void setupSparklineCardClicks() {
+        binding.cardSparklineRevenue.setOnClickListener(v ->
+                openOrdersWithTab(OrderListFragment.TAB_COMPLETED));
+        binding.cardSparklineOrders.setOnClickListener(v ->
+                openOrdersWithTab(OrderListFragment.TAB_ALL));
+    }
+
+    private void loadHomeData(SessionManager sessionManager) {
+        new Thread(() -> {
+            try {
+                RootieAdminDatabase db = RootieAdminDatabase.getDatabase(requireContext().getApplicationContext());
+                OrderRepository orderRepository = new OrderRepository(db.orderDao(), new FirebaseService());
+                orderRepository.checkAndSeedOrders(requireContext().getApplicationContext());
+                List<OrderEntity> orders = orderRepository.getAllOrdersSync();
+
+                String role = sessionManager.getRole();
+                if (role == null) {
+                    role = "admin";
+                }
+                boolean isAdmin = role.equalsIgnoreCase("admin") || role.equalsIgnoreCase("business");
+                List<JSONObject> products = isAdmin ? null : parseProductsJson();
+
+                if (getActivity() == null) return;
+                getActivity().runOnUiThread(() -> {
+                    if (binding == null) return;
+                    bindOverviewCards(orders);
+                    bindRecentActivities(orders);
+                    if (isAdmin) {
+                        binding.llAdminDashboard.setVisibility(View.VISIBLE);
+                        binding.llStaffDashboard.setVisibility(View.GONE);
+                        bindAdminDashboard(orders);
+                    } else {
+                        binding.llAdminDashboard.setVisibility(View.GONE);
+                        binding.llStaffDashboard.setVisibility(View.VISIBLE);
+                        bindStaffDashboard(products);
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
+    private void bindOverviewCards(List<OrderEntity> orders) {
+        Calendar today = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+
+        long todayRevenue = calcRevenue(orders, dateStr -> isToday(dateStr, sdf, today));
+        int todayOrderCount = countOrders(orders, dateStr -> isToday(dateStr, sdf, today));
+
+        binding.tvSparklineRevenueValue.setText(formatVnd(todayRevenue));
+        binding.tvSparklineOrdersValue.setText(String.valueOf(todayOrderCount));
+
+        binding.sparklineRevenue.setData(buildDailyRevenueSparkline(orders, sdf, today));
+        binding.sparklineOrders.setData(buildDailyOrderSparkline(orders, sdf, today));
+
+        long thisWeekRevenue = calcRevenue(orders, dateStr -> isThisWeek(dateStr, sdf, today));
+        long lastWeekRevenue = calcRevenue(orders, dateStr -> isLastWeek(dateStr, sdf, today));
+        updateGrowthBadge(binding.tvSparklineRevenueBadge, thisWeekRevenue, lastWeekRevenue);
+
+        int thisWeekOrders = countOrders(orders, dateStr -> isThisWeek(dateStr, sdf, today));
+        int lastWeekOrders = countOrders(orders, dateStr -> isLastWeek(dateStr, sdf, today));
+        updateGrowthBadge(binding.tvSparklineOrdersBadge, thisWeekOrders, lastWeekOrders);
+    }
+
+    private void bindRecentActivities(List<OrderEntity> orders) {
+        List<OrderEntity> sorted = new ArrayList<>(orders);
+        sorted.sort((o1, o2) -> {
+            Date d1 = parseOrderDateTime(o1);
+            Date d2 = parseOrderDateTime(o2);
+            if (d1 == null && d2 == null) return 0;
+            if (d1 == null) return 1;
+            if (d2 == null) return -1;
+            return d2.compareTo(d1);
+        });
+
+        List<RecentActivity> activities = new ArrayList<>();
+        int limit = Math.min(4, sorted.size());
+        for (int i = 0; i < limit; i++) {
+            OrderEntity order = sorted.get(i);
+            String title = getOrderDisplayTitle(order);
+            String imageUrl = null;
+            if (order.getItems() != null && !order.getItems().isEmpty()) {
+                imageUrl = order.getItems().get(0).getProductImage();
+            }
+            activities.add(new RecentActivity(
+                    title,
+                    order.getOrderId(),
+                    formatTimeAgo(order),
+                    formatVnd(order.getTotalAmount()),
+                    formatStatusLabel(order.getStatus()),
+                    null,
+                    imageUrl
+            ));
+        }
+        recentActivityAdapter.updateItems(activities);
     }
 
     // -------------------------------------------------------------------------
     // Dashboard dispatcher
     // -------------------------------------------------------------------------
 
-    private void setupDashboardByRole(SessionManager sessionManager) {
-        String role = sessionManager.getRole();
-        if (role == null) {
-            role = "admin";
-        }
-        boolean isAdmin = role.equalsIgnoreCase("admin") || role.equalsIgnoreCase("business");
+    private void setupAdminStatCardClicks() {
+        binding.cardStatNewOrders.setOnClickListener(v ->
+                openOrdersWithTab(OrderListFragment.TAB_NEW_ORDERS));
+        binding.cardStatPendingOrders.setOnClickListener(v ->
+                openOrdersWithTab(OrderListFragment.TAB_PENDING_CONFIRM));
+        binding.cardStatShippingOrders.setOnClickListener(v ->
+                openOrdersWithTab(OrderListFragment.TAB_SHIPPING));
+    }
 
-        if (isAdmin) {
-            binding.llAdminDashboard.setVisibility(View.VISIBLE);
-            binding.llStaffDashboard.setVisibility(View.GONE);
-            loadAdminDashboard();
-        } else {
-            binding.llAdminDashboard.setVisibility(View.GONE);
-            binding.llStaffDashboard.setVisibility(View.VISIBLE);
-            loadStaffDashboard();
+    private void openProductList() {
+        MainActivity mainActivity = (MainActivity) getActivity();
+        if (mainActivity == null) return;
+
+        mainActivity.setCurrentTabId(R.id.nav_product);
+        mainActivity.loadFragment(new ProductListFragment());
+
+        View bottomNav = mainActivity.findViewById(R.id.bottom_nav);
+        if (bottomNav != null) {
+            BottomNavHelper.highlightTab(bottomNav, R.id.nav_product);
         }
     }
 
-    // -------------------------------------------------------------------------
-    // ADMIN Dashboard
-    // -------------------------------------------------------------------------
+    private void openOrdersWithTab(String tab) {
+        MainActivity mainActivity = (MainActivity) getActivity();
+        if (mainActivity == null) return;
 
-    private void loadAdminDashboard() {
-        new Thread(() -> {
-            try {
-                List<OrderEntity> orders = RootieAdminDatabase.getDatabase(requireContext().getApplicationContext()).orderDao().getAllSync();
-                if (getActivity() == null) return;
-                getActivity().runOnUiThread(() -> {
-                    if (binding == null) return;
+        mainActivity.setCurrentTabId(R.id.nav_order);
+        mainActivity.loadFragment(OrderListFragment.newInstance(tab));
 
-                    // --- Stat cards ---
-                    int newOrders = 0;
-                    int pendingOrders = 0;
-                    int shippingOrders = 0;
-                    long totalAmountSum = 0;
+        View bottomNav = mainActivity.findViewById(R.id.bottom_nav);
+        if (bottomNav != null) {
+            BottomNavHelper.highlightTab(bottomNav, R.id.nav_order);
+        }
+    }
 
-                    for (OrderEntity order : orders) {
-                        if ("Chờ xử lý".equals(order.getStatus())) {
-                            newOrders++;
-                        }
-                        if ("Chờ xử lý".equals(order.getStatus()) || "Đang xử lý".equals(order.getStatus())) {
-                            pendingOrders++;
-                        }
-                        if ("Đang giao".equals(order.getStatus())) {
-                            shippingOrders++;
-                        }
-                        totalAmountSum += order.getTotalAmount();
-                    }
+    private void bindAdminDashboard(List<OrderEntity> orders) {
+        int newOrders = 0;
+        int pendingOrders = 0;
+        int shippingOrders = 0;
+        long totalAmountSum = 0;
 
-                    long avgValue = orders.isEmpty() ? 0L : totalAmountSum / orders.size();
-
-                    binding.tvStatNewOrders.setText(String.valueOf(newOrders));
-                    binding.tvStatPendingOrders.setText(String.valueOf(pendingOrders));
-                    binding.tvStatShippingOrders.setText(String.valueOf(shippingOrders));
-                    binding.tvStatAvgOrderValue.setText(formatShort(avgValue));
-
-                    // --- Doanh thu & Tỷ lệ hủy theo tab ---
-                    setupRevenueTabs(orders);
-
-                    // --- Sản phẩm bán chạy (top 5 theo sold từ products.json) ---
-                    loadTopSellingProducts();
-                });
-            } catch (Exception e) {
-                e.printStackTrace();
+        for (OrderEntity order : orders) {
+            String status = order.getStatus();
+            if ("Chờ xử lý".equals(status)) {
+                newOrders++;
             }
-        }).start();
+            if ("Chờ xử lý".equals(status) || "Đang xử lý".equals(status)) {
+                pendingOrders++;
+            }
+            if ("Đang giao".equals(status)) {
+                shippingOrders++;
+            }
+            totalAmountSum += order.getTotalAmount();
+        }
+
+        long avgValue = orders.isEmpty() ? 0L : totalAmountSum / orders.size();
+
+        binding.tvStatNewOrders.setText(String.valueOf(newOrders));
+        binding.tvStatPendingOrders.setText(String.valueOf(pendingOrders));
+        binding.tvStatShippingOrders.setText(String.valueOf(shippingOrders));
+        binding.tvStatAvgOrderValue.setText(formatShort(avgValue));
+
+        setupRevenueTabs(orders);
+        loadTopSellingProducts();
     }
 
     private void setupRevenueTabs(List<OrderEntity> orders) {
@@ -327,6 +403,157 @@ public class HomeFragment extends RootieAdminFragment {
         }
     }
 
+    private boolean isLastWeek(String dateStr, SimpleDateFormat sdf, Calendar today) {
+        try {
+            Date date = sdf.parse(dateStr);
+            if (date == null) return false;
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(date);
+            Calendar lastWeek = (Calendar) today.clone();
+            lastWeek.add(Calendar.WEEK_OF_YEAR, -1);
+            return cal.get(Calendar.WEEK_OF_YEAR) == lastWeek.get(Calendar.WEEK_OF_YEAR) &&
+                   cal.get(Calendar.YEAR) == lastWeek.get(Calendar.YEAR);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private int countOrders(List<OrderEntity> orders, DateFilter filter) {
+        int count = 0;
+        for (OrderEntity order : orders) {
+            if (filter.filter(order.getOrderDate())) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private List<Float> buildDailyRevenueSparkline(List<OrderEntity> orders, SimpleDateFormat sdf, Calendar today) {
+        List<Float> points = new ArrayList<>();
+        for (int i = 6; i >= 0; i--) {
+            Calendar day = (Calendar) today.clone();
+            day.add(Calendar.DAY_OF_YEAR, -i);
+            long revenue = 0;
+            for (OrderEntity order : orders) {
+                if ("Hoàn tất".equals(order.getStatus()) && isSameCalendarDay(order.getOrderDate(), sdf, day)) {
+                    revenue += order.getTotalAmount();
+                }
+            }
+            points.add((float) revenue);
+        }
+        return ensureSparklinePoints(points);
+    }
+
+    private List<Float> buildDailyOrderSparkline(List<OrderEntity> orders, SimpleDateFormat sdf, Calendar today) {
+        List<Float> points = new ArrayList<>();
+        for (int i = 6; i >= 0; i--) {
+            Calendar day = (Calendar) today.clone();
+            day.add(Calendar.DAY_OF_YEAR, -i);
+            int count = 0;
+            for (OrderEntity order : orders) {
+                if (isSameCalendarDay(order.getOrderDate(), sdf, day)) {
+                    count++;
+                }
+            }
+            points.add((float) count);
+        }
+        return ensureSparklinePoints(points);
+    }
+
+    private List<Float> ensureSparklinePoints(List<Float> points) {
+        if (points.size() >= 2) {
+            return points;
+        }
+        List<Float> fallback = new ArrayList<>();
+        fallback.add(0f);
+        fallback.add(0f);
+        return fallback;
+    }
+
+    private boolean isSameCalendarDay(String dateStr, SimpleDateFormat sdf, Calendar targetDay) {
+        try {
+            Date date = sdf.parse(dateStr);
+            if (date == null) return false;
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(date);
+            return cal.get(Calendar.DAY_OF_YEAR) == targetDay.get(Calendar.DAY_OF_YEAR) &&
+                   cal.get(Calendar.YEAR) == targetDay.get(Calendar.YEAR);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private void updateGrowthBadge(TextView badgeView, long current, long previous) {
+        if (previous <= 0 && current <= 0) {
+            badgeView.setVisibility(View.GONE);
+            return;
+        }
+        badgeView.setVisibility(View.VISIBLE);
+        if (previous <= 0) {
+            badgeView.setText("+100%");
+            return;
+        }
+        float change = ((float) (current - previous) / previous) * 100f;
+        badgeView.setText(formatPercentChange(change));
+    }
+
+    private void updateGrowthBadge(TextView badgeView, int current, int previous) {
+        updateGrowthBadge(badgeView, (long) current, (long) previous);
+    }
+
+    private String formatPercentChange(float change) {
+        String sign = change >= 0 ? "+" : "";
+        return String.format(Locale.getDefault(), "%s%.0f%%", sign, change);
+    }
+
+    private Date parseOrderDateTime(OrderEntity order) {
+        try {
+            SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
+            String time = order.getOrderTime() != null ? order.getOrderTime() : "00:00";
+            return format.parse(order.getOrderDate() + " " + time);
+        } catch (Exception e) {
+            try {
+                return new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(order.getOrderDate());
+            } catch (Exception ignored) {
+                return null;
+            }
+        }
+    }
+
+    private String formatTimeAgo(OrderEntity order) {
+        Date orderDate = parseOrderDateTime(order);
+        if (orderDate == null) {
+            return order.getOrderDate() != null ? order.getOrderDate() : "";
+        }
+        long diffMs = System.currentTimeMillis() - orderDate.getTime();
+        if (diffMs < 0) diffMs = 0;
+        long minutes = diffMs / (60 * 1000);
+        if (minutes < 1) return "Vừa xong";
+        if (minutes < 60) return minutes + " phút trước";
+        long hours = minutes / 60;
+        if (hours < 24) return hours + " giờ trước";
+        long days = hours / 24;
+        if (days < 7) return days + " ngày trước";
+        return new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(orderDate);
+    }
+
+    private String formatStatusLabel(String status) {
+        if (status == null || status.trim().isEmpty()) {
+            return "KHÔNG RÕ";
+        }
+        return status.trim().toUpperCase(Locale.getDefault());
+    }
+
+    private String getOrderDisplayTitle(OrderEntity order) {
+        if (order.getItems() != null && !order.getItems().isEmpty()) {
+            OrderItem firstItem = order.getItems().get(0);
+            if (firstItem.getProductName() != null && !firstItem.getProductName().trim().isEmpty()) {
+                return firstItem.getProductName();
+            }
+        }
+        return "Đơn hàng " + order.getOrderId();
+    }
+
     private void selectTab(TextView selected, DateFilter filter, List<OrderEntity> orders) {
         List<TextView> tabs = Arrays.asList(binding.tabRevenueToday, binding.tabRevenueWeek, binding.tabRevenueMonth, binding.tabRevenueQuarter);
         for (TextView tab : tabs) {
@@ -346,96 +573,132 @@ public class HomeFragment extends RootieAdminFragment {
 
     private void loadTopSellingProducts() {
         new Thread(() -> {
-            List<JSONObject> products = parseProductsJson();
-            // Sort by sold descending
-            products.sort((p1, p2) -> Long.compare(p2.optLong("sold", 0), p1.optLong("sold", 0)));
-            List<JSONObject> top5 = products.subList(0, Math.min(5, products.size()));
+            try {
+                RootieAdminDatabase db = RootieAdminDatabase.getDatabase(requireContext().getApplicationContext());
+                ProductRepository productRepository = new ProductRepository(db.productDao(), new FirebaseService());
+                productRepository.checkAndSeedProducts(requireContext().getApplicationContext());
 
-            if (getActivity() == null) return;
-            getActivity().runOnUiThread(() -> {
-                if (binding == null) return;
-                binding.llTopSelling.removeAllViews();
-                for (int i = 0; i < top5.size(); i++) {
-                    JSONObject product = top5.get(i);
-                    String name = product.optString("name", "");
-                    long sold = product.optLong("sold", 0);
-                    binding.llTopSelling.addView(buildRankRow(i + 1, name, vndFormat.format(sold) + " đã bán", "#4F6544"));
-                }
-            });
+                List<ProductEntity> products = new ArrayList<>(db.productDao().getAllSync());
+                products.sort((p1, p2) -> Integer.compare(p2.getSold(), p1.getSold()));
+                List<ProductEntity> top5 = products.subList(0, Math.min(5, products.size()));
+
+                if (getActivity() == null) return;
+                getActivity().runOnUiThread(() -> {
+                    if (binding == null) return;
+                    binding.llTopSelling.removeAllViews();
+
+                    if (top5.isEmpty()) {
+                        TextView emptyView = new TextView(requireContext());
+                        emptyView.setText("Chưa có dữ liệu sản phẩm");
+                        emptyView.setTextColor(Color.parseColor("#95A192"));
+                        emptyView.setTextSize(13f);
+                        emptyView.setPadding(0, dpToPx(8), 0, dpToPx(8));
+                        binding.llTopSelling.addView(emptyView);
+                        return;
+                    }
+
+                    for (int i = 0; i < top5.size(); i++) {
+                        binding.llTopSelling.addView(createTopSellingRow(top5.get(i), i + 1, i < top5.size() - 1));
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }).start();
+    }
+
+    private View createTopSellingRow(ProductEntity product, int rank, boolean showDivider) {
+        HomeItemTopSellingBinding rowBinding = HomeItemTopSellingBinding.inflate(
+                LayoutInflater.from(requireContext()),
+                binding.llTopSelling,
+                false
+        );
+
+        rowBinding.txtRank.setText("#" + rank);
+        rowBinding.txtProductName.setText(product.getName());
+        rowBinding.txtSoldCount.setText(vndFormat.format(product.getSold()) + " đã bán");
+        rowBinding.txtPrice.setText(formatVnd(product.getPrice()));
+        rowBinding.divider.setVisibility(showDivider ? View.VISIBLE : View.GONE);
+
+        String imageUrl = product.getMainImage();
+        if (imageUrl != null && !imageUrl.trim().isEmpty()) {
+            ImageUtils.loadImage(requireContext(), rowBinding.imvProduct, imageUrl, R.color.gray_light);
+        } else {
+            rowBinding.imvProduct.setImageResource(R.color.gray_light);
+        }
+
+        rowBinding.rowTopSelling.setOnClickListener(v -> {
+            MainActivity mainActivity = (MainActivity) getActivity();
+            if (mainActivity == null) return;
+            View bottomNav = mainActivity.findViewById(R.id.bottom_nav);
+            if (bottomNav != null) {
+                bottomNav.setVisibility(View.GONE);
+            }
+            mainActivity.getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.main_container, ProductAddFragment.newInstance(product.getId()))
+                    .addToBackStack(null)
+                    .commit();
+        });
+
+        return rowBinding.getRoot();
     }
 
     // -------------------------------------------------------------------------
     // STAFF Dashboard
     // -------------------------------------------------------------------------
 
-    private void loadStaffDashboard() {
-        new Thread(() -> {
-            List<JSONObject> products = parseProductsJson();
+    private void bindStaffDashboard(List<JSONObject> products) {
+        if (products == null) {
+            products = new ArrayList<>();
+        }
+        binding.llTopViewed.removeAllViews();
+        List<JSONObject> topViewed = new ArrayList<>(products);
+        topViewed.sort((p1, p2) -> Long.compare(p2.optLong("sold", 0), p1.optLong("sold", 0)));
+        List<JSONObject> finalTopViewed = topViewed.subList(0, Math.min(5, topViewed.size()));
 
-            // Top 5 quan tâm (theo sold)
-            List<JSONObject> topViewed = new ArrayList<>(products);
-            topViewed.sort((p1, p2) -> Long.compare(p2.optLong("sold", 0), p1.optLong("sold", 0)));
-            List<JSONObject> finalTopViewed = topViewed.subList(0, Math.min(5, topViewed.size()));
+        List<JSONObject> topRated = new ArrayList<>(products);
+        topRated.sort((p1, p2) -> Double.compare(p2.optDouble("rating", 0.0), p1.optDouble("rating", 0.0)));
+        List<JSONObject> finalTopRated = topRated.subList(0, Math.min(5, topRated.size()));
 
-            // Top 5 rating cao
-            List<JSONObject> topRated = new ArrayList<>(products);
-            topRated.sort((p1, p2) -> Double.compare(p2.optDouble("rating", 0.0), p1.optDouble("rating", 0.0)));
-            List<JSONObject> finalTopRated = topRated.subList(0, Math.min(5, topRated.size()));
-
-            // Sản phẩm phản hồi xấu (rating < 3.5)
-            List<JSONObject> badProducts = new ArrayList<>();
-            for (JSONObject p : products) {
-                if (p.optDouble("rating", 5.0) < 3.5) {
-                    badProducts.add(p);
-                }
+        List<JSONObject> badProducts = new ArrayList<>();
+        for (JSONObject p : products) {
+            if (p.optDouble("rating", 5.0) < 3.5) {
+                badProducts.add(p);
             }
-            badProducts.sort((p1, p2) -> Double.compare(p1.optDouble("rating", 0.0), p2.optDouble("rating", 0.0)));
-            List<JSONObject> finalBadProducts = badProducts.subList(0, Math.min(5, badProducts.size()));
+        }
+        badProducts.sort((p1, p2) -> Double.compare(p1.optDouble("rating", 0.0), p2.optDouble("rating", 0.0)));
+        List<JSONObject> finalBadProducts = badProducts.subList(0, Math.min(5, badProducts.size()));
 
-            if (getActivity() == null) return;
-            getActivity().runOnUiThread(() -> {
-                if (binding == null) return;
+        for (int i = 0; i < finalTopViewed.size(); i++) {
+            JSONObject p = finalTopViewed.get(i);
+            binding.llTopViewed.addView(
+                buildRankRow(i + 1, p.optString("name"), "Đã bán: " + vndFormat.format(p.optLong("sold", 0)), "#4F6544")
+            );
+        }
 
-                // Bind top viewed
-                binding.llTopViewed.removeAllViews();
-                for (int i = 0; i < finalTopViewed.size(); i++) {
-                    JSONObject p = finalTopViewed.get(i);
-                    binding.llTopViewed.addView(
-                        buildRankRow(i + 1, p.optString("name"), "Đã bán: " + vndFormat.format(p.optLong("sold", 0)), "#4F6544")
-                    );
-                }
+        binding.llTopRated.removeAllViews();
+        for (int i = 0; i < finalTopRated.size(); i++) {
+            JSONObject p = finalTopRated.get(i);
+            double rating = p.optDouble("rating", 0.0);
+            binding.llTopRated.addView(
+                buildRankRow(i + 1, p.optString("name"), String.format(Locale.getDefault(), "⭐ %.1f", rating), "#59AE7B")
+            );
+        }
 
-                // Bind top rated
-                binding.llTopRated.removeAllViews();
-                for (int i = 0; i < finalTopRated.size(); i++) {
-                    JSONObject p = finalTopRated.get(i);
-                    double rating = p.optDouble("rating", 0.0);
-                    binding.llTopRated.addView(
-                        buildRankRow(i + 1, p.optString("name"), String.format(Locale.getDefault(), "⭐ %.1f", rating), "#59AE7B")
-                    );
-                }
+        binding.llBadFeedback.removeAllViews();
+        if (finalBadProducts.isEmpty()) {
+            binding.llBadFeedback.addView(buildInfoText("Không có sản phẩm nào có phản hồi xấu 🎉", "#1B5E20"));
+        } else {
+            for (JSONObject p : finalBadProducts) {
+                double rating = p.optDouble("rating", 0.0);
+                binding.llBadFeedback.addView(
+                    buildInfoText(String.format(Locale.getDefault(), "⚠ %s — rating %.1f", p.optString("name"), rating), "#B71C1C")
+                );
+            }
+        }
 
-                // Bind bad feedback
-                binding.llBadFeedback.removeAllViews();
-                if (finalBadProducts.isEmpty()) {
-                    binding.llBadFeedback.addView(buildInfoText("Không có sản phẩm nào có phản hồi xấu 🎉", "#1B5E20"));
-                } else {
-                    for (JSONObject p : finalBadProducts) {
-                        double rating = p.optDouble("rating", 0.0);
-                        binding.llBadFeedback.addView(
-                            buildInfoText(String.format(Locale.getDefault(), "⚠ %s — rating %.1f", p.optString("name"), rating), "#B71C1C")
-                        );
-                    }
-                }
-
-                // Skin chart
-                buildSkinChart(products);
-
-                // FAQ section
-                buildFaqSection();
-            });
-        }).start();
+        buildSkinChart(products);
+        buildFaqSection();
     }
 
     private void buildSkinChart(List<JSONObject> products) {
@@ -648,6 +911,10 @@ public class HomeFragment extends RootieAdminFragment {
         tvParams.bottomMargin = dpToPx(8);
         tv.setLayoutParams(tvParams);
         return tv;
+    }
+
+    private String formatVnd(long value) {
+        return vndFormat.format(value) + "đ";
     }
 
     private String formatShort(long value) {

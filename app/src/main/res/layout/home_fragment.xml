@@ -154,9 +154,13 @@
 
                     <!-- Card 1: Doanh thu -->
                     <androidx.cardview.widget.CardView
+                        android:id="@+id/card_sparkline_revenue"
                         android:layout_width="230dp"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="16dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?android:attr/selectableItemBackground"
                         app:cardCornerRadius="24dp"
                         app:cardElevation="2dp"
                         app:cardBackgroundColor="#FFFFFF">
@@ -190,12 +194,14 @@
 
                                 <!-- Badge percentage -->
                                 <TextView
+                                    android:id="@+id/tv_sparkline_revenue_badge"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_toEndOf="@id/icon_cash_container"
                                     android:layout_marginStart="8dp"
                                     android:layout_centerVertical="true"
-                                    android:text="+12%"
+                                    android:text="--"
+                                    android:visibility="gone"
                                     android:textColor="#5D6C52"
                                     android:textSize="12sp"
                                     android:textStyle="bold"
@@ -219,10 +225,11 @@
 
                             <!-- Value -->
                             <TextView
+                                android:id="@+id/tv_sparkline_revenue_value"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
-                                android:text="$12,840"
+                                android:text="0đ"
                                 android:textColor="#3E4D44"
                                 android:textSize="22sp"
                                 android:textStyle="bold"
@@ -240,9 +247,13 @@
 
                     <!-- Card 2: Đơn hàng -->
                     <androidx.cardview.widget.CardView
+                        android:id="@+id/card_sparkline_orders"
                         android:layout_width="230dp"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="16dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?android:attr/selectableItemBackground"
                         app:cardCornerRadius="24dp"
                         app:cardElevation="2dp"
                         app:cardBackgroundColor="#FFFFFF">
@@ -276,12 +287,14 @@
 
                                 <!-- Badge percentage -->
                                 <TextView
+                                    android:id="@+id/tv_sparkline_orders_badge"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_toEndOf="@id/icon_bag_container"
                                     android:layout_marginStart="8dp"
                                     android:layout_centerVertical="true"
-                                    android:text="+5%"
+                                    android:text="--"
+                                    android:visibility="gone"
                                     android:textColor="#5D6C52"
                                     android:textSize="12sp"
                                     android:textStyle="bold"
@@ -305,10 +318,11 @@
 
                             <!-- Value -->
                             <TextView
+                                android:id="@+id/tv_sparkline_orders_value"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
-                                android:text="148"
+                                android:text="0"
                                 android:textColor="#3E4D44"
                                 android:textSize="22sp"
                                 android:textStyle="bold"
@@ -605,10 +619,14 @@
 
                     <!-- Đơn mới -->
                     <androidx.cardview.widget.CardView
+                        android:id="@+id/card_stat_new_orders"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:layout_marginEnd="8dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?android:attr/selectableItemBackground"
                         app:cardCornerRadius="16dp"
                         app:cardElevation="2dp"
                         app:cardBackgroundColor="#FFFFFF">
@@ -652,10 +670,14 @@
 
                     <!-- Chờ xác nhận -->
                     <androidx.cardview.widget.CardView
+                        android:id="@+id/card_stat_pending_orders"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:layout_marginEnd="8dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?android:attr/selectableItemBackground"
                         app:cardCornerRadius="16dp"
                         app:cardElevation="2dp"
                         app:cardBackgroundColor="#FFFFFF">
@@ -699,9 +721,13 @@
 
                     <!-- Đang giao -->
                     <androidx.cardview.widget.CardView
+                        android:id="@+id/card_stat_shipping_orders"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?android:attr/selectableItemBackground"
                         app:cardCornerRadius="16dp"
                         app:cardElevation="2dp"
                         app:cardBackgroundColor="#FFFFFF">
@@ -745,55 +771,69 @@
 
                 </LinearLayout>
 
-                <!-- Sản phẩm bán chạy header -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginTop="28dp"
-                    android:paddingHorizontal="24dp">
-
-                    <View
-                        android:layout_width="4dp"
-                        android:layout_height="22dp"
-                        android:background="@drawable/bg_dashboard_green"
-                        android:layout_marginEnd="10dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Sản phẩm bán chạy"
-                        android:textColor="#3E4D44"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:fontFamily="@font/be_vietnam_pro" />
-                </LinearLayout>
-
-                <!-- Card bán chạy -->
+                <!-- Sản phẩm bán chạy -->
                 <androidx.cardview.widget.CardView
+                    android:id="@+id/card_top_selling"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="28dp"
                     android:layout_marginHorizontal="24dp"
                     android:layout_marginBottom="8dp"
+                    app:cardBackgroundColor="#FFFFFF"
                     app:cardCornerRadius="20dp"
-                    app:cardElevation="3dp"
-                    app:cardBackgroundColor="#FFFFFF">
+                    app:cardElevation="3dp">
+
                     <LinearLayout
-                        android:id="@+id/ll_top_selling"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:paddingHorizontal="20dp"
-                        android:paddingVertical="16dp">
-                        <TextView
-                            android:layout_width="wrap_content"
+                        android:paddingTop="20dp"
+                        android:paddingBottom="8dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Đang tải..."
-                            android:textColor="#95A192"
-                            android:textSize="13sp"
-                            android:fontFamily="@font/be_vietnam_pro" />
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <View
+                                android:layout_width="4dp"
+                                android:layout_height="22dp"
+                                android:layout_marginEnd="10dp"
+                                android:background="@drawable/bg_dashboard_green" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:fontFamily="@font/be_vietnam_pro"
+                                android:text="Sản phẩm bán chạy"
+                                android:textColor="@color/rootie_green_dark"
+                                android:textSize="18sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/btn_see_all_top_selling"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/bg_see_all_outline"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:fontFamily="@font/be_vietnam_pro"
+                                android:paddingHorizontal="14dp"
+                                android:paddingVertical="6dp"
+                                android:text="Xem tất cả"
+                                android:textColor="#7E8A83"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/ll_top_selling"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:orientation="vertical" />
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 

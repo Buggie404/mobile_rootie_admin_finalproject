@@ -17,7 +17,8 @@ import com.veganbeauty.admin.core.utils.ImageUtils;
 import com.veganbeauty.admin.data.local.entities.ProductEntity;
 import com.veganbeauty.admin.databinding.ProductItemBinding;
 
-import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,7 +72,7 @@ public class ProductAdapter extends ListAdapter<ProductEntity, ProductAdapter.Vi
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         ProductEntity product = getItem(position);
         android.content.Context context = holder.binding.getRoot().getContext();
-        DecimalFormat formatter = new DecimalFormat("#,###");
+        NumberFormat formatter = NumberFormat.getNumberInstance(new Locale("vi", "VN"));
 
         ProductItemBinding binding = holder.binding;
 

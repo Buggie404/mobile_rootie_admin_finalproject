@@ -46,6 +46,13 @@ import java.util.UUID;
 
 public class OrderListFragment extends RootieAdminFragment {
 
+    public static final String ARG_INITIAL_TAB = "initial_tab";
+    public static final String TAB_NEW_ORDERS = "chờ xác nhận";
+    public static final String TAB_PENDING_CONFIRM = "chờ xn";
+    public static final String TAB_SHIPPING = "đang giao";
+    public static final String TAB_COMPLETED = "hoàn tất";
+    public static final String TAB_ALL = "tất cả";
+
     private OrderFragmentListBinding binding;
     private OrderRepository repository;
     private OrderAdapter adapter;
@@ -62,6 +69,14 @@ public class OrderListFragment extends RootieAdminFragment {
     private final Set<String> filterPriceRanges = new HashSet<>();
     private final Set<String> filterRegions = new HashSet<>();
     private ListenerRegistration firestoreListener = null;
+
+    public static OrderListFragment newInstance(String initialTab) {
+        OrderListFragment fragment = new OrderListFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_INITIAL_TAB, initialTab);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Nullable
     @Override
@@ -102,7 +117,24 @@ public class OrderListFragment extends RootieAdminFragment {
 
         setupRecyclerView();
         setupListeners();
-        selectTab("tất cả", binding.tabAll);
+        applyInitialTabSelection();
+    }
+
+    private void applyInitialTabSelection() {
+        String initialTab = getArguments() != null ? getArguments().getString(ARG_INITIAL_TAB) : null;
+        if (TAB_NEW_ORDERS.equals(initialTab)) {
+            selectTab(TAB_NEW_ORDERS, binding.tabPending);
+        } else if (TAB_PENDING_CONFIRM.equals(initialTab)) {
+            selectTab(TAB_PENDING_CONFIRM, binding.tabPending);
+        } else if (TAB_SHIPPING.equals(initialTab)) {
+            selectTab(TAB_SHIPPING, binding.tabDelivering);
+        } else if (TAB_COMPLETED.equals(initialTab)) {
+            selectTab(TAB_COMPLETED, binding.tabCompleted);
+        } else if (TAB_ALL.equals(initialTab)) {
+            selectTab(TAB_ALL, binding.tabAll);
+        } else {
+            selectTab(TAB_ALL, binding.tabAll);
+        }
     }
 
     private void setupRecyclerView() {
@@ -198,14 +230,9 @@ public class OrderListFragment extends RootieAdminFragment {
                     localOrders = new ArrayList<>();
                 }
 
-                // Fallback: If DB is empty, parse from assets/orders.json and seed the local DB
                 if (localOrders.isEmpty()) {
-                    List<OrderEntity> parsedOrders = parseOrdersFromAssets();
-                    if (!parsedOrders.isEmpty()) {
-                        RootieAdminDatabase database = RootieAdminDatabase.getDatabase(requireContext().getApplicationContext());
-                        database.orderDao().insertAllSync(parsedOrders);
-                        localOrders = parsedOrders;
-                    }
+                    repository.checkAndSeedOrders(requireContext().getApplicationContext());
+                    localOrders = repository.getAllOrdersSync();
                 }
 
                 final List<OrderEntity> finalOrders = localOrders;
@@ -220,58 +247,6 @@ public class OrderListFragment extends RootieAdminFragment {
                 e.printStackTrace();
             }
         }).start();
-    }
-
-    private List<OrderEntity> parseOrdersFromAssets() {
-        List<OrderEntity> list = new ArrayList<>();
-        try {
-            StringBuilder sb = new StringBuilder();
-            try (BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(requireContext().getAssets().open("orders.json")))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    sb.append(line);
-                }
-            }
-            JSONObject root = new JSONObject(sb.toString());
-            JSONArray jsonArray = root.getJSONArray("orders");
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject obj = jsonArray.getJSONObject(i);
-                JSONArray itemsRaw = obj.optJSONArray("items");
-                List<OrderItem> orderItems = new ArrayList<>();
-                if (itemsRaw != null) {
-                    for (int j = 0; j < itemsRaw.length(); j++) {
-                        JSONObject itemObj = itemsRaw.getJSONObject(j);
-                        OrderItem orderItem = new OrderItem();
-                        orderItem.setProductId(itemObj.optString("productId", ""));
-                        orderItem.setProductName(itemObj.optString("productName", ""));
-                        orderItem.setProductImage(itemObj.optString("productImage", ""));
-                        orderItem.setQuantity(itemObj.optInt("quantity", 0));
-                        orderItem.setPrice(itemObj.optLong("price", 0L));
-                        orderItems.add(orderItem);
-                    }
-                }
-
-                OrderEntity entity = new OrderEntity();
-                entity.setOrderId(obj.optString("id", UUID.randomUUID().toString()));
-                entity.setUserId(obj.optString("userId", ""));
-                entity.setOrderDate(obj.optString("orderDate", ""));
-                entity.setOrderTime(obj.optString("orderTime", ""));
-                entity.setStatus(obj.optString("status", ""));
-                entity.setTotalAmount(obj.optLong("totalAmount", 0L));
-                entity.setItems(orderItems);
-                entity.setShippingName(obj.optString("shippingName", ""));
-                entity.setShippingPhone(obj.optString("shippingPhone", ""));
-                entity.setShippingAddress(obj.optString("shippingAddress", ""));
-                entity.setShippingCost(obj.optLong("shippingCost", 0L));
-                entity.setVoucherDiscount(obj.optLong("voucherDiscount", 0L));
-                entity.setPaymentMethod(obj.optString("paymentMethod", ""));
-                list.add(entity);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return list;
     }
 
     private void selectTab(String tab, TextView selectedView) {
@@ -376,6 +351,12 @@ public class OrderListFragment extends RootieAdminFragment {
                     case "chờ xác nhận":
                         match = statusLower.contains("chờ xử lý") || statusLower.contains("chờ xác nhận");
                         break;
+                    case "chờ xn":
+                        match = statusLower.contains("chờ xử lý")
+                                || statusLower.contains("chờ xác nhận")
+                                || statusLower.contains("đang xử lý")
+                                || statusLower.contains("đang chuẩn bị");
+                        break;
                     case "đang chuẩn bị":
                         match = statusLower.contains("đang xử lý") || statusLower.contains("đang chuẩn bị");
                         break;
@@ -433,7 +414,9 @@ public class OrderListFragment extends RootieAdminFragment {
     }
 
     private void updateListUI() {
-        boolean selectionAllowed = !"tất cả".equals(currentSelectedTab) && !"hoàn tất".equals(currentSelectedTab) && !"đã hủy".equals(currentSelectedTab);
+        boolean selectionAllowed = !"tất cả".equals(currentSelectedTab)
+                && !"hoàn tất".equals(currentSelectedTab)
+                && !"đã hủy".equals(currentSelectedTab);
         adapter.updateData(filteredOrdersList, selectedOrderIds, selectionAllowed);
         if (selectionAllowed) {
             binding.layoutSelectionRow.setVisibility(View.VISIBLE);
@@ -489,6 +472,7 @@ public class OrderListFragment extends RootieAdminFragment {
             binding.layoutBulkActions.setVisibility(View.VISIBLE);
             switch (currentSelectedTab) {
                 case "chờ xác nhận":
+                case "chờ xn":
                     binding.btnBulkCancel.setText("Hủy (" + size + ")");
                     binding.btnBulkApprove.setText("Xác nhận (" + size + ")");
                     break;

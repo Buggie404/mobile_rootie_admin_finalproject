@@ -12,4 +12,11 @@
     <!-- Gray tones -->
     <color name="gray_light">#E0E4E2</color>
     <color name="gray_dark">#7E8A83</color>
+
+    <!-- Rootie brand -->
+    <color name="rootie_green">#4F6544</color>
+    <color name="rootie_green_dark">#3E4D44</color>
+    <color name="rootie_orange">#E65100</color>
+    <color name="rootie_surface_muted">#E5E8DA</color>
+    <color name="rootie_border_soft">#D5DAC8</color>
 </resources>

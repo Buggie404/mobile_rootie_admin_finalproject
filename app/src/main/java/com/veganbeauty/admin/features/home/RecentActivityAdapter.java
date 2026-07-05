@@ -8,6 +8,7 @@ import com.veganbeauty.admin.R;
 import com.veganbeauty.admin.core.utils.ImageUtils;
 import com.veganbeauty.admin.databinding.ItemRecentActivityBinding;
 import java.util.List;
+import java.util.ArrayList;
 
 public class RecentActivityAdapter extends RecyclerView.Adapter<RecentActivityAdapter.ViewHolder> {
 
@@ -19,8 +20,16 @@ public class RecentActivityAdapter extends RecyclerView.Adapter<RecentActivityAd
     private final OnItemClickListener onItemClickListener;
 
     public RecentActivityAdapter(List<RecentActivity> items, OnItemClickListener onItemClickListener) {
-        this.items = items;
+        this.items = new ArrayList<>(items);
         this.onItemClickListener = onItemClickListener;
+    }
+
+    public void updateItems(List<RecentActivity> newItems) {
+        items.clear();
+        if (newItems != null) {
+            items.addAll(newItems);
+        }
+        notifyDataSetChanged();
     }
 
     @NonNull
