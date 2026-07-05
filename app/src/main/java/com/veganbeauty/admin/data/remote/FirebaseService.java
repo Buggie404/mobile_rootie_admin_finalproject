@@ -27,16 +27,24 @@ import java.util.UUID;
 
 public class FirebaseService {
 
+    private static boolean isInitialized = false;
     private final FirebaseFirestore db;
 
     public FirebaseService() {
         FirebaseFirestore firestore = null;
         try {
             firestore = FirebaseFirestore.getInstance();
+            isInitialized = true;
+            Log.d("FirebaseService", "FirebaseFirestore initialized successfully");
         } catch (Exception e) {
             Log.e("FirebaseService", "Failed to initialize FirebaseFirestore", e);
+            isInitialized = false;
         }
         this.db = firestore;
+    }
+
+    public static boolean isFirebaseInitialized() {
+        return isInitialized;
     }
 
     private long toLong(Object value) {
@@ -153,9 +161,11 @@ public class FirebaseService {
 
     public List<ProductEntity> fetchAllProducts() {
         if (db == null) {
+            Log.e("FirebaseService", "fetchAllProducts: db is null!");
             return Collections.emptyList();
         }
         try {
+            Log.d("FirebaseService", "fetchAllProducts: Fetching all products from Firestore...");
             QuerySnapshot snapshot = Tasks.await(db.collection("products").get());
             List<ProductEntity> list = new ArrayList<>();
             for (DocumentSnapshot doc : snapshot.getDocuments()) {
@@ -224,8 +234,10 @@ public class FirebaseService {
                     e.printStackTrace();
                 }
             }
+            Log.d("FirebaseService", "fetchAllProducts: Found " + list.size() + " products");
             return list;
         } catch (Exception e) {
+            Log.e("FirebaseService", "fetchAllProducts: Error fetching products", e);
             e.printStackTrace();
             return Collections.emptyList();
         }
@@ -233,21 +245,32 @@ public class FirebaseService {
 
     public boolean saveProduct(ProductEntity product) {
         if (db == null) {
+            Log.e("FirebaseService", "saveProduct: db is null! Firebase may not be initialized properly.");
+            return false;
+        }
+        if (product.getId() == null || product.getId().isEmpty()) {
+            Log.e("FirebaseService", "saveProduct: product ID is null or empty!");
             return false;
         }
         try {
+            Log.d("FirebaseService", "saveProduct: saving product " + product.getId() + " to Firestore");
+
             List<Map<String, String>> keyIngredientsMap = new ArrayList<>();
-            for (KeyIngredient ki : product.getKeyIngredients()) {
-                Map<String, String> m = new HashMap<>();
-                m.put("name", ki.getName());
-                m.put("description", ki.getDescription());
-                keyIngredientsMap.add(m);
+            if (product.getKeyIngredients() != null) {
+                for (KeyIngredient ki : product.getKeyIngredients()) {
+                    Map<String, String> m = new HashMap<>();
+                    m.put("name", ki.getName());
+                    m.put("description", ki.getDescription());
+                    keyIngredientsMap.add(m);
+                }
             }
 
             List<String> catIds = new ArrayList<>();
-            for (String s : product.getCategoryIds().split(",")) {
-                if (!s.trim().isEmpty()) {
-                    catIds.add(s.trim());
+            if (product.getCategoryIds() != null) {
+                for (String s : product.getCategoryIds().split(",")) {
+                    if (!s.trim().isEmpty()) {
+                        catIds.add(s.trim());
+                    }
                 }
             }
 
@@ -288,12 +311,122 @@ public class FirebaseService {
             data.put("sold", product.getSold());
             data.put("isHidden", product.isHidden());
 
+            Log.d("FirebaseService", "saveProduct: writing to collection 'products' with document ID: " + product.getId());
             Tasks.await(db.collection("products").document(product.getId()).set(data));
+            Log.d("FirebaseService", "saveProduct: successfully saved product " + product.getId());
+
+            // Verify by reading back
+            DocumentSnapshot savedDoc = Tasks.await(db.collection("products").document(product.getId()).get());
+            if (savedDoc.exists()) {
+                Log.d("FirebaseService", "saveProduct: Verified! Product " + product.getId() + " exists in Firestore");
+                Log.d("FirebaseService", "saveProduct: Product name in Firestore: " + savedDoc.getString("name"));
+            } else {
+                Log.e("FirebaseService", "saveProduct: Verification FAILED! Product " + product.getId() + " does NOT exist in Firestore");
+            }
+
             return true;
         } catch (Exception e) {
+            Log.e("FirebaseService", "saveProduct: failed to save product " + product.getId(), e);
             e.printStackTrace();
             return false;
         }
+    }
+
+    public boolean verifyProductInFirestore(String productId) {
+        if (db == null) {
+            Log.e("FirebaseService", "verifyProductInFirestore: db is null!");
+            return false;
+        }
+        try {
+            DocumentSnapshot doc = Tasks.await(db.collection("products").document(productId).get());
+            if (doc.exists()) {
+                Log.d("FirebaseService", "verifyProductInFirestore: Product " + productId + " EXISTS in Firestore");
+                Log.d("FirebaseService", "verifyProductInFirestore: name=" + doc.getString("name") + ", price=" + doc.getLong("price") + ", stock=" + doc.getLong("stock"));
+                return true;
+            } else {
+                Log.e("FirebaseService", "verifyProductInFirestore: Product " + productId + " does NOT exist in Firestore!");
+                return false;
+            }
+        } catch (Exception e) {
+            Log.e("FirebaseService", "verifyProductInFirestore: Error verifying product " + productId, e);
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public ProductEntity fetchProductById(String productId) {
+        if (db == null || productId == null || productId.trim().isEmpty()) {
+            return null;
+        }
+        try {
+            DocumentSnapshot doc = Tasks.await(db.collection("products").document(productId.trim()).get());
+            if (doc.exists()) {
+                List<String> albumList = toStringList(doc.get("album"));
+                List<KeyIngredient> keyIngredientsList = toKeyIngredientsList(doc.get("keyIngredients"));
+                List<String> detailedList = toStringList(doc.get("detailedIngredients"));
+                List<String> idealList = toStringList(doc.get("idealFor"));
+                List<String> benefitsList = toStringList(doc.get("benefits"));
+
+                String categoryIdsStr = joinListOrToString(doc.get("categoryId"));
+                String subcategoryStr = joinListOrToString(doc.get("subcategory"));
+
+                long price = toLong(doc.get("price"));
+                Long originalPrice = toNullableLong(doc.get("originalPrice"));
+                int stock = toInt(doc.get("stock"));
+                int sold = toInt(doc.get("sold"));
+
+                Object isNewRaw = doc.get("isNew");
+                if (isNewRaw == null) {
+                    isNewRaw = doc.get("newProduct");
+                }
+                boolean isNew = toBoolean(isNewRaw);
+                boolean isHidden = toBoolean(doc.get("isHidden"));
+                float rating = toFloat(doc.get("rating"));
+
+                ProductEntity product = new ProductEntity();
+                product.setId(doc.getId());
+                product.setName(doc.getString("name") != null ? doc.getString("name") : "");
+                product.setSku(doc.getString("sku") != null ? doc.getString("sku") : "");
+                product.setBarcode(doc.getString("barcode") != null ? doc.getString("barcode") : "");
+                product.setPrice(price);
+                product.setOriginalPrice(originalPrice);
+                product.setCategory(doc.getString("category") != null ? doc.getString("category") : "");
+                product.setSubcategory(subcategoryStr);
+                product.setBrand(doc.getString("brand") != null ? doc.getString("brand") : "");
+                product.setStock(stock);
+                product.setDescription(doc.getString("description") != null ? doc.getString("description") : "");
+                product.setMainImage(doc.getString("mainImage") != null ? doc.getString("mainImage") : "");
+                product.setSuitableFor(doc.getString("suitableFor") != null ? doc.getString("suitableFor") : "");
+                product.setOrigin(doc.getString("origin") != null ? doc.getString("origin") : "");
+                product.setExpiryDate(doc.getString("expiryDate") != null ? doc.getString("expiryDate") : "");
+                product.setNew(isNew);
+                product.setCategoryIds(categoryIdsStr);
+                product.setAlbum(albumList);
+                product.setMainIngredientsSummary(doc.getString("mainIngredientsSummary") != null ? doc.getString("mainIngredientsSummary") : "");
+                product.setAllergyInformation(doc.getString("allergyInformation") != null ? doc.getString("allergyInformation") : "");
+                product.setKeyIngredients(keyIngredientsList);
+                product.setDetailedIngredients(detailedList);
+                product.setStoryDescription(doc.getString("storyDescription") != null ? doc.getString("storyDescription") : "");
+                product.setStoryImage(doc.getString("storyImage") != null ? doc.getString("storyImage") : "");
+                product.setIngredientsImage(doc.getString("ingredientsImage") != null ? doc.getString("ingredientsImage") : "");
+                product.setUsageMedia(doc.getString("usageMedia") != null ? doc.getString("usageMedia") : "");
+                product.setIdealFor(idealList);
+                product.setBenefits(benefitsList);
+                product.setUsage(doc.getString("usage") != null ? doc.getString("usage") : "");
+                product.setUsageAmount(doc.getString("usageAmount") != null ? doc.getString("usageAmount") : "");
+                product.setTexture(doc.getString("texture") != null ? doc.getString("texture") : "");
+                product.setScent(doc.getString("scent") != null ? doc.getString("scent") : "");
+                product.setNotes(doc.getString("notes") != null ? doc.getString("notes") : "");
+                product.setRating(rating);
+                product.setSold(sold);
+                product.setHidden(isHidden);
+                return product;
+            }
+        } catch (Exception e) {
+            Log.e("FirebaseService", "fetchProductById: Error fetching product " + productId, e);
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public boolean deleteProduct(String productId) {
@@ -309,20 +442,128 @@ public class FirebaseService {
         }
     }
 
+    public boolean updateProductStock(String productId, int newStock) {
+        if (db == null) {
+            return false;
+        }
+        try {
+            Tasks.await(db.collection("products").document(productId).update("stock", newStock));
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public interface ProductListener {
+        void onProductsUpdated(List<ProductEntity> products);
+    }
+
+    public com.google.firebase.firestore.ListenerRegistration listenToProducts(final ProductListener listener) {
+        if (db == null) {
+            Log.e("FirebaseService", "listenToProducts: db is null!");
+            return null;
+        }
+        Log.d("FirebaseService", "listenToProducts: Starting to listen to products collection");
+        return db.collection("products").addSnapshotListener((snapshot, e) -> {
+            if (e != null) {
+                Log.e("FirebaseService", "listenToProducts: Error listening to products", e);
+                e.printStackTrace();
+                return;
+            }
+            if (snapshot != null) {
+                Log.d("FirebaseService", "listenToProducts: Received " + snapshot.getDocuments().size() + " products from Firestore");
+                List<ProductEntity> list = new ArrayList<>();
+                for (DocumentSnapshot doc : snapshot.getDocuments()) {
+                    try {
+                        List<String> albumList = toStringList(doc.get("album"));
+                        List<KeyIngredient> keyIngredientsList = toKeyIngredientsList(doc.get("keyIngredients"));
+                        List<String> detailedList = toStringList(doc.get("detailedIngredients"));
+                        List<String> idealList = toStringList(doc.get("idealFor"));
+                        List<String> benefitsList = toStringList(doc.get("benefits"));
+
+                        String categoryIdsStr = joinListOrToString(doc.get("categoryId"));
+                        String subcategoryStr = joinListOrToString(doc.get("subcategory"));
+
+                        long price = toLong(doc.get("price"));
+                        Long originalPrice = toNullableLong(doc.get("originalPrice"));
+                        int stock = toInt(doc.get("stock"));
+                        int sold = toInt(doc.get("sold"));
+
+                        Object isNewRaw = doc.get("isNew");
+                        if (isNewRaw == null) {
+                            isNewRaw = doc.get("newProduct");
+                        }
+                        boolean isNew = toBoolean(isNewRaw);
+                        boolean isHidden = toBoolean(doc.get("isHidden"));
+                        float rating = toFloat(doc.get("rating"));
+
+                        ProductEntity product = new ProductEntity();
+                        product.setId(doc.getId());
+                        product.setName(doc.getString("name") != null ? doc.getString("name") : "");
+                        product.setSku(doc.getString("sku") != null ? doc.getString("sku") : "");
+                        product.setBarcode(doc.getString("barcode") != null ? doc.getString("barcode") : "");
+                        product.setPrice(price);
+                        product.setOriginalPrice(originalPrice);
+                        product.setCategory(doc.getString("category") != null ? doc.getString("category") : "");
+                        product.setSubcategory(subcategoryStr);
+                        product.setBrand(doc.getString("brand") != null ? doc.getString("brand") : "");
+                        product.setStock(stock);
+                        product.setDescription(doc.getString("description") != null ? doc.getString("description") : "");
+                        product.setMainImage(doc.getString("mainImage") != null ? doc.getString("mainImage") : "");
+                        product.setSuitableFor(doc.getString("suitableFor") != null ? doc.getString("suitableFor") : "");
+                        product.setOrigin(doc.getString("origin") != null ? doc.getString("origin") : "");
+                        product.setExpiryDate(doc.getString("expiryDate") != null ? doc.getString("expiryDate") : "");
+                        product.setNew(isNew);
+                        product.setCategoryIds(categoryIdsStr);
+                        product.setAlbum(albumList);
+                        product.setMainIngredientsSummary(doc.getString("mainIngredientsSummary") != null ? doc.getString("mainIngredientsSummary") : "");
+                        product.setAllergyInformation(doc.getString("allergyInformation") != null ? doc.getString("allergyInformation") : "");
+                        product.setKeyIngredients(keyIngredientsList);
+                        product.setDetailedIngredients(detailedList);
+                        product.setStoryDescription(doc.getString("storyDescription") != null ? doc.getString("storyDescription") : "");
+                        product.setStoryImage(doc.getString("storyImage") != null ? doc.getString("storyImage") : "");
+                        product.setIngredientsImage(doc.getString("ingredientsImage") != null ? doc.getString("ingredientsImage") : "");
+                        product.setUsageMedia(doc.getString("usageMedia") != null ? doc.getString("usageMedia") : "");
+                        product.setIdealFor(idealList);
+                        product.setBenefits(benefitsList);
+                        product.setUsage(doc.getString("usage") != null ? doc.getString("usage") : "");
+                        product.setUsageAmount(doc.getString("usageAmount") != null ? doc.getString("usageAmount") : "");
+                        product.setTexture(doc.getString("texture") != null ? doc.getString("texture") : "");
+                        product.setScent(doc.getString("scent") != null ? doc.getString("scent") : "");
+                        product.setNotes(doc.getString("notes") != null ? doc.getString("notes") : "");
+                        product.setRating(rating);
+                        product.setSold(sold);
+                        product.setHidden(isHidden);
+                        list.add(product);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+                Log.d("FirebaseService", "listenToProducts: Parsed " + list.size() + " products, sending to listener");
+                listener.onProductsUpdated(list);
+            }
+        });
+    }
+
     public interface OrderListener {
         void onOrdersUpdated(List<OrderEntity> orders);
     }
 
     public com.google.firebase.firestore.ListenerRegistration listenToOrders(final OrderListener listener) {
         if (db == null) {
+            Log.e("FirebaseService", "listenToOrders: db is null!");
             return null;
         }
+        Log.d("FirebaseService", "listenToOrders: Starting to listen to orders collection");
         return db.collection("orders").addSnapshotListener((snapshot, e) -> {
             if (e != null) {
+                Log.e("FirebaseService", "listenToOrders: Error listening to orders", e);
                 e.printStackTrace();
                 return;
             }
             if (snapshot != null) {
+                Log.d("FirebaseService", "listenToOrders: Received " + snapshot.getDocuments().size() + " orders from Firestore");
                 List<OrderEntity> list = new ArrayList<>();
                 for (DocumentSnapshot doc : snapshot.getDocuments()) {
                     try {

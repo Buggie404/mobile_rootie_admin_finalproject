@@ -64,7 +64,7 @@ public class OrderDetailFragment extends RootieAdminFragment {
     @Override
     protected void setupUI(View view) {
         RootieAdminDatabase database = RootieAdminDatabase.getDatabase(requireContext().getApplicationContext());
-        repository = new OrderRepository(database.orderDao(), new FirebaseService());
+        repository = new OrderRepository(database.orderDao(), new FirebaseService(), database);
 
         setupListeners();
         loadOrderData();

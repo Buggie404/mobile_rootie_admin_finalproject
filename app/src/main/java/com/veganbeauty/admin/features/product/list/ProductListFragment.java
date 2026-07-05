@@ -20,6 +20,7 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 
+import com.google.firebase.firestore.ListenerRegistration;
 import com.veganbeauty.admin.MainActivity;
 import com.veganbeauty.admin.R;
 import com.veganbeauty.admin.core.base.RootieAdminFragment;
@@ -40,6 +41,7 @@ public class ProductListFragment extends RootieAdminFragment {
     private ProductFragmentListBinding binding;
     private ProductViewModel viewModel;
     private ProductAdapter adapter;
+    private ListenerRegistration firestoreListener = null;
 
     @Nullable
     @Override
@@ -127,6 +129,9 @@ public class ProductListFragment extends RootieAdminFragment {
 
         // Sync and observe data
         viewModel.syncFromFirebase();
+
+        // Start listening to Firestore remote changes in real-time
+        firestoreListener = viewModel.startRealtimeSync();
 
         // Bind message button in header
         setupHeaderMessageButton(binding.btnMessage);
@@ -369,6 +374,9 @@ public class ProductListFragment extends RootieAdminFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        if (firestoreListener != null) {
+            firestoreListener.remove();
+        }
         binding = null;
     }
 }

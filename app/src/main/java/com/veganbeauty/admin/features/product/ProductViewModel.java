@@ -102,19 +102,43 @@ public class ProductViewModel extends AndroidViewModel {
         }).start();
     }
 
-    public void saveProduct(ProductEntity product) {
+    public void toggleProductVisibility(ProductEntity product) {
+        ProductEntity updatedProduct = EntityUtils.copy(product, !product.isHidden());
+        saveProduct(updatedProduct, null);
+    }
+
+    public interface SaveProductCallback {
+        void onSaveComplete(boolean success);
+    }
+
+    public void saveProduct(ProductEntity product, SaveProductCallback callback) {
         new Thread(() -> {
             try {
-                repository.saveProduct(product);
+                boolean success = repository.saveProduct(product);
+                if (callback != null) {
+                    callback.onSaveComplete(success);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                if (callback != null) {
+                    callback.onSaveComplete(false);
+                }
+            }
+        }).start();
+    }
+
+    public void updateProductStock(String productId, int newStock) {
+        new Thread(() -> {
+            try {
+                repository.updateProductStock(productId, newStock);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }).start();
     }
 
-    public void toggleProductVisibility(ProductEntity product) {
-        ProductEntity updatedProduct = EntityUtils.copy(product, !product.isHidden());
-        saveProduct(updatedProduct);
+    public com.google.firebase.firestore.ListenerRegistration startRealtimeSync() {
+        return repository.startRealtimeSync();
     }
 
     private void updateFilteredProducts() {

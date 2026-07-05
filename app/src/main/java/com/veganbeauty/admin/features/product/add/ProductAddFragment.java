@@ -630,13 +630,22 @@ public class ProductAddFragment extends RootieAdminFragment {
         product.setUsageMedia(usageMediaUrl);
         product.setDetailedIngredients(detailedIngredients);
 
-        // Save using ViewModel
-        viewModel.saveProduct(product);
-        String successMsg = isEditMode ? "Cập nhật sản phẩm thành công" : "Thêm sản phẩm thành công";
-        Toast.makeText(getContext(), successMsg, Toast.LENGTH_SHORT).show();
-
-        // Return to product list
-        getParentFragmentManager().popBackStack();
+        // Save using ViewModel with callback
+        viewModel.saveProduct(product, success -> {
+            if (getActivity() == null) return;
+            getActivity().runOnUiThread(() -> {
+                if (binding == null) return;
+                String successMsg;
+                if (success) {
+                    successMsg = isEditMode ? "Cập nhật sản phẩm thành công" : "Thêm sản phẩm thành công";
+                } else {
+                    successMsg = "Lưu thất bại, đã lưu local. Vui lòng thử lại.";
+                }
+                Toast.makeText(getContext(), successMsg, Toast.LENGTH_SHORT).show();
+                // Return to product list
+                getParentFragmentManager().popBackStack();
+            });
+        });
     }
 
     @Override

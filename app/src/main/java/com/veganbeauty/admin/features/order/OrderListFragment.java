@@ -99,7 +99,16 @@ public class OrderListFragment extends RootieAdminFragment {
 
         // Initialize Repository
         RootieAdminDatabase database = RootieAdminDatabase.getDatabase(requireContext().getApplicationContext());
-        repository = new OrderRepository(database.orderDao(), new FirebaseService());
+        repository = new OrderRepository(database.orderDao(), new FirebaseService(), database);
+
+        // Sync from Firebase on startup to ensure fresh data
+        new Thread(() -> {
+            try {
+                repository.syncFromFirebase();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
 
         // Observe local database updates
         repository.getAllOrders().observe(getViewLifecycleOwner(), localOrders -> {

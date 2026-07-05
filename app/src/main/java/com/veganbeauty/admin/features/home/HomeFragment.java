@@ -152,7 +152,7 @@ public class HomeFragment extends RootieAdminFragment {
         new Thread(() -> {
             try {
                 RootieAdminDatabase db = RootieAdminDatabase.getDatabase(requireContext().getApplicationContext());
-                OrderRepository orderRepository = new OrderRepository(db.orderDao(), new FirebaseService());
+                OrderRepository orderRepository = new OrderRepository(db.orderDao(), new FirebaseService(), db);
                 orderRepository.checkAndSeedOrders(requireContext().getApplicationContext());
                 List<OrderEntity> orders = orderRepository.getAllOrdersSync();
 

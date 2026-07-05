@@ -36,4 +36,7 @@ public interface ProductDao {
 
     @Delete
     void deleteSync(ProductEntity product);
+
+    @Query("UPDATE products SET stock = :newStock WHERE id = :productId")
+    void updateStockSync(String productId, int newStock);
 }

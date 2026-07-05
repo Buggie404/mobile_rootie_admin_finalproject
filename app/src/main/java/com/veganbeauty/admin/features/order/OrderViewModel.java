@@ -25,7 +25,7 @@ public class OrderViewModel extends AndroidViewModel {
     public OrderViewModel(@NonNull Application application) {
         super(application);
         RootieAdminDatabase database = RootieAdminDatabase.getDatabase(application);
-        repository = new OrderRepository(database.orderDao(), new FirebaseService());
+        repository = new OrderRepository(database.orderDao(), new FirebaseService(), database);
         allOrders = repository.getAllOrders();
 
         filteredOrders.addSource(allOrders, orders -> updateFilteredOrders());

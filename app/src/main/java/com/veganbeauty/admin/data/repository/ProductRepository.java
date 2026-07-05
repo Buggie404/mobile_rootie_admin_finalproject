@@ -2,6 +2,7 @@ package com.veganbeauty.admin.data.repository;
 
 import android.content.Context;
 import androidx.lifecycle.LiveData;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.veganbeauty.admin.data.local.dao.ProductDao;
 import com.veganbeauty.admin.data.local.entities.KeyIngredient;
 import com.veganbeauty.admin.data.local.entities.ProductEntity;
@@ -204,6 +205,31 @@ public class ProductRepository {
 
     public boolean deleteProduct(ProductEntity product) {
         productDao.deleteSync(product);
-        return firebaseService.deleteProduct(product.getId());
+        android.util.Log.d("ProductRepository", "deleteProduct: Deleted from local DB: " + product.getId());
+        boolean success = firebaseService.deleteProduct(product.getId());
+        android.util.Log.d("ProductRepository", "deleteProduct: Delete from Firebase: " + success);
+        return success;
+    }
+
+    public boolean updateProductStock(String productId, int newStock) {
+        productDao.updateStockSync(productId, newStock);
+        android.util.Log.d("ProductRepository", "updateProductStock: Updated local stock for " + productId + " to " + newStock);
+        boolean success = firebaseService.updateProductStock(productId, newStock);
+        android.util.Log.d("ProductRepository", "updateProductStock: Updated Firebase stock: " + success);
+        return success;
+    }
+
+    public com.google.firebase.firestore.ListenerRegistration startRealtimeSync() {
+        return firebaseService.listenToProducts(products -> {
+            if (products != null && !products.isEmpty()) {
+                android.util.Log.d("ProductRepository", "startRealtimeSync: Received " + products.size() + " products from Firebase");
+                new Thread(() -> {
+                    productDao.insertAllSync(products);
+                    android.util.Log.d("ProductRepository", "startRealtimeSync: Inserted " + products.size() + " products to local DB");
+                }).start();
+            } else {
+                android.util.Log.d("ProductRepository", "startRealtimeSync: No products received");
+            }
+        });
     }
 }

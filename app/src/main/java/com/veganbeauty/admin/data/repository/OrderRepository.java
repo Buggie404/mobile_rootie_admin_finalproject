@@ -3,9 +3,11 @@ package com.veganbeauty.admin.data.repository;
 import android.content.Context;
 
 import androidx.lifecycle.LiveData;
+import com.veganbeauty.admin.data.local.RootieAdminDatabase;
 import com.veganbeauty.admin.data.local.dao.OrderDao;
 import com.veganbeauty.admin.data.local.entities.OrderEntity;
 import com.veganbeauty.admin.data.local.entities.OrderItem;
+import com.veganbeauty.admin.data.local.entities.ProductEntity;
 import com.veganbeauty.admin.data.remote.FirebaseService;
 
 import org.json.JSONArray;
@@ -20,10 +22,12 @@ import java.util.UUID;
 public class OrderRepository {
     private final OrderDao orderDao;
     private final FirebaseService firebaseService;
+    private final RootieAdminDatabase database;
 
-    public OrderRepository(OrderDao orderDao, FirebaseService firebaseService) {
+    public OrderRepository(OrderDao orderDao, FirebaseService firebaseService, RootieAdminDatabase database) {
         this.orderDao = orderDao;
         this.firebaseService = firebaseService;
+        this.database = database;
     }
 
     public LiveData<List<OrderEntity>> getAllOrders() {
@@ -118,9 +122,33 @@ public class OrderRepository {
     public com.google.firebase.firestore.ListenerRegistration startRealtimeSync() {
         return firebaseService.listenToOrders(orders -> {
             if (orders != null && !orders.isEmpty()) {
+                android.util.Log.d("OrderRepository", "startRealtimeSync: Received " + orders.size() + " orders");
                 new Thread(() -> {
-                    orderDao.insertAllSync(orders);
+                    // Update local orders and sync product stock from Firestore
+                    for (OrderEntity order : orders) {
+                        orderDao.insertSync(order);
+                        android.util.Log.d("OrderRepository", "startRealtimeSync: Inserted order " + order.getOrderId());
+                        // Fetch the updated products from Firestore to sync local DB stock
+                        if (order.getItems() != null) {
+                            for (OrderItem item : order.getItems()) {
+                                String productId = item.getProductId();
+                                if (productId != null && !productId.isEmpty()) {
+                                    try {
+                                        ProductEntity remoteProduct = firebaseService.fetchProductById(productId);
+                                        if (remoteProduct != null) {
+                                            database.productDao().insertSync(remoteProduct);
+                                            android.util.Log.d("OrderRepository", "startRealtimeSync: Synced product stock from Firestore for " + productId + " to " + remoteProduct.getStock());
+                                        }
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }).start();
+            } else {
+                android.util.Log.d("OrderRepository", "startRealtimeSync: No orders received");
             }
         });
     }
