@@ -31,9 +31,17 @@
 
         <!-- Title (Center) -->
         <TextView
-            android:layout_width="wrap_content"
+            android:id="@+id/txt_title"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
+            android:layout_toEndOf="@id/img_logo"
+            android:layout_toStartOf="@id/btn_notification"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:gravity="center"
+            android:ellipsize="end"
+            android:singleLine="true"
             android:text="Quản lý đơn hàng"
             android:textColor="#3E4D44"
             android:textSize="20sp"
@@ -58,17 +66,18 @@
 
             <TextView
                 android:id="@+id/notification_badge"
-                android:layout_width="12dp"
-                android:layout_height="12dp"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
                 android:layout_gravity="top|end"
-                android:layout_marginTop="4dp"
-                android:layout_marginEnd="4dp"
-                android:background="@drawable/bg_notification_badge"
+                android:layout_marginTop="2dp"
+                android:layout_marginEnd="2dp"
+                android:background="@drawable/ic_notification_badge"
                 android:gravity="center"
-                android:text="1"
+                android:text=""
                 android:textColor="@color/white"
                 android:textSize="8sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:visibility="gone" />
         </FrameLayout>
     </RelativeLayout>
 

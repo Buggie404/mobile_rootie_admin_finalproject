@@ -94,6 +94,15 @@ public class CustomerDetailFragment extends RootieAdminFragment {
                 mainActivity.loadFragment(chartFragment);
             }
         });
+
+        binding.btnBookingHistory.setOnClickListener(v -> {
+            if (customerId == null) return;
+            CustomerBookingHistoryFragment bookingHistoryFragment = CustomerBookingHistoryFragment.newInstance(customerId, fromStaff);
+            MainActivity mainActivity = (MainActivity) getActivity();
+            if (mainActivity != null) {
+                mainActivity.loadFragment(bookingHistoryFragment);
+            }
+        });
     }
 
     private void loadCustomerData() {

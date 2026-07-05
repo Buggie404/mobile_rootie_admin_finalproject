@@ -91,8 +91,8 @@ public class CustomerAdminFragment extends RootieAdminFragment {
     }
 
     private void setupListeners() {
-        // Back Button
-        binding.btnBack.setOnClickListener(v -> {
+        // Logo (Back to Home shortcut)
+        binding.imgLogo.setOnClickListener(v -> {
             MainActivity mainActivity = (MainActivity) getActivity();
             if (mainActivity != null) {
                 BottomNavHelper.navigate(mainActivity, R.id.nav_home);

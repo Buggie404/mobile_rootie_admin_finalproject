@@ -604,6 +604,7 @@
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:paddingHorizontal="16dp"
+                android:layout_marginBottom="16dp"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground">
@@ -623,6 +624,48 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Xem biểu đồ chi tiêu"
+                    android:textColor="#3E4D44"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/be_vietnam_pro"
+                    android:layout_marginStart="16dp" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_arrow_forward"
+                    app:tint="#7E8A83" />
+
+            </LinearLayout>
+
+            <!-- Quick Action 3: Booking History -->
+            <LinearLayout
+                android:id="@+id/btn_booking_history"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:background="@drawable/bg_rounded_white_card"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground">
+
+                <!-- Clock Icon -->
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/bg_search_bar"
+                    android:backgroundTint="#F0F2EA"
+                    android:padding="10dp"
+                    android:src="@drawable/ic_clock"
+                    app:tint="#677559" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Lịch sử lịch hẹn"
                     android:textColor="#3E4D44"
                     android:textSize="15sp"
                     android:textStyle="bold"
