@@ -86,12 +86,14 @@ public class OrderRepository {
                 }
 
                 OrderEntity entity = new OrderEntity();
-                entity.setOrderId(obj.optString("id", UUID.randomUUID().toString()));
+                entity.setId(obj.optString("id", UUID.randomUUID().toString()));
                 entity.setUserId(obj.optString("userId", ""));
                 entity.setOrderDate(obj.optString("orderDate", ""));
                 entity.setOrderTime(obj.optString("orderTime", ""));
                 entity.setStatus(obj.optString("status", ""));
                 entity.setTotalAmount(obj.optLong("totalAmount", 0L));
+                entity.setSubTotal(obj.optLong("subTotal", obj.optLong("totalAmount", 0L)));
+                entity.setGuest(obj.optBoolean("isGuest", false));
                 entity.setItems(orderItems);
                 entity.setShippingName(obj.optString("shippingName", ""));
                 entity.setShippingPhone(obj.optString("shippingPhone", ""));
@@ -99,6 +101,11 @@ public class OrderRepository {
                 entity.setShippingCost(obj.optLong("shippingCost", 0L));
                 entity.setVoucherDiscount(obj.optLong("voucherDiscount", 0L));
                 entity.setPaymentMethod(obj.optString("paymentMethod", ""));
+                entity.setOrderNote(obj.optString("orderNote", null));
+                entity.setBillingName(obj.optString("billingName", null));
+                entity.setBillingPhone(obj.optString("billingPhone", null));
+                entity.setBillingEmail(obj.optString("billingEmail", null));
+                entity.setDeliveryDate(obj.optString("deliveryDate", null));
                 list.add(entity);
             }
         } catch (Exception e) {

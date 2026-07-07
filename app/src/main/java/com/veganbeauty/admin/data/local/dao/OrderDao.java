@@ -21,7 +21,7 @@ public interface OrderDao {
     @Query("SELECT * FROM orders")
     List<OrderEntity> getAllSync();
 
-    @Query("SELECT * FROM orders WHERE orderId = :orderId")
+    @Query("SELECT * FROM orders WHERE id = :orderId")
     @Nullable
     OrderEntity getByIdSync(String orderId);
 

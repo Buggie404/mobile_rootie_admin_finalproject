@@ -454,7 +454,7 @@ public class CustomerSpendingChartFragment extends RootieAdminFragment {
                 }
 
                 OrderEntity oe = new OrderEntity();
-                oe.setOrderId(obj.getString("id"));
+                oe.setId(obj.getString("id"));
                 oe.setUserId(obj.getString("userId"));
                 oe.setOrderDate(obj.getString("orderDate"));
                 oe.setOrderTime(obj.getString("orderTime"));

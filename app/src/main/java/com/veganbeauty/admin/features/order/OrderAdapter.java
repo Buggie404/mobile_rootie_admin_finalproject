@@ -88,7 +88,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ViewHolder> 
         OrderItemBinding binding = holder.binding;
 
         // Bind Order Code
-        binding.txtOrderCode.setText(item.getOrderId());
+        binding.txtOrderCode.setText(item.getId());
 
         // Bind Customer Name
         String shippingName = item.getShippingName();
@@ -117,7 +117,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ViewHolder> 
         // Bind Checkbox
         if (isSelectionAllowed) {
             binding.imgSelectOrder.setVisibility(View.VISIBLE);
-            boolean isSelected = selectedOrderIds.contains(item.getOrderId());
+            boolean isSelected = selectedOrderIds.contains(item.getId());
             binding.imgSelectOrder.setImageResource(
                     isSelected ? R.drawable.ic_checkbox_checked
                             : R.drawable.ic_radio_primary_unchecked

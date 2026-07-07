@@ -631,13 +631,18 @@ public class FirebaseService {
         }
 
         OrderEntity oe = new OrderEntity();
-        oe.setOrderId(orderId);
+        oe.setId(orderId);
         oe.setUserId(doc.getString("userId") != null ? doc.getString("userId") : "");
         oe.setOrderDate(doc.getString("orderDate") != null ? doc.getString("orderDate") : "");
         oe.setOrderTime(doc.getString("orderTime") != null ? doc.getString("orderTime") : "");
         oe.setStatus(doc.getString("status") != null ? doc.getString("status") : "");
         oe.setTotalAmount(toLong(doc.get("totalAmount")));
+        oe.setSubTotal(toLong(doc.get("subTotal")));
+        if (oe.getSubTotal() == 0L) {
+            oe.setSubTotal(oe.getTotalAmount());
+        }
         oe.setItems(orderItems);
+        oe.setGuest(toBoolean(doc.get("isGuest")));
         oe.setShippingName(doc.getString("shippingName") != null ? doc.getString("shippingName") : "");
         oe.setShippingPhone(doc.getString("shippingPhone") != null ? doc.getString("shippingPhone") : "");
         oe.setShippingAddress(doc.getString("shippingAddress") != null ? doc.getString("shippingAddress") : "");
@@ -645,12 +650,32 @@ public class FirebaseService {
         oe.setVoucherDiscount(toLong(doc.get("voucherDiscount")));
         oe.setPaymentMethod(doc.getString("paymentMethod") != null ? doc.getString("paymentMethod") : "");
         oe.setExpectedDeliveryTime(doc.getString("expectedDeliveryTime"));
+        oe.setDeliveryDate(doc.getString("deliveryDate"));
+        oe.setAffiliate(toBoolean(doc.get("isAffiliate")));
+        Object affiliateRaw = doc.get("affiliate");
+        if (affiliateRaw instanceof Map) {
+            Map<?, ?> affMap = (Map<?, ?>) affiliateRaw;
+            OrderEntity.AffiliateInfo info = new OrderEntity.AffiliateInfo();
+            Object affId = affMap.get("affiliate_id");
+            if (affId == null) affId = affMap.get("affiliateId");
+            info.setAffiliate_id(affId != null ? affId.toString() : "");
+            Object refId = affMap.get("referrerUserId");
+            info.setReferrerUserId(refId != null ? refId.toString() : "");
+            info.setCommissionAmount(toLong(affMap.get("commissionAmount")));
+            Object statusObj = affMap.get("commissionStatus");
+            info.setCommissionStatus(statusObj != null ? statusObj.toString() : "");
+            oe.setAffiliate(info);
+        }
         oe.setHasReview(toBoolean(doc.get("hasReview")));
         oe.setReviewStars(toInt(doc.get("reviewStars")));
         oe.setReviewText(doc.getString("reviewText"));
         oe.setReviewImage(doc.getString("reviewImage"));
         oe.setAnonymous(toBoolean(doc.get("isAnonymous")));
         oe.setRecommendToFriends(toBoolean(doc.get("recommendToFriends")));
+        oe.setBillingName(doc.getString("billingName"));
+        oe.setBillingPhone(doc.getString("billingPhone"));
+        oe.setBillingEmail(doc.getString("billingEmail"));
+        oe.setOrderNote(doc.getString("orderNote"));
         oe.setStoreName(storeName);
         oe.setStoreID(storeID);
         return oe;
@@ -814,12 +839,25 @@ public class FirebaseService {
             for (DocumentSnapshot doc : snapshot.getDocuments()) {
                 try {
                     CustomerEntity customer = new CustomerEntity();
-                    customer.setId(doc.getId());
-                    customer.setName(doc.getString("username") != null ? doc.getString("username") : "");
+                    String userId = doc.getString("user_id");
+                    if (userId == null || userId.isEmpty()) {
+                        userId = doc.getId();
+                    }
+                    customer.setId(userId);
+                    String username = doc.getString("username");
+                    String fullName = doc.getString("full_name");
+                    customer.setUsername(username != null ? username : "");
+                    customer.setFull_name(fullName != null ? fullName : "");
+                    if (fullName != null && !fullName.isEmpty()) {
+                        customer.setName(fullName);
+                    } else {
+                        customer.setName(username != null ? username : "");
+                    }
                     customer.setEmail(doc.getString("email") != null ? doc.getString("email") : "");
                     customer.setPhone(doc.getString("phone") != null ? doc.getString("phone") : "");
                     customer.setAddress(doc.getString("address") != null ? doc.getString("address") : "");
                     customer.setAvatar(doc.getString("avatar") != null ? doc.getString("avatar") : "");
+                    customer.setPrimary_image(doc.getString("primary_image") != null ? doc.getString("primary_image") : "");
                     customer.setSpending(toLong(doc.get("spending")));
                     customer.setTier(doc.getString("tier") != null ? doc.getString("tier") : "Thường");
                     customer.setLastActive(doc.getString("last_active") != null ? doc.getString("last_active") : "");

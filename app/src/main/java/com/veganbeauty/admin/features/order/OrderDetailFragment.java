@@ -101,7 +101,7 @@ public class OrderDetailFragment extends RootieAdminFragment {
     }
 
     private void bindOrder(OrderEntity order) {
-        binding.txtOrderCodeTitle.setText("Đơn hàng " + order.getOrderId());
+        binding.txtOrderCodeTitle.setText("Đơn hàng " + order.getId());
 
         // Status and styling
         String statusClean = order.getStatus() != null ? order.getStatus().trim() : "";
@@ -231,8 +231,8 @@ public class OrderDetailFragment extends RootieAdminFragment {
             btnApprove.setVisibility(View.VISIBLE);
             btnApprove.setText("Xác nhận");
 
-            btnCancel.setOnClickListener(v -> updateStatus(order.getOrderId(), "Đã hủy"));
-            btnApprove.setOnClickListener(v -> updateStatus(order.getOrderId(), "Đang chuẩn bị"));
+            btnCancel.setOnClickListener(v -> updateStatus(order.getId(), "Đã hủy"));
+            btnApprove.setOnClickListener(v -> updateStatus(order.getId(), "Đang chuẩn bị"));
         } else if (normalizedStatus.contains("đang xử lý") || normalizedStatus.contains("đang chuẩn bị")) {
             actionsLayout.setVisibility(View.VISIBLE);
             btnCancel.setVisibility(View.VISIBLE);
@@ -240,8 +240,8 @@ public class OrderDetailFragment extends RootieAdminFragment {
             btnApprove.setVisibility(View.VISIBLE);
             btnApprove.setText("Giao hàng");
 
-            btnCancel.setOnClickListener(v -> updateStatus(order.getOrderId(), "Đã hủy"));
-            btnApprove.setOnClickListener(v -> updateStatus(order.getOrderId(), "Đang giao"));
+            btnCancel.setOnClickListener(v -> updateStatus(order.getId(), "Đã hủy"));
+            btnApprove.setOnClickListener(v -> updateStatus(order.getId(), "Đang giao"));
         } else if (normalizedStatus.contains("đang giao")) {
             actionsLayout.setVisibility(View.VISIBLE);
             btnCancel.setVisibility(View.VISIBLE);
@@ -249,8 +249,8 @@ public class OrderDetailFragment extends RootieAdminFragment {
             btnApprove.setVisibility(View.VISIBLE);
             btnApprove.setText("Hoàn tất");
 
-            btnCancel.setOnClickListener(v -> updateStatus(order.getOrderId(), "Đã hủy"));
-            btnApprove.setOnClickListener(v -> updateStatus(order.getOrderId(), "Hoàn tất"));
+            btnCancel.setOnClickListener(v -> updateStatus(order.getId(), "Đã hủy"));
+            btnApprove.setOnClickListener(v -> updateStatus(order.getId(), "Hoàn tất"));
         } else {
             // Completed or Cancelled -> no actions
             actionsLayout.setVisibility(View.GONE);

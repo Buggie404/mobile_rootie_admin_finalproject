@@ -258,7 +258,7 @@ public class CustomerOrderHistoryFragment extends RootieAdminFragment {
                 }
 
                 OrderEntity oe = new OrderEntity();
-                oe.setOrderId(obj.getString("id"));
+                oe.setId(obj.getString("id"));
                 oe.setUserId(obj.getString("userId"));
                 oe.setOrderDate(obj.getString("orderDate"));
                 oe.setOrderTime(obj.getString("orderTime"));
@@ -328,7 +328,7 @@ public class CustomerOrderHistoryFragment extends RootieAdminFragment {
             OrderEntity order = list.get(position);
             ItemOrderHistoryBinding binding = holder.binding;
 
-            binding.txtOrderId.setText("#" + order.getOrderId());
+            binding.txtOrderId.setText("#" + order.getId());
             binding.txtOrderDatetime.setText(order.getOrderTime() + ", " + order.getOrderDate());
 
             int totalQty = 0;

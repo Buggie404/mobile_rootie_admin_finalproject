@@ -150,14 +150,14 @@ public class OrderListFragment extends RootieAdminFragment {
         adapter = new OrderAdapter(
                 new ArrayList<>(),
                 selectedOrderIds,
-                order -> toggleOrderSelection(order.getOrderId()),
-                order -> updateSingleOrderStatus(order.getOrderId(), "Đã hủy"),
+                order -> toggleOrderSelection(order.getId()),
+                order -> updateSingleOrderStatus(order.getId(), "Đã hủy"),
                 order -> {
                     String nextStatus = getNextStatus(order.getStatus());
-                    updateSingleOrderStatus(order.getOrderId(), nextStatus);
+                    updateSingleOrderStatus(order.getId(), nextStatus);
                 },
                 order -> {
-                    OrderDetailFragment detailFragment = OrderDetailFragment.newInstance(order.getOrderId());
+                    OrderDetailFragment detailFragment = OrderDetailFragment.newInstance(order.getId());
                     MainActivity mainActivity = (MainActivity) getActivity();
                     if (mainActivity != null) {
                         mainActivity.loadFragment(detailFragment);
@@ -295,7 +295,7 @@ public class OrderListFragment extends RootieAdminFragment {
         if (!currentSearchQuery.isEmpty()) {
             List<OrderEntity> searchFiltered = new ArrayList<>();
             for (OrderEntity order : result) {
-                if (order.getOrderId().toLowerCase().contains(currentSearchQuery.toLowerCase()) ||
+                if (order.getId().toLowerCase().contains(currentSearchQuery.toLowerCase()) ||
                     (order.getShippingName() != null && order.getShippingName().toLowerCase().contains(currentSearchQuery.toLowerCase()))) {
                     searchFiltered.add(order);
                 }
@@ -409,7 +409,7 @@ public class OrderListFragment extends RootieAdminFragment {
                         dateCompare = currentSort.equals("DATE_DESC") ? d2.compareTo(d1) : d1.compareTo(d2);
                     }
                     if (dateCompare != 0) return dateCompare;
-                    return o2.getOrderId().compareTo(o1.getOrderId());
+                    return o2.getId().compareTo(o1.getId());
                 } else if (currentSort.equals("PRICE_DESC")) {
                     return Long.compare(o2.getTotalAmount(), o1.getTotalAmount());
                 } else {
@@ -448,7 +448,7 @@ public class OrderListFragment extends RootieAdminFragment {
     private void toggleSelectAll() {
         List<String> allDisplayedIds = new ArrayList<>();
         for (OrderEntity order : filteredOrdersList) {
-            allDisplayedIds.add(order.getOrderId());
+            allDisplayedIds.add(order.getId());
         }
         boolean allDisplayedSelected = selectedOrderIds.containsAll(allDisplayedIds) && !allDisplayedIds.isEmpty();
 
@@ -463,7 +463,7 @@ public class OrderListFragment extends RootieAdminFragment {
     private void updateSelectAllCheckboxUI() {
         List<String> allDisplayedIds = new ArrayList<>();
         for (OrderEntity order : filteredOrdersList) {
-            allDisplayedIds.add(order.getOrderId());
+            allDisplayedIds.add(order.getId());
         }
         boolean isAllSelected = selectedOrderIds.containsAll(allDisplayedIds) && !allDisplayedIds.isEmpty();
 
@@ -511,7 +511,7 @@ public class OrderListFragment extends RootieAdminFragment {
                         // Refresh local lists
                         int index = -1;
                         for (int i = 0; i < allOrdersList.size(); i++) {
-                            if (allOrdersList.get(i).getOrderId().equals(orderId)) {
+                            if (allOrdersList.get(i).getId().equals(orderId)) {
                                 index = i;
                                 break;
                             }
@@ -572,7 +572,7 @@ public class OrderListFragment extends RootieAdminFragment {
                 for (String id : idsToUpdate) {
                     OrderEntity order = null;
                     for (OrderEntity o : allOrdersList) {
-                        if (o.getOrderId().equals(id)) {
+                        if (o.getId().equals(id)) {
                             order = o;
                             break;
                         }

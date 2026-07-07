@@ -27,7 +27,7 @@ import com.veganbeauty.admin.data.local.entities.ProductEntity;
         ChatMessageEntity.class,
         AdminEntity.class
     },
-    version = 10
+    version = 11
 )
 @TypeConverters({OrderConverters.class, ProductConverters.class})
 public abstract class RootieAdminDatabase extends RoomDatabase {

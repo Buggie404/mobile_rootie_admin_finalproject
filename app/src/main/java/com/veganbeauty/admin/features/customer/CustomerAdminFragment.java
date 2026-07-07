@@ -224,11 +224,14 @@ public class CustomerAdminFragment extends RootieAdminFragment {
                 JSONObject obj = jsonArray.getJSONObject(i);
                 CustomerEntity entity = new CustomerEntity();
                 entity.setId(obj.optString("user_id", UUID.randomUUID().toString()));
+                entity.setUsername(obj.optString("username", ""));
+                entity.setFull_name(obj.optString("full_name", ""));
                 entity.setName(obj.has("full_name") && !obj.getString("full_name").isEmpty() ? obj.getString("full_name") : obj.optString("username", ""));
                 entity.setEmail(obj.optString("email", ""));
                 entity.setPhone(obj.optString("phone", ""));
                 entity.setAddress(obj.optString("bio", ""));
                 entity.setAvatar(obj.optString("avatar", ""));
+                entity.setPrimary_image(obj.optString("primary_image", ""));
                 entity.setSpending(obj.optLong("spending", 0L));
                 entity.setTier(obj.optString("tier", "Thường"));
                 entity.setLastActive(obj.optString("last_active", ""));

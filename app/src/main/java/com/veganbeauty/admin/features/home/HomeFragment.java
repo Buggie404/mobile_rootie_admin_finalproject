@@ -90,7 +90,7 @@ public class HomeFragment extends RootieAdminFragment {
                 activityItem -> {
                     MainActivity mainActivity = (MainActivity) getActivity();
                     if (mainActivity != null) {
-                        mainActivity.loadFragment(OrderDetailFragment.newInstance(activityItem.getOrderId()));
+                        mainActivity.loadFragment(OrderDetailFragment.newInstance(activityItem.getId()));
                     }
                 }
         );
@@ -103,8 +103,6 @@ public class HomeFragment extends RootieAdminFragment {
         setupAdminStatCardClicks();
 
         binding.btnSeeAllTopSelling.setOnClickListener(v -> openProductList());
-
-        binding.fabAdd.setOnClickListener(v -> openProductList());
 
         // Bind header message icon
         setupHeaderMessageButton(binding.header.homeHeaderMessageBtn);
@@ -228,7 +226,7 @@ public class HomeFragment extends RootieAdminFragment {
             }
             activities.add(new RecentActivity(
                     title,
-                    order.getOrderId(),
+                    order.getId(),
                     formatTimeAgo(order),
                     formatVnd(order.getTotalAmount()),
                     formatStatusLabel(order.getStatus()),
@@ -551,7 +549,7 @@ public class HomeFragment extends RootieAdminFragment {
                 return firstItem.getProductName();
             }
         }
-        return "Đơn hàng " + order.getOrderId();
+        return "Đơn hàng " + order.getId();
     }
 
     private void selectTab(TextView selected, DateFilter filter, List<OrderEntity> orders) {
