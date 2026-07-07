@@ -13,7 +13,6 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
@@ -21,19 +20,29 @@ import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.veganbeauty.admin.core.base.RootieAdminActivity;
 import com.veganbeauty.admin.data.local.SessionManager;
+import com.veganbeauty.admin.data.remote.ChatMessage;
+import com.veganbeauty.admin.data.remote.FirebaseService;
 import com.veganbeauty.admin.databinding.ActivityMainBinding;
 import com.veganbeauty.admin.features.auth.LoginActivity;
 import com.veganbeauty.admin.features.home.BottomNavHelper;
 import com.veganbeauty.admin.features.home.HomeFragment;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends RootieAdminActivity {
 
+    public interface ChatMessagesListener {
+        void onChatMessagesUpdated(List<ChatMessage> messages);
+    }
+
     private ActivityMainBinding binding;
     private ListenerRegistration chatListenerRegistration = null;
+    private final FirebaseService firebaseService = new FirebaseService();
+    private final List<ChatMessagesListener> chatMessagesListeners = new ArrayList<>();
+    private List<ChatMessage> cachedChatMessages = new ArrayList<>();
     private int lastUnreadCount = 0;
     private int currentTabId = R.id.nav_home;
 
@@ -68,6 +77,12 @@ public class MainActivity extends RootieAdminActivity {
         if (savedInstanceState == null) {
             loadFragment(new HomeFragment());
         }
+
+        getSupportFragmentManager().addOnBackStackChangedListener(() -> {
+            if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
+                ensureBottomNavVisible();
+            }
+        });
 
         startChatUnreadListener();
         requestNotificationPermission();
@@ -146,10 +161,8 @@ public class MainActivity extends RootieAdminActivity {
                 bottomNav,
                 currentTabId,
                 tabId -> {
-                    if (tabId != currentTabId) {
-                        currentTabId = tabId;
-                        BottomNavHelper.navigate(this, tabId);
-                    }
+                    currentTabId = tabId;
+                    BottomNavHelper.navigate(this, tabId);
                 }
             );
             BottomNavHelper.highlightTab(bottomNav, currentTabId);
@@ -157,9 +170,69 @@ public class MainActivity extends RootieAdminActivity {
     }
 
     public void loadFragment(Fragment fragment) {
+        ensureBottomNavVisible();
         getSupportFragmentManager().beginTransaction()
             .replace(binding.mainContainer.getId(), fragment)
             .commit();
+        bringBottomNavToFront();
+    }
+
+    public void loadFragmentHidingNav(Fragment fragment) {
+        hideBottomNav();
+        getSupportFragmentManager().beginTransaction()
+            .replace(binding.mainContainer.getId(), fragment)
+            .addToBackStack(null)
+            .commit();
+    }
+
+    public void ensureBottomNavVisible() {
+        View bottomNav = findViewById(R.id.bottom_nav);
+        if (bottomNav != null) {
+            bottomNav.setVisibility(View.VISIBLE);
+            bringBottomNavToFront();
+        }
+    }
+
+    public void hideBottomNav() {
+        View bottomNav = findViewById(R.id.bottom_nav);
+        if (bottomNav != null) {
+            bottomNav.setVisibility(View.GONE);
+        }
+    }
+
+    private void bringBottomNavToFront() {
+        View bottomNav = findViewById(R.id.bottom_nav);
+        if (bottomNav != null) {
+            bottomNav.bringToFront();
+            bottomNav.requestLayout();
+        }
+    }
+
+    public void addChatMessagesListener(ChatMessagesListener listener) {
+        if (listener == null || chatMessagesListeners.contains(listener)) {
+            return;
+        }
+        chatMessagesListeners.add(listener);
+        if (!cachedChatMessages.isEmpty()) {
+            listener.onChatMessagesUpdated(new ArrayList<>(cachedChatMessages));
+        }
+    }
+
+    public void removeChatMessagesListener(ChatMessagesListener listener) {
+        chatMessagesListeners.remove(listener);
+    }
+
+    public List<ChatMessage> getCachedChatMessages() {
+        return new ArrayList<>(cachedChatMessages);
+    }
+
+    private void notifyChatMessagesListeners(List<ChatMessage> messages) {
+        List<ChatMessage> copy = new ArrayList<>(messages);
+        runOnUiThread(() -> {
+            for (ChatMessagesListener listener : new ArrayList<>(chatMessagesListeners)) {
+                listener.onChatMessagesUpdated(copy);
+            }
+        });
     }
 
     private void startChatUnreadListener() {
@@ -180,34 +253,12 @@ public class MainActivity extends RootieAdminActivity {
                     }
 
                     if (snapshot != null) {
-                        int unreadConvCount = 0;
-                        for (DocumentSnapshot doc : snapshot.getDocuments()) {
-                            try {
-                                @SuppressWarnings("unchecked")
-                                List<String> members = (List<String>) doc.get("members");
-                                if (members == null || !members.contains("rootie_vn")) continue;
-
-                                @SuppressWarnings("unchecked")
-                                List<Map<String, Object>> messagesRaw = (List<Map<String, Object>>) doc.get("messages");
-                                if (messagesRaw == null) continue;
-                                boolean hasUnread = false;
-                                for (Map<String, Object> msgMap : messagesRaw) {
-                                    String senderId = msgMap.get("sender_id") != null ? msgMap.get("sender_id").toString() : "";
-                                    if (!"rootie_vn".equals(senderId) && msgMap.get("seen_at") == null) {
-                                        hasUnread = true;
-                                        break;
-                                    }
-                                }
-                                if (hasUnread) {
-                                    unreadConvCount++;
-                                }
-                            } catch (Exception ex) {
-                                ex.printStackTrace();
-                            }
-                        }
-
+                        List<ChatMessage> messages = firebaseService.parseChatMessagesFromSnapshot(snapshot);
+                        cachedChatMessages = messages;
+                        int unreadConvCount = firebaseService.countUnreadConversations(snapshot);
                         lastUnreadCount = unreadConvCount;
                         updateGlobalMessageBadges(unreadConvCount);
+                        notifyChatMessagesListeners(messages);
                     }
                 });
         } catch (Exception ex) {

@@ -2,6 +2,7 @@ package com.veganbeauty.admin.data.repository;
 
 import android.content.Context;
 import androidx.lifecycle.LiveData;
+import com.veganbeauty.admin.core.utils.BookingExpiryHelper;
 import com.veganbeauty.admin.data.local.dao.BookingDao;
 import com.veganbeauty.admin.data.local.entities.BookingEntity;
 import com.veganbeauty.admin.data.remote.FirebaseService;
@@ -11,6 +12,7 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class BookingRepository {
@@ -35,11 +37,37 @@ public class BookingRepository {
     public void syncFromFirebase() {
         List<BookingEntity> remoteList = firebaseService.fetchAllBookings();
         if (!remoteList.isEmpty()) {
+            expireOverdueBookings(remoteList);
             bookingDao.insertAllSync(remoteList);
-        } else {
-            int localCount = bookingDao.getAllSync().size();
-            if (localCount == 0 && context != null) {
-                seedFromAssets(context);
+            return;
+        }
+
+        int localCount = bookingDao.getAllSync().size();
+        if (localCount == 0 && context != null) {
+            seedFromAssets(context);
+            return;
+        }
+
+        List<BookingEntity> localList = bookingDao.getAllSync();
+        if (!localList.isEmpty()) {
+            expireOverdueBookings(localList);
+            bookingDao.insertAllSync(localList);
+        }
+    }
+
+    private void expireOverdueBookings(List<BookingEntity> bookings) {
+        if (bookings == null || bookings.isEmpty()) {
+            return;
+        }
+        Calendar now = Calendar.getInstance();
+        for (BookingEntity booking : bookings) {
+            String reason = BookingExpiryHelper.resolveAutoCancelReason(booking, now);
+            if (reason == null) {
+                continue;
+            }
+            if (firebaseService.updateBookingStatus(booking.getId(), "Đã huỷ", reason)) {
+                booking.setStatus("Đã huỷ");
+                booking.setCancelReason(reason);
             }
         }
     }
@@ -101,25 +129,23 @@ public class BookingRepository {
 
     public boolean updateBookingStatus(String bookingId, String status, String cancelReason) {
         BookingEntity localBooking = bookingDao.getByIdSync(bookingId);
-        boolean success;
-        if (localBooking != null) {
-            localBooking.setStatus(status);
-            localBooking.setCancelReason(cancelReason);
-            success = firebaseService.uploadBooking(localBooking);
-            if (success) {
-                bookingDao.insertSync(localBooking);
-            }
-        } else {
-            success = firebaseService.updateBookingStatus(bookingId, status, cancelReason);
+        boolean success = firebaseService.updateBookingStatus(bookingId, status, cancelReason);
+
+        if (localBooking == null) {
+            localBooking = new BookingEntity();
+            localBooking.setId(bookingId);
+        }
+        localBooking.setStatus(status);
+        localBooking.setCancelReason(cancelReason != null ? cancelReason : "");
+
+        if (success) {
+            bookingDao.insertSync(localBooking);
+            return true;
         }
 
-        if (!success && localBooking != null) {
-            // Cập nhật local dù Firebase offline/thất bại
-            localBooking.setStatus(status);
-            localBooking.setCancelReason(cancelReason);
-            bookingDao.insertSync(localBooking);
-        }
-        return true;
+        // Cập nhật local dù Firebase offline/thất bại
+        bookingDao.insertSync(localBooking);
+        return false;
     }
 
     public boolean updateBookingStatus(String bookingId, String status) {

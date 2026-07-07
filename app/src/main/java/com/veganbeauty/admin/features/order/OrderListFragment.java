@@ -89,6 +89,7 @@ public class OrderListFragment extends RootieAdminFragment {
     protected void setupUI(View view) {
         MainActivity mainActivity = (MainActivity) getActivity();
         if (mainActivity != null) {
+            mainActivity.ensureBottomNavVisible();
             BottomNavHelper.setup(
                     mainActivity,
                     binding.getRoot(),

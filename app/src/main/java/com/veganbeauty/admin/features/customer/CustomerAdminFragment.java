@@ -56,6 +56,7 @@ public class CustomerAdminFragment extends RootieAdminFragment {
     protected void setupUI(View view) {
         MainActivity mainActivity = (MainActivity) getActivity();
         if (mainActivity != null) {
+            mainActivity.ensureBottomNavVisible();
             View bottomNav = mainActivity.findViewById(R.id.bottom_nav);
             if (bottomNav != null) {
                 BottomNavHelper.highlightTab(bottomNav, R.id.nav_customer);

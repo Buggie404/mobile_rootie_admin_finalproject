@@ -72,15 +72,7 @@ public class ProductListFragment extends RootieAdminFragment {
                 product -> {
                     MainActivity mainAct = (MainActivity) getActivity();
                     if (mainAct != null) {
-                        View bottomNav = mainAct.findViewById(R.id.bottom_nav);
-                        if (bottomNav != null) {
-                            bottomNav.setVisibility(View.GONE);
-                        }
-                        ProductAddFragment editFragment = ProductAddFragment.newInstance(product.getId());
-                        mainAct.getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.main_container, editFragment)
-                                .addToBackStack(null)
-                                .commit();
+                        mainAct.loadFragmentHidingNav(ProductAddFragment.newInstance(product.getId()));
                     }
                 },
                 product -> {
@@ -141,14 +133,7 @@ public class ProductListFragment extends RootieAdminFragment {
     private void openAddProduct() {
         MainActivity mainAct = (MainActivity) getActivity();
         if (mainAct == null) return;
-        View bottomNav = mainAct.findViewById(R.id.bottom_nav);
-        if (bottomNav != null) {
-            bottomNav.setVisibility(View.GONE);
-        }
-        mainAct.getSupportFragmentManager().beginTransaction()
-                .replace(R.id.main_container, new ProductAddFragment())
-                .addToBackStack(null)
-                .commit();
+        mainAct.loadFragmentHidingNav(new ProductAddFragment());
     }
 
     private void setupDraggableFab() {
@@ -157,7 +142,7 @@ public class ProductListFragment extends RootieAdminFragment {
         View edgeTab = binding.fabEdgeTab;
         View edgeBg = binding.viewEdgeTabBg;
         ImageView edgeChevron = binding.imvEdgeChevron;
-        View host = binding.fabHost;
+        View host = binding.getRoot();
         Handler handler = new Handler(Looper.getMainLooper());
         int touchSlop = ViewConfiguration.get(requireContext()).getScaledTouchSlop();
         long longPressTimeout = ViewConfiguration.getLongPressTimeout();
@@ -551,14 +536,7 @@ public class ProductListFragment extends RootieAdminFragment {
                 dialog.dismiss();
                 MainActivity mainAct = (MainActivity) getActivity();
                 if (mainAct != null) {
-                    View bottomNav = mainAct.findViewById(R.id.bottom_nav);
-                    if (bottomNav != null) {
-                        bottomNav.setVisibility(View.GONE);
-                    }
-                    mainAct.getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.main_container, ProductAddFragment.newInstance(product.getId()))
-                            .addToBackStack(null)
-                            .commit();
+                    mainAct.loadFragmentHidingNav(ProductAddFragment.newInstance(product.getId()));
                 }
             });
         }
@@ -634,9 +612,9 @@ public class ProductListFragment extends RootieAdminFragment {
         super.onResume();
         MainActivity mainAct = (MainActivity) getActivity();
         if (mainAct != null) {
+            mainAct.ensureBottomNavVisible();
             View bottomNav = mainAct.findViewById(R.id.bottom_nav);
             if (bottomNav != null) {
-                bottomNav.setVisibility(View.VISIBLE);
                 BottomNavHelper.highlightTab(bottomNav, R.id.nav_product);
             }
         }

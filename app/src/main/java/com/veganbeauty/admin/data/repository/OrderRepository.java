@@ -47,8 +47,8 @@ public class OrderRepository {
             if (!localOrders.isEmpty()) {
                 orderDao.insertAllSync(localOrders);
             }
+            syncFromFirebase();
         }
-        syncFromFirebase();
     }
 
     public List<OrderEntity> getAllOrdersSync() {

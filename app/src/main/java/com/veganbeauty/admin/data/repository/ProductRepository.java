@@ -38,16 +38,12 @@ public class ProductRepository {
     }
 
     public void checkAndSeedProducts(Context context) {
-        int localCount = productDao.getAllSync().size();
-        if (localCount < 5) {
+        if (productDao.getAllSync().isEmpty()) {
             List<ProductEntity> localProducts = parseProductsFromAssets(context);
             if (!localProducts.isEmpty()) {
                 productDao.insertAllSync(localProducts);
             }
-        }
-        List<ProductEntity> remoteList = firebaseService.fetchAllProducts();
-        if (!remoteList.isEmpty()) {
-            productDao.insertAllSync(remoteList);
+            syncFromFirebase();
         }
     }
 

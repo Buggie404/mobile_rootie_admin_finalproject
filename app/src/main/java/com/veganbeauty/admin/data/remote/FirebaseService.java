@@ -782,7 +782,14 @@ public class FirebaseService {
         try {
             Map<String, Object> updates = new HashMap<>();
             updates.put("status", status);
-            updates.put("cancelReason", cancelReason);
+            updates.put("cancelReason", cancelReason != null ? cancelReason : "");
+            if ("Đã huỷ".equals(status) || "Đã hủy".equals(status)) {
+                updates.put(
+                        "cancelledAt",
+                        new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss", java.util.Locale.getDefault())
+                                .format(new java.util.Date())
+                );
+            }
             Tasks.await(db.collection("bookings").document(bookingId).update(updates));
             return true;
         } catch (Exception e) {
@@ -906,79 +913,131 @@ public class FirebaseService {
         }
         try {
             QuerySnapshot snapshot = Tasks.await(db.collection("community_message").get());
-            List<ChatMessage> list = new ArrayList<>();
-            for (DocumentSnapshot doc : snapshot.getDocuments()) {
-                try {
-                    Object membersRaw = doc.get("members");
-                    List<String> members = toStringList(membersRaw);
-                    if (!members.contains("rootie_vn")) {
-                        continue;
-                    }
-
-                    String userId = "";
-                    for (String m : members) {
-                        if (!m.equals("rootie_vn")) {
-                            userId = m;
-                            break;
-                        }
-                    }
-                    if (userId.isEmpty()) {
-                        continue;
-                    }
-
-                    Object memberInfoRaw = doc.get("member_info");
-                    String username = "User";
-                    String avatar = "";
-                    if (memberInfoRaw instanceof Map) {
-                        Map<?, ?> memberInfo = (Map<?, ?>) memberInfoRaw;
-                        Object partnerInfoObj = memberInfo.get(userId);
-                        if (partnerInfoObj instanceof Map) {
-                            Map<?, ?> partnerInfo = (Map<?, ?>) partnerInfoObj;
-                            Object nameObj = partnerInfo.get("name");
-                            Object avatarObj = partnerInfo.get("avatar");
-                            if (nameObj != null) username = nameObj.toString();
-                            if (avatarObj != null) avatar = avatarObj.toString();
-                        }
-                    }
-
-                    Object messagesRawObj = doc.get("messages");
-                    if (messagesRawObj instanceof List) {
-                        List<?> messagesRaw = (List<?>) messagesRawObj;
-                        for (Object msgObj : messagesRaw) {
-                            if (msgObj instanceof Map) {
-                                Map<?, ?> msgMap = (Map<?, ?>) msgObj;
-                                String senderId = msgMap.get("sender_id") != null ? msgMap.get("sender_id").toString() : "";
-                                String text = msgMap.get("text") != null ? msgMap.get("text").toString() : "";
-                                String sentAt = msgMap.get("sent_at") != null ? msgMap.get("sent_at").toString() : "";
-
-                                boolean isAgent = senderId.equals("rootie_vn");
-                                long timestamp = parseIsoString(sentAt);
-                                String msgId = msgMap.get("id") != null ? msgMap.get("id").toString() : "msg_" + userId + "_" + timestamp;
-
-                                ChatMessage msg = new ChatMessage();
-                                msg.setId(msgId);
-                                msg.setSenderId(isAgent ? "rootie_vn" : userId);
-                                msg.setSenderName(isAgent ? "Rootie VietNam" : username);
-                                msg.setSenderAvatar(isAgent ? "https://res.cloudinary.com/dpjkzxjl2/image/upload/v1780560866/Rootie_logo.png" : avatar);
-                                msg.setReceiverId(isAgent ? userId : "rootie_vn");
-                                msg.setReceiverName(isAgent ? username : "Rootie VietNam");
-                                msg.setReceiverAvatar(isAgent ? avatar : "https://res.cloudinary.com/dpjkzxjl2/image/upload/v1780560866/Rootie_logo.png");
-                                msg.setContent(text);
-                                msg.setTimestamp(timestamp);
-                                msg.setRead(isAgent || (msgMap.get("seen_at") != null));
-                                list.add(msg);
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            return list;
+            return parseChatMessagesFromSnapshot(snapshot);
         } catch (Exception e) {
             e.printStackTrace();
             return Collections.emptyList();
         }
+    }
+
+    public List<ChatMessage> parseChatMessagesFromSnapshot(QuerySnapshot snapshot) {
+        if (snapshot == null) {
+            return Collections.emptyList();
+        }
+        List<ChatMessage> list = new ArrayList<>();
+        for (DocumentSnapshot doc : snapshot.getDocuments()) {
+            list.addAll(parseChatMessagesFromDocument(doc));
+        }
+        return list;
+    }
+
+    public int countUnreadConversations(QuerySnapshot snapshot) {
+        if (snapshot == null) {
+            return 0;
+        }
+        int unreadConvCount = 0;
+        for (DocumentSnapshot doc : snapshot.getDocuments()) {
+            try {
+                Object membersRaw = doc.get("members");
+                List<String> members = toStringList(membersRaw);
+                if (!members.contains("rootie_vn")) {
+                    continue;
+                }
+
+                Object messagesRawObj = doc.get("messages");
+                if (!(messagesRawObj instanceof List)) {
+                    continue;
+                }
+                List<?> messagesRaw = (List<?>) messagesRawObj;
+                boolean hasUnread = false;
+                for (Object msgObj : messagesRaw) {
+                    if (msgObj instanceof Map) {
+                        Map<?, ?> msgMap = (Map<?, ?>) msgObj;
+                        String senderId = msgMap.get("sender_id") != null ? msgMap.get("sender_id").toString() : "";
+                        if (!senderId.equals("rootie_vn") && msgMap.get("seen_at") == null) {
+                            hasUnread = true;
+                            break;
+                        }
+                    }
+                }
+                if (hasUnread) {
+                    unreadConvCount++;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return unreadConvCount;
+    }
+
+    private List<ChatMessage> parseChatMessagesFromDocument(DocumentSnapshot doc) {
+        List<ChatMessage> list = new ArrayList<>();
+        try {
+            Object membersRaw = doc.get("members");
+            List<String> members = toStringList(membersRaw);
+            if (!members.contains("rootie_vn")) {
+                return list;
+            }
+
+            String userId = "";
+            for (String m : members) {
+                if (!m.equals("rootie_vn")) {
+                    userId = m;
+                    break;
+                }
+            }
+            if (userId.isEmpty()) {
+                return list;
+            }
+
+            Object memberInfoRaw = doc.get("member_info");
+            String username = "User";
+            String avatar = "";
+            if (memberInfoRaw instanceof Map) {
+                Map<?, ?> memberInfo = (Map<?, ?>) memberInfoRaw;
+                Object partnerInfoObj = memberInfo.get(userId);
+                if (partnerInfoObj instanceof Map) {
+                    Map<?, ?> partnerInfo = (Map<?, ?>) partnerInfoObj;
+                    Object nameObj = partnerInfo.get("name");
+                    Object avatarObj = partnerInfo.get("avatar");
+                    if (nameObj != null) username = nameObj.toString();
+                    if (avatarObj != null) avatar = avatarObj.toString();
+                }
+            }
+
+            Object messagesRawObj = doc.get("messages");
+            if (messagesRawObj instanceof List) {
+                List<?> messagesRaw = (List<?>) messagesRawObj;
+                for (Object msgObj : messagesRaw) {
+                    if (msgObj instanceof Map) {
+                        Map<?, ?> msgMap = (Map<?, ?>) msgObj;
+                        String senderId = msgMap.get("sender_id") != null ? msgMap.get("sender_id").toString() : "";
+                        String text = msgMap.get("text") != null ? msgMap.get("text").toString() : "";
+                        String sentAt = msgMap.get("sent_at") != null ? msgMap.get("sent_at").toString() : "";
+
+                        boolean isAgent = senderId.equals("rootie_vn");
+                        long timestamp = parseIsoString(sentAt);
+                        String msgId = msgMap.get("id") != null ? msgMap.get("id").toString() : "msg_" + userId + "_" + timestamp;
+
+                        ChatMessage msg = new ChatMessage();
+                        msg.setId(msgId);
+                        msg.setSenderId(isAgent ? "rootie_vn" : userId);
+                        msg.setSenderName(isAgent ? "Rootie VietNam" : username);
+                        msg.setSenderAvatar(isAgent ? "https://res.cloudinary.com/dpjkzxjl2/image/upload/v1780560866/Rootie_logo.png" : avatar);
+                        msg.setReceiverId(isAgent ? userId : "rootie_vn");
+                        msg.setReceiverName(isAgent ? username : "Rootie VietNam");
+                        msg.setReceiverAvatar(isAgent ? avatar : "https://res.cloudinary.com/dpjkzxjl2/image/upload/v1780560866/Rootie_logo.png");
+                        msg.setContent(text);
+                        msg.setTimestamp(timestamp);
+                        msg.setRead(isAgent || (msgMap.get("seen_at") != null));
+                        list.add(msg);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 
     public boolean saveChatMessage(ChatMessage message) {
@@ -1056,47 +1115,8 @@ public class FirebaseService {
         com.google.firebase.firestore.DocumentReference docRef = db.collection("community_message").document(convId);
 
         try {
-            DocumentSnapshot snapshot = Tasks.await(docRef.get());
-            if (snapshot.exists()) {
-                String timeStr = getCurrentTimeString();
-                Object unreadByRaw = snapshot.get("unread_by");
-                List<String> unreadBy = toStringList(unreadByRaw);
-                List<String> updatedUnread = new ArrayList<>();
-                for (String s : unreadBy) {
-                    if (!s.equals("rootie_vn")) {
-                        updatedUnread.add(s);
-                    }
-                }
-
-                Object messagesRawObj = snapshot.get("messages");
-                List<Map<String, Object>> updatedMessages = new ArrayList<>();
-                if (messagesRawObj instanceof List) {
-                    List<?> messagesRaw = (List<?>) messagesRawObj;
-                    for (Object msgObj : messagesRaw) {
-                        if (msgObj instanceof Map) {
-                            @SuppressWarnings("unchecked")
-                            Map<String, Object> msgMap = (Map<String, Object>) msgObj;
-                            String senderId = msgMap.get("sender_id") != null ? msgMap.get("sender_id").toString() : "";
-                            if (!senderId.equals("rootie_vn") && msgMap.get("seen_at") == null) {
-                                Map<String, Object> newMap = new HashMap<>(msgMap);
-                                newMap.put("seen_at", timeStr);
-                                updatedMessages.add(newMap);
-                            } else {
-                                updatedMessages.add(msgMap);
-                            }
-                        }
-                    }
-                }
-
-                Map<String, Object> updates = new HashMap<>();
-                updates.put("unread_by", updatedUnread);
-                updates.put("messages", updatedMessages);
-
-                Tasks.await(docRef.update(updates));
-                return true;
-            } else {
-                return true;
-            }
+            Tasks.await(docRef.update("unread_by", FieldValue.arrayRemove("rootie_vn")));
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
             return false;

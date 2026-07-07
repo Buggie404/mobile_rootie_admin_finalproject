@@ -129,6 +129,7 @@ public class BottomNavHelper {
     }
 
     public static void navigate(MainActivity activity, int tabId) {
+        activity.ensureBottomNavVisible();
         Fragment target = null;
         if (tabId == R.id.nav_home) {
             target = new HomeFragment();

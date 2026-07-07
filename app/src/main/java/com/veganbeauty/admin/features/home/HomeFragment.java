@@ -68,12 +68,7 @@ public class HomeFragment extends RootieAdminFragment {
 
     @Override
     protected void setupUI(View view) {
-        SessionManager sessionManager = new SessionManager(requireContext());
-        String name = sessionManager.getFullName();
-        if (name == null) {
-            name = "Xuân";
-        }
-        binding.tvGreeting.setText("Chào buổi sáng, " + name);
+        bindGreeting();
 
         binding.cardSpaBooking.setOnClickListener(v -> {
             MainActivity mainActivity = (MainActivity) getActivity();
@@ -90,7 +85,7 @@ public class HomeFragment extends RootieAdminFragment {
                 activityItem -> {
                     MainActivity mainActivity = (MainActivity) getActivity();
                     if (mainActivity != null) {
-                        mainActivity.loadFragment(OrderDetailFragment.newInstance(activityItem.getId()));
+                        mainActivity.loadFragment(OrderDetailFragment.newInstance(activityItem.getOrderId()));
                     }
                 }
         );
@@ -136,7 +131,39 @@ public class HomeFragment extends RootieAdminFragment {
     @Override
     public void onResume() {
         super.onResume();
+        MainActivity mainActivity = (MainActivity) getActivity();
+        if (mainActivity != null) {
+            mainActivity.ensureBottomNavVisible();
+        }
+        bindGreeting();
         loadHomeData(new SessionManager(requireContext()));
+    }
+
+    private void bindGreeting() {
+        if (binding == null) {
+            return;
+        }
+        SessionManager sessionManager = new SessionManager(requireContext());
+        String name = sessionManager.getFullName();
+        if (name == null) {
+            name = "Xuân";
+        }
+        binding.tvGreeting.setText(buildGreeting(name));
+    }
+
+    private String buildGreeting(String name) {
+        int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+        String period;
+        if (hour >= 5 && hour < 12) {
+            period = "buổi sáng";
+        } else if (hour >= 12 && hour < 14) {
+            period = "buổi trưa";
+        } else if (hour >= 14 && hour < 18) {
+            period = "buổi chiều";
+        } else {
+            period = "buổi tối";
+        }
+        return "Chào " + period + ", " + name;
     }
 
     private void setupSparklineCardClicks() {
@@ -628,14 +655,7 @@ public class HomeFragment extends RootieAdminFragment {
         rowBinding.rowTopSelling.setOnClickListener(v -> {
             MainActivity mainActivity = (MainActivity) getActivity();
             if (mainActivity == null) return;
-            View bottomNav = mainActivity.findViewById(R.id.bottom_nav);
-            if (bottomNav != null) {
-                bottomNav.setVisibility(View.GONE);
-            }
-            mainActivity.getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.main_container, ProductAddFragment.newInstance(product.getId()))
-                    .addToBackStack(null)
-                    .commit();
+            mainActivity.loadFragmentHidingNav(ProductAddFragment.newInstance(product.getId()));
         });
 
         return rowBinding.getRoot();

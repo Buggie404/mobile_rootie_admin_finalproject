@@ -23,7 +23,6 @@ import com.veganbeauty.admin.R;
 import com.veganbeauty.admin.core.base.RootieAdminFragment;
 import com.veganbeauty.admin.core.utils.ImageUtils;
 import com.veganbeauty.admin.data.remote.ChatMessage;
-import com.veganbeauty.admin.data.remote.FirebaseService;
 import com.veganbeauty.admin.databinding.FragmentHomeMessageBinding;
 import com.veganbeauty.admin.databinding.ItemChatThreadBinding;
 import com.veganbeauty.admin.databinding.ItemStoryUserBinding;
@@ -42,14 +41,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.UUID;
 
 public class HomeMessageFragment extends RootieAdminFragment {
 
     private FragmentHomeMessageBinding binding;
-    private final FirebaseService firebaseService = new FirebaseService();
-    private com.google.firebase.firestore.ListenerRegistration firestoreListener = null;
 
     private final List<ChatMessage> allMessages = new ArrayList<>();
     private final List<ChatThread> chatThreads = new ArrayList<>();
@@ -60,6 +56,8 @@ public class HomeMessageFragment extends RootieAdminFragment {
 
     private String currentFilter = "all"; // all, unread, pending
     private String searchQuery = "";
+
+    private final MainActivity.ChatMessagesListener chatMessagesListener = this::applyRemoteMessages;
 
     @Nullable
     @Override
@@ -99,7 +97,6 @@ public class HomeMessageFragment extends RootieAdminFragment {
 
         setupRecyclerViews();
         loadAndSyncMessages();
-        startFirestoreListener();
     }
 
     private void setupRecyclerViews() {
@@ -118,7 +115,6 @@ public class HomeMessageFragment extends RootieAdminFragment {
         if (getActivity() == null) return;
         new Thread(() -> {
             try {
-                // 1. Load local messages
                 List<ChatMessage> localList = loadLocalMessages();
 
                 if (getActivity() != null) {
@@ -126,27 +122,26 @@ public class HomeMessageFragment extends RootieAdminFragment {
                         allMessages.clear();
                         allMessages.addAll(localList);
                         updateChatThreads();
-                    });
-                }
 
-                // 2. Load Firestore remote messages and merge
-                List<ChatMessage> remoteList = firebaseService.fetchChatMessages();
-
-                if (getActivity() != null) {
-                    getActivity().runOnUiThread(() -> {
-                        List<ChatMessage> merged = mergeMessages(allMessages, remoteList);
-                        allMessages.clear();
-                        allMessages.addAll(merged);
-
-                        new Thread(() -> saveLocalMessages(allMessages)).start();
-
-                        updateChatThreads();
+                        MainActivity mainAct = (MainActivity) getActivity();
+                        if (mainAct != null) {
+                            mainAct.addChatMessagesListener(chatMessagesListener);
+                        }
                     });
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }).start();
+    }
+
+    private void applyRemoteMessages(List<ChatMessage> remoteMessages) {
+        if (binding == null) return;
+        List<ChatMessage> merged = mergeMessages(allMessages, remoteMessages);
+        allMessages.clear();
+        allMessages.addAll(merged);
+        new Thread(() -> saveLocalMessages(allMessages)).start();
+        updateChatThreads();
     }
 
     private List<ChatMessage> loadLocalMessages() {
@@ -396,117 +391,13 @@ public class HomeMessageFragment extends RootieAdminFragment {
         }
     }
 
-    private void startFirestoreListener() {
-        try {
-            com.google.firebase.firestore.FirebaseFirestore firestore = com.google.firebase.firestore.FirebaseFirestore.getInstance();
-            firestoreListener = firestore.collection("community_message")
-                .addSnapshotListener((snapshot, e) -> {
-                    if (e != null) {
-                        e.printStackTrace();
-                        return;
-                    }
-
-                    if (snapshot != null && !snapshot.isEmpty()) {
-                        List<ChatMessage> remoteMessages = new ArrayList<>();
-                        for (com.google.firebase.firestore.DocumentSnapshot doc : snapshot.getDocuments()) {
-                            try {
-                                @SuppressWarnings("unchecked")
-                                List<String> members = (List<String>) doc.get("members");
-                                if (members == null || !members.contains("rootie_vn")) continue;
-
-                                String userId = null;
-                                for (String m : members) {
-                                    if (!"rootie_vn".equals(m)) {
-                                        userId = m;
-                                        break;
-                                    }
-                                }
-                                if (userId == null) continue;
-
-                                @SuppressWarnings("unchecked")
-                                Map<String, Map<String, Object>> memberInfo = (Map<String, Map<String, Object>>) doc.get("member_info");
-                                Map<String, Object> partnerInfo = memberInfo != null ? memberInfo.get(userId) : null;
-                                String username = partnerInfo != null && partnerInfo.get("name") != null ? partnerInfo.get("name").toString() : "User";
-                                String avatar = partnerInfo != null && partnerInfo.get("avatar") != null ? partnerInfo.get("avatar").toString() : "";
-
-                                @SuppressWarnings("unchecked")
-                                List<Map<String, Object>> messagesRaw = (List<Map<String, Object>>) doc.get("messages");
-                                if (messagesRaw == null) continue;
-
-                                for (Map<String, Object> msgMap : messagesRaw) {
-                                    String senderId = msgMap.get("sender_id") != null ? msgMap.get("sender_id").toString() : "";
-                                    String text = msgMap.get("text") != null ? msgMap.get("text").toString() : "";
-                                    String sentAt = msgMap.get("sent_at") != null ? msgMap.get("sent_at").toString() : "";
-
-                                    boolean isAgent = "rootie_vn".equals(senderId);
-                                    long timestamp = parseIsoString(sentAt);
-                                    String msgId = msgMap.get("id") != null ? msgMap.get("id").toString() : "msg_" + userId + "_" + timestamp;
-
-                                    ChatMessage msg = new ChatMessage();
-                                    msg.setId(msgId);
-                                    msg.setSenderId(isAgent ? "rootie_vn" : userId);
-                                    msg.setSenderName(isAgent ? "Rootie VietNam" : username);
-                                    msg.setSenderAvatar(isAgent ? "https://res.cloudinary.com/dpjkzxjl2/image/upload/v1780560866/Rootie_logo.png" : avatar);
-                                    msg.setReceiverId(isAgent ? userId : "rootie_vn");
-                                    msg.setReceiverName(isAgent ? username : "Rootie VietNam");
-                                    msg.setReceiverAvatar(isAgent ? avatar : "https://res.cloudinary.com/dpjkzxjl2/image/upload/v1780560866/Rootie_logo.png");
-                                    msg.setContent(text);
-                                    msg.setTimestamp(timestamp);
-                                    msg.setRead(isAgent || (msgMap.get("seen_at") != null));
-                                    remoteMessages.add(msg);
-                                }
-                            } catch (Exception ex) {
-                                ex.printStackTrace();
-                            }
-                        }
-
-                        List<ChatMessage> merged = mergeMessages(allMessages, remoteMessages);
-                        if (isDifferent(allMessages, merged)) {
-                            allMessages.clear();
-                            allMessages.addAll(merged);
-
-                            new Thread(() -> saveLocalMessages(allMessages)).start();
-
-                            updateChatThreads();
-                        }
-                    }
-                });
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    private long parseIsoString(String isoStr) {
-        try {
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault());
-            format.setTimeZone(TimeZone.getTimeZone("UTC"));
-            Date d = format.parse(isoStr);
-            return d != null ? d.getTime() : System.currentTimeMillis();
-        } catch (Exception ex) {
-            return System.currentTimeMillis();
-        }
-    }
-
-    private boolean isDifferent(List<ChatMessage> local, List<ChatMessage> remote) {
-        if (local.size() != remote.size()) return true;
-        for (int i = 0; i < local.size(); i++) {
-            ChatMessage l = local.get(i);
-            ChatMessage r = remote.get(i);
-            if (!l.getSenderId().equals(r.getSenderId()) ||
-                !l.getContent().equals(r.getContent()) ||
-                l.getTimestamp() != r.getTimestamp()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     @Override
     public void onDestroyView() {
-        super.onDestroyView();
-        if (firestoreListener != null) {
-            firestoreListener.remove();
+        MainActivity mainAct = (MainActivity) getActivity();
+        if (mainAct != null) {
+            mainAct.removeChatMessagesListener(chatMessagesListener);
         }
+        super.onDestroyView();
         binding = null;
     }
 
