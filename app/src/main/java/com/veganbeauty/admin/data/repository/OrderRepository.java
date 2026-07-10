@@ -134,7 +134,7 @@ public class OrderRepository {
                     // Update local orders and sync product stock from Firestore
                     for (OrderEntity order : orders) {
                         orderDao.insertSync(order);
-                        android.util.Log.d("OrderRepository", "startRealtimeSync: Inserted order " + order.getOrderId());
+                        android.util.Log.d("OrderRepository", "startRealtimeSync: Inserted order " + order.getId());
                         // Fetch the updated products from Firestore to sync local DB stock
                         if (order.getItems() != null) {
                             for (OrderItem item : order.getItems()) {

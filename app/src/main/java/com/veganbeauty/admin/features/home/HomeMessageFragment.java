@@ -1,9 +1,8 @@
 package com.veganbeauty.admin.features.home;
 
-import android.content.res.ColorStateList;
 import android.graphics.Color;
-import java.util.Arrays;
 import android.graphics.Typeface;
+import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -22,17 +21,13 @@ import com.veganbeauty.admin.MainActivity;
 import com.veganbeauty.admin.R;
 import com.veganbeauty.admin.core.base.RootieAdminFragment;
 import com.veganbeauty.admin.core.utils.ImageUtils;
+import com.veganbeauty.admin.data.local.ChatMessageLocalStore;
+import com.veganbeauty.admin.data.remote.AdminCommunityMessageSeeder;
 import com.veganbeauty.admin.data.remote.ChatMessage;
+import com.veganbeauty.admin.data.remote.FirebaseService;
 import com.veganbeauty.admin.databinding.FragmentHomeMessageBinding;
 import com.veganbeauty.admin.databinding.ItemChatThreadBinding;
 import com.veganbeauty.admin.databinding.ItemStoryUserBinding;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,7 +36,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.UUID;
 
 public class HomeMessageFragment extends RootieAdminFragment {
 
@@ -56,7 +50,9 @@ public class HomeMessageFragment extends RootieAdminFragment {
 
     private String currentFilter = "all"; // all, unread, pending
     private String searchQuery = "";
+    private boolean localMessagesLoaded = false;
 
+    private final FirebaseService firebaseService = new FirebaseService();
     private final MainActivity.ChatMessagesListener chatMessagesListener = this::applyRemoteMessages;
 
     @Nullable
@@ -96,12 +92,40 @@ public class HomeMessageFragment extends RootieAdminFragment {
         });
 
         setupRecyclerViews();
+        updateStoryUsers();
         loadAndSyncMessages();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (binding != null && localMessagesLoaded) {
+            refreshFromLocalStore();
+        }
+    }
+
+    private void refreshFromLocalStore() {
+        Context appContext = requireContext().getApplicationContext();
+        new Thread(() -> {
+            List<ChatMessage> localList = ChatMessageLocalStore.load(appContext);
+            List<ChatMessage> merged = ChatMessageLocalStore.merge(allMessages, localList);
+            if (getActivity() == null) {
+                return;
+            }
+            getActivity().runOnUiThread(() -> {
+                if (binding == null) {
+                    return;
+                }
+                allMessages.clear();
+                allMessages.addAll(merged);
+                updateChatThreads();
+            });
+        }).start();
     }
 
     private void setupRecyclerViews() {
         // 1. Stories Horizontal List
-        storiesAdapter = new StoriesAdapter(getMockStories(), story -> openChatDetail(story.userId, story.name, story.avatar));
+        storiesAdapter = new StoriesAdapter(new ArrayList<>(), story -> openChatDetail(story.userId, story.name, story.avatar));
         binding.rvStories.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         binding.rvStories.setAdapter(storiesAdapter);
 
@@ -112,113 +136,101 @@ public class HomeMessageFragment extends RootieAdminFragment {
     }
 
     private void loadAndSyncMessages() {
-        if (getActivity() == null) return;
-        new Thread(() -> {
-            try {
-                List<ChatMessage> localList = loadLocalMessages();
+        if (getContext() == null) {
+            return;
+        }
+        localMessagesLoaded = false;
+        Context appContext = requireContext().getApplicationContext();
 
-                if (getActivity() != null) {
-                    getActivity().runOnUiThread(() -> {
-                        allMessages.clear();
-                        allMessages.addAll(localList);
-                        updateChatThreads();
+        List<ChatMessage> assetMessages = AdminCommunityMessageSeeder.loadMessagesFromAssets(appContext);
+        List<ChatMessage> localList = ChatMessageLocalStore.load(appContext);
+        List<ChatMessage> initial = ChatMessageLocalStore.merge(localList, assetMessages);
+        if (!initial.isEmpty()) {
+            allMessages.clear();
+            allMessages.addAll(initial);
+            localMessagesLoaded = true;
+            ChatMessageLocalStore.saveAll(appContext, initial);
+            updateChatThreads();
 
-                        MainActivity mainAct = (MainActivity) getActivity();
-                        if (mainAct != null) {
-                            mainAct.addChatMessagesListener(chatMessagesListener);
-                        }
-                    });
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+            MainActivity activity = (MainActivity) getActivity();
+            if (activity != null) {
+                activity.addChatMessagesListener(chatMessagesListener);
             }
-        }).start();
+        }
+
+        new Thread(() -> syncMessagesWithFirebase(appContext)).start();
+    }
+
+    private void syncMessagesWithFirebase(Context appContext) {
+        try {
+            AdminCommunityMessageSeeder.restoreRootieChatsFromAssets(appContext, firebaseService);
+            List<ChatMessage> remoteList = firebaseService.fetchChatMessages();
+
+            MainActivity mainAct = (MainActivity) getActivity();
+            if ((remoteList == null || remoteList.isEmpty()) && mainAct != null) {
+                remoteList = new ArrayList<>(mainAct.getCachedChatMessages());
+            }
+            if (remoteList == null) {
+                remoteList = new ArrayList<>();
+            }
+
+            List<ChatMessage> localList = ChatMessageLocalStore.load(appContext);
+            List<ChatMessage> assetMessages = AdminCommunityMessageSeeder.loadMessagesFromAssets(appContext);
+            List<ChatMessage> merged = ChatMessageLocalStore.merge(localList, assetMessages);
+            merged = ChatMessageLocalStore.merge(merged, remoteList);
+
+            if (!merged.isEmpty()) {
+                ChatMessageLocalStore.saveAll(appContext, merged);
+            }
+
+            List<ChatMessage> finalList = new ArrayList<>(merged);
+            if (getActivity() == null) {
+                return;
+            }
+            getActivity().runOnUiThread(() -> {
+                if (binding == null) {
+                    return;
+                }
+                allMessages.clear();
+                allMessages.addAll(finalList);
+                localMessagesLoaded = true;
+                updateChatThreads();
+
+                MainActivity activity = (MainActivity) getActivity();
+                if (activity != null) {
+                    activity.addChatMessagesListener(chatMessagesListener);
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (getActivity() == null) {
+                return;
+            }
+            getActivity().runOnUiThread(() -> {
+                if (binding == null || localMessagesLoaded) {
+                    return;
+                }
+                List<ChatMessage> fallback = AdminCommunityMessageSeeder.loadMessagesFromAssets(appContext);
+                if (!fallback.isEmpty()) {
+                    allMessages.clear();
+                    allMessages.addAll(fallback);
+                    localMessagesLoaded = true;
+                    updateChatThreads();
+                }
+            });
+        }
     }
 
     private void applyRemoteMessages(List<ChatMessage> remoteMessages) {
-        if (binding == null) return;
-        List<ChatMessage> merged = mergeMessages(allMessages, remoteMessages);
+        if (binding == null || !localMessagesLoaded || remoteMessages == null) {
+            return;
+        }
+        List<ChatMessage> merged = ChatMessageLocalStore.merge(allMessages, remoteMessages);
         allMessages.clear();
         allMessages.addAll(merged);
-        new Thread(() -> saveLocalMessages(allMessages)).start();
+        Context appContext = requireContext().getApplicationContext();
+        new Thread(() -> ChatMessageLocalStore.saveAll(appContext, merged)).start();
         updateChatThreads();
-    }
-
-    private List<ChatMessage> loadLocalMessages() {
-        List<ChatMessage> list = new ArrayList<>();
-        try {
-            File localFile = new File(requireContext().getFilesDir(), "community_message.json");
-            if (localFile.exists()) {
-                StringBuilder sb = new StringBuilder();
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(localFile)))) {
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        sb.append(line);
-                    }
-                }
-                String jsonString = sb.toString();
-                if (!jsonString.trim().isEmpty()) {
-                    JSONArray jsonArray = new JSONArray(jsonString);
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject obj = jsonArray.getJSONObject(i);
-                        ChatMessage msg = new ChatMessage();
-                        msg.setId(obj.optString("id", UUID.randomUUID().toString()));
-                        msg.setSenderId(obj.optString("senderId"));
-                        msg.setSenderName(obj.optString("senderName"));
-                        msg.setSenderAvatar(obj.optString("senderAvatar"));
-                        msg.setReceiverId(obj.optString("receiverId"));
-                        msg.setReceiverName(obj.optString("receiverName"));
-                        msg.setReceiverAvatar(obj.optString("receiverAvatar"));
-                        msg.setContent(obj.optString("content"));
-                        msg.setTimestamp(obj.optLong("timestamp"));
-                        msg.setRead(obj.optBoolean("isRead", false));
-                        list.add(msg);
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    private void saveLocalMessages(List<ChatMessage> messages) {
-        try {
-            File localFile = new File(requireContext().getFilesDir(), "community_message.json");
-            JSONArray jsonArray = new JSONArray();
-            for (ChatMessage msg : messages) {
-                JSONObject obj = new JSONObject();
-                obj.put("id", msg.getId());
-                obj.put("senderId", msg.getSenderId());
-                obj.put("senderName", msg.getSenderName());
-                obj.put("senderAvatar", msg.getSenderAvatar());
-                obj.put("receiverId", msg.getReceiverId());
-                obj.put("receiverName", msg.getReceiverName());
-                obj.put("receiverAvatar", msg.getReceiverAvatar());
-                obj.put("content", msg.getContent());
-                obj.put("timestamp", msg.getTimestamp());
-                obj.put("isRead", msg.isRead());
-                jsonArray.put(obj);
-            }
-            try (FileOutputStream fos = new FileOutputStream(localFile)) {
-                fos.write(jsonArray.toString(2).getBytes());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private List<ChatMessage> mergeMessages(List<ChatMessage> local, List<ChatMessage> remote) {
-        Map<String, ChatMessage> map = new HashMap<>();
-        for (ChatMessage msg : local) {
-            map.put(msg.getId(), msg);
-        }
-        for (ChatMessage msg : remote) {
-            map.put(msg.getId(), msg);
-        }
-        List<ChatMessage> merged = new ArrayList<>(map.values());
-        Collections.sort(merged, (o1, o2) -> Long.compare(o1.getTimestamp(), o2.getTimestamp()));
-        return merged;
     }
 
     private void updateChatThreads() {
@@ -253,22 +265,27 @@ public class HomeMessageFragment extends RootieAdminFragment {
 
             int unreadCount = 0;
             for (ChatMessage msg : messages) {
-                if ("rootie_vn".equals(msg.getReceiverId()) && !msg.isRead()) {
+                if (partnerId.equals(msg.getSenderId()) && "rootie_vn".equals(msg.getReceiverId()) && !msg.isRead()) {
                     unreadCount++;
                 }
             }
 
             boolean isActive = partnerId.equals("48228004") || partnerId.equals("quynh_nhu_user");
+            boolean lastFromCustomer = !"rootie_vn".equals(lastMsg.getSenderId());
+            String snippet = lastFromCustomer
+                ? lastMsg.getContent()
+                : "Bạn: " + lastMsg.getContent();
 
             chatThreads.add(new ChatThread(
                 partnerId,
                 partnerName,
                 partnerAvatar,
-                lastMsg.getContent(),
+                snippet,
                 formatRelativeTime(lastMsg.getTimestamp()),
                 unreadCount,
                 isActive,
-                lastMsg.getTimestamp()
+                lastMsg.getTimestamp(),
+                lastFromCustomer
             ));
         }
 
@@ -292,7 +309,13 @@ public class HomeMessageFragment extends RootieAdminFragment {
             }
             result = temp;
         } else if ("pending".equals(currentFilter)) {
-            result = new ArrayList<>();
+            List<ChatThread> temp = new ArrayList<>();
+            for (ChatThread ct : result) {
+                if (ct.lastMessageFromCustomer) {
+                    temp.add(ct);
+                }
+            }
+            result = temp;
         }
 
         // 2. Search Query
@@ -312,6 +335,8 @@ public class HomeMessageFragment extends RootieAdminFragment {
         if (chatsAdapter != null) {
             chatsAdapter.notifyDataSetChanged();
         }
+        updateStoryUsers();
+        updateNotificationBadge();
 
         // 3. Show/Hide Empty State
         if (filteredThreads.isEmpty()) {
@@ -335,7 +360,7 @@ public class HomeMessageFragment extends RootieAdminFragment {
             switch (item.getItemId()) {
                 case 1:
                     currentFilter = "all";
-                    binding.txtTitle.setText("Message");
+                    binding.txtTitle.setText("Tin nhắn");
                     break;
                 case 2:
                     currentFilter = "unread";
@@ -356,18 +381,38 @@ public class HomeMessageFragment extends RootieAdminFragment {
         ChatDetailFragment chatDetail = ChatDetailFragment.newInstance(userId, username, avatar);
         MainActivity mainAct = (MainActivity) getActivity();
         if (mainAct != null) {
-            mainAct.loadFragment(chatDetail);
+            mainAct.loadFragmentHidingNav(chatDetail);
         }
     }
 
-    private List<StoryUser> getMockStories() {
-        return Arrays.asList(
-            new StoryUser("rootie_vn", "Tin của bạn", "https://res.cloudinary.com/dpjkzxjl2/image/upload/v1780560866/Rootie_logo.png", false, true),
-            new StoryUser("48228004", "nguyen_bao", "https://i.pinimg.com/736x/ab/32/b1/ab32b13edefed48f94d93ee4b6f12f6b.jpg", true, false),
-            new StoryUser("68751659", "khanh_xun", "https://i1-c.pinimg.com/736x/4d/fe/b7/4dfeb7f781432e75e270d3bf70f494e4.jpg", true, false),
-            new StoryUser("87962440", "bin_khanh", "https://i1-c.pinimg.com/736x/9e/12/94/9e1294132dbb8f12c70f31058b98bdb1.jpg", true, false),
-            new StoryUser("85097162", "mei_anh", "https://i.pinimg.com/736x/87/1c/91/871c91ffb39c0fc6a44c77f0a905a396.jpg", true, false)
-        );
+    private void updateStoryUsers() {
+        if (storiesAdapter == null || binding == null) {
+            return;
+        }
+        List<StoryUser> stories = new ArrayList<>();
+        int limit = Math.min(filteredThreads.size(), 12);
+        for (int i = 0; i < limit; i++) {
+            ChatThread thread = filteredThreads.get(i);
+            stories.add(new StoryUser(thread.userId, thread.username, thread.avatar, thread.isActive, false));
+        }
+        storiesAdapter.updateStories(stories);
+        binding.rvStories.setVisibility(stories.isEmpty() ? View.GONE : View.VISIBLE);
+    }
+
+    private void updateNotificationBadge() {
+        if (binding == null) {
+            return;
+        }
+        int totalUnread = 0;
+        for (ChatThread thread : chatThreads) {
+            totalUnread += thread.unreadCount;
+        }
+        if (totalUnread > 0) {
+            binding.notificationBadge.setVisibility(View.VISIBLE);
+            binding.notificationBadge.setText(totalUnread > 99 ? "99+" : String.valueOf(totalUnread));
+        } else {
+            binding.notificationBadge.setVisibility(View.GONE);
+        }
     }
 
     private String formatRelativeTime(long timestamp) {
@@ -411,8 +456,9 @@ public class HomeMessageFragment extends RootieAdminFragment {
         final int unreadCount;
         final boolean isActive;
         final long timestamp;
+        final boolean lastMessageFromCustomer;
 
-        public ChatThread(String userId, String username, String avatar, String lastMessage, String lastMessageTime, int unreadCount, boolean isActive, long timestamp) {
+        public ChatThread(String userId, String username, String avatar, String lastMessage, String lastMessageTime, int unreadCount, boolean isActive, long timestamp, boolean lastMessageFromCustomer) {
             this.userId = userId;
             this.username = username;
             this.avatar = avatar;
@@ -421,6 +467,7 @@ public class HomeMessageFragment extends RootieAdminFragment {
             this.unreadCount = unreadCount;
             this.isActive = isActive;
             this.timestamp = timestamp;
+            this.lastMessageFromCustomer = lastMessageFromCustomer;
         }
     }
 
@@ -450,8 +497,16 @@ public class HomeMessageFragment extends RootieAdminFragment {
         private final OnStoryClickListener listener;
 
         StoriesAdapter(List<StoryUser> list, OnStoryClickListener listener) {
-            this.list = list;
+            this.list = new ArrayList<>(list);
             this.listener = listener;
+        }
+
+        void updateStories(List<StoryUser> stories) {
+            list.clear();
+            if (stories != null) {
+                list.addAll(stories);
+            }
+            notifyDataSetChanged();
         }
 
         @NonNull
@@ -530,18 +585,24 @@ public class HomeMessageFragment extends RootieAdminFragment {
             binding.txtName.setText(item.username);
 
             boolean isUnread = item.unreadCount > 0;
+            holder.itemView.setAlpha(isUnread ? 1f : 0.58f);
+
             if (isUnread) {
                 setTextStyleBold(binding.txtName);
                 setTextStyleBold(binding.txtMessageSnippet);
-                binding.txtMessageSnippet.setText(item.unreadCount + "+ tin nhắn mới");
-                binding.viewUnreadDot.setVisibility(View.VISIBLE);
+                binding.txtMessageSnippet.setTextColor(Color.parseColor("#3E4D44"));
+                binding.txtTime.setTextColor(Color.parseColor("#4F6544"));
+                binding.txtUnreadCount.setVisibility(View.VISIBLE);
+                binding.txtUnreadCount.setText(item.unreadCount > 99 ? "99+" : String.valueOf(item.unreadCount));
             } else {
                 setTextStyleNormal(binding.txtName);
                 setTextStyleNormal(binding.txtMessageSnippet);
-                binding.txtMessageSnippet.setText(item.lastMessage);
-                binding.viewUnreadDot.setVisibility(View.GONE);
+                binding.txtMessageSnippet.setTextColor(Color.parseColor("#7E8A83"));
+                binding.txtTime.setTextColor(Color.parseColor("#97A49C"));
+                binding.txtUnreadCount.setVisibility(View.GONE);
             }
 
+            binding.txtMessageSnippet.setText(item.lastMessage);
             binding.txtTime.setText(item.lastMessageTime);
             binding.viewActiveDot.setVisibility(item.isActive ? View.VISIBLE : View.GONE);
 

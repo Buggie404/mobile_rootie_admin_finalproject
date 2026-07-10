@@ -16,6 +16,33 @@
     "storeAddress": "235 Nguyễn Thị Minh Khai, P. Nguyễn Cư Trinh, Q.1, TP.HCM"
   },
   {
+    "username": "staff2",
+    "password": "123456",
+    "fullName": "Rootie Staff 2",
+    "role": "nhân viên",
+    "storeID": "CH002",
+    "storeName": "Cửa hàng mỹ phẩm Rootie - Cơ sở 2",
+    "storeAddress": "45 Lê Lợi, P. Bến Nghé, Q.1, TP.HCM"
+  },
+  {
+    "username": "staff3",
+    "password": "123456",
+    "fullName": "Rootie Staff 3",
+    "role": "nhân viên",
+    "storeID": "CH003",
+    "storeName": "Cửa hàng mỹ phẩm Rootie - Cơ sở 3",
+    "storeAddress": "12 Nguyễn Văn Linh, P. Tân Phú, Q.7, TP.HCM"
+  },
+  {
+    "username": "staff4",
+    "password": "123456",
+    "fullName": "Rootie Staff 4",
+    "role": "nhân viên",
+    "storeID": "CH004",
+    "storeName": "Cửa hàng mỹ phẩm Rootie - Cơ sở 4",
+    "storeAddress": "88 Xô Viết Nghệ Tĩnh, P. 21, Q. Bình Thạnh, TP.HCM"
+  },
+  {
     "username": "staff5",
     "password": "123456",
     "fullName": "Rootie Staff 5",
@@ -23,5 +50,50 @@
     "storeID": "CH005",
     "storeName": "Cửa hàng mỹ phẩm Rootie - Cơ sở 5",
     "storeAddress": "329 Hoàng Văn Thụ, P. Phường 10, Quận 3, Hồ Chí Minh"
+  },
+  {
+    "username": "staff6",
+    "password": "123456",
+    "fullName": "Rootie Staff 6",
+    "role": "nhân viên",
+    "storeID": "CH006",
+    "storeName": "Cửa hàng mỹ phẩm Rootie - Cơ sở 6",
+    "storeAddress": "56 Phan Đăng Lưu, P. 3, Q. Phú Nhuận, TP.HCM"
+  },
+  {
+    "username": "staff7",
+    "password": "123456",
+    "fullName": "Rootie Staff 7",
+    "role": "nhân viên",
+    "storeID": "CH007",
+    "storeName": "Cửa hàng mỹ phẩm Rootie - Cơ sở 7",
+    "storeAddress": "102 Quang Trung, P. 10, Gò Vấp, TP.HCM"
+  },
+  {
+    "username": "staff8",
+    "password": "123456",
+    "fullName": "Rootie Staff 8",
+    "role": "nhân viên",
+    "storeID": "CH008",
+    "storeName": "Cửa hàng mỹ phẩm Rootie - Cơ sở 8",
+    "storeAddress": "27 Võ Văn Ngân, P. Linh Chiểu, TP. Thủ Đức, TP.HCM"
+  },
+  {
+    "username": "staff9",
+    "password": "123456",
+    "fullName": "Rootie Staff 9",
+    "role": "nhân viên",
+    "storeID": "CH009",
+    "storeName": "Cửa hàng mỹ phẩm Rootie - Cơ sở 9",
+    "storeAddress": "65 Cộng Hòa, P. 4, Q. Tân Bình, TP.HCM"
+  },
+  {
+    "username": "staff10",
+    "password": "123456",
+    "fullName": "Rootie Staff 10",
+    "role": "nhân viên",
+    "storeID": "CH010",
+    "storeName": "Cửa hàng mỹ phẩm Rootie - Cơ sở 10",
+    "storeAddress": "199 Hai Bà Trưng, P. 6, Q. 3, TP.HCM"
   }
 ]

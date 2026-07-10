@@ -1107,6 +1107,144 @@ public class FirebaseService {
         }
     }
 
+    public List<String> listRootieChatCustomerIds() {
+        if (db == null) {
+            return Collections.emptyList();
+        }
+        List<String> customerIds = new ArrayList<>();
+        try {
+            QuerySnapshot snapshot = Tasks.await(db.collection("community_message").get());
+            for (DocumentSnapshot doc : snapshot.getDocuments()) {
+                String docId = doc.getId();
+                if (!docId.startsWith("chat_rootie_vn_")) {
+                    continue;
+                }
+                Object membersRaw = doc.get("members");
+                List<String> members = toStringList(membersRaw);
+                if (!members.contains("rootie_vn")) {
+                    continue;
+                }
+                String customerId = docId.substring("chat_rootie_vn_".length());
+                if (!customerId.isEmpty()) {
+                    customerIds.add(customerId);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return customerIds;
+    }
+
+    public boolean ensureRootieChatIfMissing(
+            String customerId,
+            String customerName,
+            String customerAvatar,
+            String customerMessage,
+            String adminReply
+    ) {
+        if (db == null || customerId == null || customerId.trim().isEmpty()) {
+            return false;
+        }
+        String convId = "chat_rootie_vn_" + customerId;
+        com.google.firebase.firestore.DocumentReference docRef = db.collection("community_message").document(convId);
+        try {
+            DocumentSnapshot existing = Tasks.await(docRef.get());
+            if (existing.exists()) {
+                return false;
+            }
+
+            String safeName = customerName != null && !customerName.trim().isEmpty() ? customerName : "Khách hàng";
+            String safeAvatar = customerAvatar != null ? customerAvatar : "";
+            String opener = customerMessage != null && !customerMessage.trim().isEmpty()
+                    ? customerMessage
+                    : "Xin chào Rootie, mình cần được tư vấn ạ!";
+            String reply = adminReply != null && !adminReply.trim().isEmpty()
+                    ? adminReply
+                    : "Chào bạn! Rootie rất vui được hỗ trợ bạn ạ.";
+
+            long now = System.currentTimeMillis();
+            long customerTs = now - 3600000L;
+            long adminTs = now - 1800000L;
+            String customerTime = formatIsoFromMillis(customerTs);
+            String adminTime = formatIsoFromMillis(adminTs);
+
+            Map<String, Object> customerMsg = new HashMap<>();
+            customerMsg.put("id", "m_" + customerId + "_1");
+            customerMsg.put("sender_id", customerId);
+            customerMsg.put("text", opener);
+            customerMsg.put("sent_at", customerTime);
+            customerMsg.put("delivered_at", customerTime);
+            customerMsg.put("seen_at", null);
+
+            Map<String, Object> adminMsg = new HashMap<>();
+            adminMsg.put("id", "m_" + customerId + "_2");
+            adminMsg.put("sender_id", "rootie_vn");
+            adminMsg.put("text", reply);
+            adminMsg.put("sent_at", adminTime);
+            adminMsg.put("delivered_at", adminTime);
+            adminMsg.put("seen_at", adminTime);
+
+            List<Map<String, Object>> messages = new ArrayList<>();
+            messages.add(customerMsg);
+            messages.add(adminMsg);
+
+            Map<String, Object> rootieInfo = new HashMap<>();
+            rootieInfo.put("name", "Rootie VietNam");
+            rootieInfo.put("avatar", "https://res.cloudinary.com/dpjkzxjl2/image/upload/v1780560866/Rootie_logo.png");
+
+            Map<String, Object> custInfo = new HashMap<>();
+            custInfo.put("name", safeName);
+            custInfo.put("avatar", safeAvatar);
+
+            Map<String, Object> memberInfo = new HashMap<>();
+            memberInfo.put("rootie_vn", rootieInfo);
+            memberInfo.put(customerId, custInfo);
+
+            List<String> members = new ArrayList<>();
+            members.add(customerId);
+            members.add("rootie_vn");
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("id", convId);
+            data.put("chat_type", "private");
+            data.put("members", members);
+            data.put("member_info", memberInfo);
+            data.put("active_by", Collections.emptyList());
+            data.put("typing_by", Collections.emptyList());
+            data.put("unread_by", Collections.singletonList("rootie_vn"));
+            data.put("created_at", customerTime);
+            data.put("updated_at", adminTime);
+            data.put("last_message", reply);
+            data.put("last_message_at", adminTime);
+            data.put("messages", messages);
+
+            Tasks.await(docRef.set(data));
+            return true;
+        } catch (Exception e) {
+            Log.e("FirebaseService", "ensureRootieChatIfMissing failed for " + customerId, e);
+            return false;
+        }
+    }
+
+    private String formatIsoFromMillis(long millis) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault());
+        format.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return format.format(new Date(millis));
+    }
+
+    public boolean upsertCommunityMessageDocument(String docId, Map<String, Object> payload) {
+        if (db == null || docId == null || docId.trim().isEmpty() || payload == null || payload.isEmpty()) {
+            return false;
+        }
+        try {
+            Tasks.await(db.collection("community_message").document(docId).set(payload));
+            return true;
+        } catch (Exception e) {
+            Log.e("FirebaseService", "upsertCommunityMessageDocument failed: " + docId, e);
+            return false;
+        }
+    }
+
     public boolean markConversationAsRead(String customerId) {
         if (db == null) {
             return false;
@@ -1115,7 +1253,40 @@ public class FirebaseService {
         com.google.firebase.firestore.DocumentReference docRef = db.collection("community_message").document(convId);
 
         try {
-            Tasks.await(docRef.update("unread_by", FieldValue.arrayRemove("rootie_vn")));
+            com.google.firebase.firestore.DocumentSnapshot doc = Tasks.await(docRef.get());
+            if (!doc.exists()) {
+                return false;
+            }
+
+            String timeStr = getCurrentTimeString();
+            Object messagesRawObj = doc.get("messages");
+            Map<String, Object> updates = new HashMap<>();
+
+            if (messagesRawObj instanceof List) {
+                List<?> messagesRaw = (List<?>) messagesRawObj;
+                List<Map<String, Object>> updatedMessages = new ArrayList<>();
+                for (Object msgObj : messagesRaw) {
+                    if (!(msgObj instanceof Map)) {
+                        continue;
+                    }
+                    Map<String, Object> msgMap = new HashMap<>();
+                    Map<?, ?> rawMap = (Map<?, ?>) msgObj;
+                    for (Map.Entry<?, ?> entry : rawMap.entrySet()) {
+                        if (entry.getKey() != null) {
+                            msgMap.put(entry.getKey().toString(), entry.getValue());
+                        }
+                    }
+                    String senderId = msgMap.get("sender_id") != null ? msgMap.get("sender_id").toString() : "";
+                    if (!senderId.equals("rootie_vn") && msgMap.get("seen_at") == null) {
+                        msgMap.put("seen_at", timeStr);
+                    }
+                    updatedMessages.add(msgMap);
+                }
+                updates.put("messages", updatedMessages);
+            }
+
+            updates.put("unread_by", FieldValue.arrayRemove("rootie_vn"));
+            Tasks.await(docRef.update(updates));
             return true;
         } catch (Exception e) {
             e.printStackTrace();

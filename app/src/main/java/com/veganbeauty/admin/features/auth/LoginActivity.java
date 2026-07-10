@@ -40,7 +40,7 @@ public class LoginActivity extends AppCompatActivity {
 
         sessionManager = new SessionManager(this);
 
-        seedAdminsIfEmpty();
+        seedAdminsFromAssets();
         setupUIEffects();
         setupListeners();
     }
@@ -88,25 +88,6 @@ public class LoginActivity extends AppCompatActivity {
             performLogin(username, password);
         });
 
-        // Quick profile listeners
-        binding.cardProfileAdmin.setOnClickListener(v -> {
-            binding.edtUsername.setText("admin");
-            binding.edtPassword.setText("123456");
-            performLogin("admin", "123456");
-        });
-
-        binding.cardProfileStaff1.setOnClickListener(v -> {
-            binding.edtUsername.setText("staff1");
-            binding.edtPassword.setText("123456");
-            performLogin("staff1", "123456");
-        });
-
-        binding.cardProfileStaff5.setOnClickListener(v -> {
-            binding.edtUsername.setText("staff5");
-            binding.edtPassword.setText("123456");
-            performLogin("staff5", "123456");
-        });
-
         binding.imgTogglePassword.setOnClickListener(v -> {
             isPasswordVisible = !isPasswordVisible;
             if (isPasswordVisible) {
@@ -120,34 +101,32 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void seedAdminsIfEmpty() {
+    private void seedAdminsFromAssets() {
         RootieAdminDatabase database = RootieAdminDatabase.getDatabase(this);
         new Thread(() -> {
             try {
-                if (database.adminDao().getAllSync().isEmpty()) {
-                    StringBuilder sb = new StringBuilder();
-                    try (BufferedReader reader = new BufferedReader(new InputStreamReader(getAssets().open("admins.json")))) {
-                        String line;
-                        while ((line = reader.readLine()) != null) {
-                            sb.append(line);
-                        }
+                StringBuilder sb = new StringBuilder();
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(getAssets().open("admins.json")))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        sb.append(line);
                     }
-                    JSONArray jsonArray = new JSONArray(sb.toString());
-                    List<AdminEntity> list = new ArrayList<>();
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject obj = jsonArray.getJSONObject(i);
-                        AdminEntity entity = new AdminEntity();
-                        entity.setUsername(obj.getString("username"));
-                        entity.setPassword(obj.getString("password"));
-                        entity.setFullName(obj.getString("fullName"));
-                        entity.setRole(obj.getString("role"));
-                        entity.setStoreID(obj.optString("storeID", ""));
-                        entity.setStoreName(obj.optString("storeName", ""));
-                        entity.setStoreAddress(obj.optString("storeAddress", ""));
-                        list.add(entity);
-                    }
-                    database.adminDao().insertAllSync(list);
                 }
+                JSONArray jsonArray = new JSONArray(sb.toString());
+                List<AdminEntity> list = new ArrayList<>();
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject obj = jsonArray.getJSONObject(i);
+                    AdminEntity entity = new AdminEntity();
+                    entity.setUsername(obj.getString("username"));
+                    entity.setPassword(obj.getString("password"));
+                    entity.setFullName(obj.getString("fullName"));
+                    entity.setRole(obj.getString("role"));
+                    entity.setStoreID(obj.optString("storeID", ""));
+                    entity.setStoreName(obj.optString("storeName", ""));
+                    entity.setStoreAddress(obj.optString("storeAddress", ""));
+                    list.add(entity);
+                }
+                database.adminDao().insertAllSync(list);
             } catch (Exception e) {
                 e.printStackTrace();
             }

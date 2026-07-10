@@ -1,0 +1,146 @@
+[
+  {
+    "id": "chat_rootie_vn_test_001",
+    "chat_type": "private",
+    "members": ["test_001", "rootie_vn"],
+    "member_info": {
+      "test_001": {
+        "name": "Test User",
+        "avatar": "https://i.pinimg.com/736x/1a/d8/4b/1ad84b9ab4a1e2ab17c7aab37fcff0a5.jpg"
+      },
+      "rootie_vn": {
+        "name": "Rootie VietNam",
+        "avatar": "https://res.cloudinary.com/dpjkzxjl2/image/upload/v1781257994/favicon_r7kqwf.png"
+      }
+    },
+    "active_by": [],
+    "typing_by": [],
+    "unread_by": ["rootie_vn"],
+    "created_at": "2025-05-20T14:00:00Z",
+    "updated_at": "2026-06-27T21:58:12Z",
+    "last_message": "thấy hihi",
+    "last_message_at": "2026-06-27T21:58:12Z",
+    "messages": [
+      {
+        "id": "m3",
+        "sender_id": "test_001",
+        "text": "Mình muốn hỏi về serum vitamin C",
+        "sent_at": "2026-06-27T21:40:00Z"
+      },
+      {
+        "id": "m4",
+        "sender_id": "rootie_vn",
+        "text": "thấy hihi",
+        "sent_at": "2026-06-27T21:58:12Z"
+      }
+    ]
+  },
+  {
+    "id": "chat_rootie_vn_xuannk_001",
+    "chat_type": "private",
+    "members": ["xuannk_001", "rootie_vn"],
+    "member_info": {
+      "xuannk_001": {
+        "name": "Nguyễn Khánh Xuân",
+        "avatar": "https://i.pinimg.com/736x/1a/d8/4b/1ad84b9ab4a1e2ab17c7aab37fcff0a5.jpg"
+      },
+      "rootie_vn": {
+        "name": "Rootie VietNam",
+        "avatar": "https://res.cloudinary.com/dpjkzxjl2/image/upload/v1780560866/Rootie_logo.png"
+      }
+    },
+    "active_by": [],
+    "typing_by": [],
+    "unread_by": ["rootie_vn"],
+    "created_at": "2025-06-01T10:00:00Z",
+    "updated_at": "2025-06-28T08:30:00Z",
+    "last_message": "Dạ shop tư vấn cho em sáp dưỡng ẩm sen Hậu Giang dùng cho da dầu được không ạ?",
+    "last_message_at": "2025-06-28T08:30:00Z",
+    "messages": [
+      {
+        "id": "m_x1",
+        "sender_id": "xuannk_001",
+        "text": "Chào shop!",
+        "sent_at": "2025-06-28T08:00:00Z"
+      },
+      {
+        "id": "m_x2",
+        "sender_id": "xuannk_001",
+        "text": "Dạ shop tư vấn cho em sáp dưỡng ẩm sen Hậu Giang dùng cho da dầu được không ạ?",
+        "sent_at": "2025-06-28T08:30:00Z"
+      }
+    ]
+  },
+  {
+    "id": "chat_rootie_vn_48228004",
+    "chat_type": "private",
+    "members": ["48228004", "rootie_vn"],
+    "member_info": {
+      "48228004": {
+        "name": "nguyen_bao",
+        "avatar": "https://i.pinimg.com/736x/ab/32/b1/ab32b13edefed48f94d93ee4b6f12f6b.jpg"
+      },
+      "rootie_vn": {
+        "name": "Rootie VietNam",
+        "avatar": "https://res.cloudinary.com/dpjkzxjl2/image/upload/v1780560866/Rootie_logo.png"
+      }
+    },
+    "active_by": ["48228004"],
+    "typing_by": [],
+    "unread_by": [],
+    "created_at": "2025-06-10T09:00:00Z",
+    "updated_at": "2026-06-26T15:20:00Z",
+    "last_message": "Dạ đơn hàng đang được shipper giao đi rồi ạ, dự kiến chiều nay sẽ tới.",
+    "last_message_at": "2026-06-26T15:20:00Z",
+    "messages": [
+      {
+        "id": "m_b1",
+        "sender_id": "48228004",
+        "text": "Đơn hàng #9283 của mình khi nào giao tới Quận 7 vậy shop ơi?",
+        "sent_at": "2026-06-26T14:50:00Z"
+      },
+      {
+        "id": "m_b2",
+        "sender_id": "rootie_vn",
+        "text": "Dạ đơn hàng đang được shipper giao đi rồi ạ, dự kiến chiều nay sẽ tới.",
+        "sent_at": "2026-06-26T15:20:00Z"
+      }
+    ]
+  },
+  {
+    "id": "chat_rootie_vn_68751659",
+    "chat_type": "private",
+    "members": ["68751659", "rootie_vn"],
+    "member_info": {
+      "68751659": {
+        "name": "khanh_xun",
+        "avatar": "https://i1-c.pinimg.com/736x/4d/fe/b7/4dfeb7f781432e75e270d3bf70f494e4.jpg"
+      },
+      "rootie_vn": {
+        "name": "Rootie VietNam",
+        "avatar": "https://res.cloudinary.com/dpjkzxjl2/image/upload/v1780560866/Rootie_logo.png"
+      }
+    },
+    "active_by": ["68751659"],
+    "typing_by": [],
+    "unread_by": [],
+    "created_at": "2025-06-05T08:00:00Z",
+    "updated_at": "2026-06-24T20:12:00Z",
+    "last_message": "Serum nghệ Hưng Yên dùng thích lắm ạ! Cảm ơn shop nhiều nha!",
+    "last_message_at": "2026-06-24T20:12:00Z",
+    "messages": [
+      {
+        "id": "m_k1",
+        "sender_id": "68751659",
+        "text": "Serum nghệ Hưng Yên dùng thích lắm ạ!",
+        "sent_at": "2026-06-24T19:50:00Z"
+      },
+      {
+        "id": "m_k2",
+        "sender_id": "68751659",
+        "text": "Cảm ơn shop nhiều nha!",
+        "sent_at": "2026-06-24T20:12:00Z"
+      }
+    ]
+  }
+]

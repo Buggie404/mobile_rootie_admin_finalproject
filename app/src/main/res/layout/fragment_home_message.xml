@@ -6,18 +6,17 @@
     android:layout_height="match_parent"
     android:background="#FEFBF4">
 
-    <!-- 1. Header Toolbar -->
     <RelativeLayout
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="72dp"
+        android:layout_height="64dp"
         android:background="#FEFBF4"
+        android:elevation="2dp"
         android:paddingHorizontal="16dp"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Back Button -->
         <ImageView
             android:id="@+id/btn_back"
             android:layout_width="40dp"
@@ -25,42 +24,40 @@
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Back"
+            android:contentDescription="Quay lại"
             android:padding="8dp"
             android:src="@drawable/ic_arrow_back"
             app:tint="#3E4D44" />
 
-        <!-- Title Dropdown Container -->
         <LinearLayout
             android:id="@+id/layout_title_dropdown"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:orientation="horizontal"
-            android:gravity="center"
+            android:background="?attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
-            android:background="?attr/selectableItemBackground">
+            android:gravity="center"
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/txt_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Message"
+                android:fontFamily="@font/be_vietnam_pro"
+                android:text="Tin nhắn"
                 android:textColor="#3E4D44"
-                android:textSize="22sp"
-                android:textStyle="bold"
-                android:fontFamily="@font/be_vietnam_pro" />
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
             <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
                 android:layout_marginStart="4dp"
                 android:src="@drawable/ic_chevron_down"
                 app:tint="#3E4D44" />
         </LinearLayout>
 
-        <!-- Notification Button -->
         <FrameLayout
             android:id="@+id/btn_notification"
             android:layout_width="40dp"
@@ -70,29 +67,24 @@
             android:background="?attr/selectableItemBackgroundBorderless">
 
             <ImageView
-                android:layout_width="26dp"
-                android:layout_height="26dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_notification"
-                android:contentDescription="Thông báo" />
+                android:contentDescription="Thông báo"
+                android:src="@drawable/ic_notification" />
 
-            <!-- Badge -->
             <TextView
                 android:id="@+id/notification_badge"
-                android:layout_width="14dp"
-                android:layout_height="14dp"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
                 android:layout_gravity="top|end"
-                android:layout_marginTop="2dp"
-                android:layout_marginEnd="2dp"
-                android:background="@drawable/ic_notification_badge"
+                android:background="@drawable/bg_message_badge"
                 android:gravity="center"
-                android:text=""
                 android:textColor="@color/white"
-                android:textSize="8sp"
+                android:textSize="9sp"
                 android:textStyle="bold"
                 android:visibility="gone" />
         </FrameLayout>
-
     </RelativeLayout>
 
     <View
@@ -102,124 +94,122 @@
         android:background="#E5E8DA"
         app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
-    <!-- Scrollable Content -->
-    <androidx.core.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:fillViewport="true"
-        app:layout_constraintTop_toBottomOf="@id/header_divider"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <LinearLayout
+        android:id="@+id/layout_search"
+        android:layout_width="0dp"
+        android:layout_height="44dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/bg_search_bar"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="14dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/header_divider">
 
-        <LinearLayout
+        <ImageView
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:src="@drawable/ic_search"
+            app:tint="#8E998B" />
+
+        <EditText
+            android:id="@+id/edt_search"
             android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
+            android:background="@null"
+            android:fontFamily="@font/be_vietnam_pro"
+            android:hint="Tìm kiếm tin nhắn..."
+            android:inputType="text"
+            android:maxLines="1"
+            android:textColor="#3E4D44"
+            android:textColorHint="#8E998B"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_stories"
+        android:layout_width="0dp"
+        android:layout_height="88dp"
+        android:layout_marginTop="12dp"
+        android:clipToPadding="false"
+        android:paddingHorizontal="16dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layout_search"
+        tools:listitem="@layout/item_story_user" />
+
+    <TextView
+        android:id="@+id/lbl_messages"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/be_vietnam_pro"
+        android:text="Cuộc trò chuyện"
+        android:textColor="#3E4D44"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/rv_stories" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_chats"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="4dp"
+        android:clipToPadding="false"
+        android:paddingHorizontal="16dp"
+        android:paddingBottom="88dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/lbl_messages"
+        tools:listitem="@layout/item_chat_thread" />
+
+    <LinearLayout
+        android:id="@+id/layout_empty_state"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingHorizontal="32dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/lbl_messages">
+
+        <ImageView
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_marginBottom="16dp"
+            android:contentDescription="Empty state"
+            android:src="@drawable/ic_message"
+            app:tint="#B8C4BA" />
+
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingHorizontal="16dp"
-            android:paddingTop="16dp"
-            android:paddingBottom="80dp">
+            android:fontFamily="@font/be_vietnam_pro"
+            android:text="Chưa có tin nhắn"
+            android:textColor="#3E4D44"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
-            <!-- 2. Search Bar -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:background="@drawable/bg_search_bar"
-                android:orientation="horizontal"
-                android:paddingHorizontal="16dp"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="16dp">
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_search"
-                    app:tint="#8E998B" />
-
-                <EditText
-                    android:id="@+id/edt_search"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="12dp"
-                    android:background="@null"
-                    android:hint="Tìm kiếm tin nhắn..."
-                    android:textColor="#3E4D44"
-                    android:textColorHint="#8E998B"
-                    android:textSize="14sp"
-                    android:fontFamily="@font/be_vietnam_pro"
-                    android:inputType="text"
-                    android:maxLines="1" />
-            </LinearLayout>
-
-            <!-- 3. Stories (Horizontal Users) -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_stories"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="24dp"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:listitem="@layout/item_story_user" />
-
-            <!-- Title: Tin nhắn -->
-            <TextView
-                android:id="@+id/lbl_messages"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Tin nhắn"
-                android:textColor="#3E4D44"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:fontFamily="@font/be_vietnam_pro"
-                android:layout_marginBottom="12dp" />
-
-            <!-- 4. Messages List (Vertical) -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_chats"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false"
-                tools:listitem="@layout/item_chat_thread" />
-
-            <!-- 5. Empty State (No action button) -->
-            <LinearLayout
-                android:id="@+id/layout_empty_state"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:paddingVertical="48dp"
-                android:visibility="gone">
-
-                <ImageView
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:src="@drawable/ic_warning_triangle"
-                    app:tint="#8E998B"
-                    android:layout_marginBottom="16dp"
-                    android:contentDescription="Empty state" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Chưa có tin nhắn nào"
-                    android:textColor="#3E4D44"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:fontFamily="@font/be_vietnam_pro"
-                    android:layout_marginBottom="4dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Không tìm thấy cuộc trò chuyện phù hợp."
-                    android:textColor="#7E8A83"
-                    android:textSize="13sp"
-                    android:fontFamily="@font/be_vietnam_pro"
-                    android:gravity="center" />
-            </LinearLayout>
-
-        </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:fontFamily="@font/be_vietnam_pro"
+            android:gravity="center"
+            android:text="Khi khách hàng nhắn tin, cuộc trò chuyện sẽ hiển thị tại đây."
+            android:textColor="#7E8A83"
+            android:textSize="13sp" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

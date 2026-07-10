@@ -2,109 +2,124 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="72dp"
-    android:orientation="horizontal"
-    android:gravity="center_vertical"
-    android:paddingVertical="8dp"
+    android:layout_height="wrap_content"
     android:background="?attr/selectableItemBackground"
     android:clickable="true"
-    android:focusable="true">
+    android:focusable="true"
+    android:orientation="vertical">
 
-    <!-- Avatar with active green dot -->
-    <RelativeLayout
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:layout_marginEnd="16dp">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:minHeight="72dp"
+        android:orientation="horizontal"
+        android:paddingVertical="10dp">
 
-        <androidx.cardview.widget.CardView
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_centerInParent="true"
-            app:cardCornerRadius="24dp"
-            app:cardElevation="0dp"
-            app:cardBackgroundColor="@android:color/transparent">
+        <RelativeLayout
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_marginEnd="14dp">
 
-            <ImageView
-                android:id="@+id/img_avatar"
+            <androidx.cardview.widget.CardView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_centerInParent="true"
+                app:cardBackgroundColor="@android:color/transparent"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="0dp">
+
+                <ImageView
+                    android:id="@+id/img_avatar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="User Avatar"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/imv_avatar" />
+            </androidx.cardview.widget.CardView>
+
+            <View
+                android:id="@+id/view_active_dot"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginEnd="1dp"
+                android:layout_marginBottom="1dp"
+                android:background="@drawable/bg_notification_badge"
+                android:backgroundTint="#00B074"
+                android:visibility="gone" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txt_name"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:src="@drawable/imv_avatar"
-                android:contentDescription="User Avatar" />
-        </androidx.cardview.widget.CardView>
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="@font/be_vietnam_pro"
+                android:maxLines="1"
+                android:text="Bảo Nguyên"
+                android:textColor="#3E4D44"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
-        <!-- Active Status Indicator -->
-        <View
-            android:id="@+id/view_active_dot"
-            android:layout_width="12dp"
-            android:layout_height="12dp"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginEnd="2dp"
-            android:layout_marginBottom="2dp"
-            android:background="@drawable/bg_notification_badge"
-            android:backgroundTint="#00B074"
-            android:visibility="gone" />
+            <TextView
+                android:id="@+id/txt_message_snippet"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:ellipsize="end"
+                android:fontFamily="@font/be_vietnam_pro"
+                android:maxLines="1"
+                android:text="Tin nhắn gần nhất"
+                android:textColor="#7E8A83"
+                android:textSize="13sp" />
+        </LinearLayout>
 
-    </RelativeLayout>
-
-    <!-- Name and message snippet -->
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/txt_name"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Bảo Nguyên"
-            android:textColor="#3E4D44"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:fontFamily="@font/be_vietnam_pro"
-            android:singleLine="true" />
+            android:layout_marginStart="8dp"
+            android:gravity="end"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/txt_message_snippet"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:text="4+ tin nhắn mới"
-            android:textColor="#7E8A83"
-            android:textSize="14sp"
-            android:fontFamily="@font/be_vietnam_pro"
-            android:singleLine="true" />
+            <TextView
+                android:id="@+id/txt_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/be_vietnam_pro"
+                android:text="4 ngày"
+                android:textColor="#97A49C"
+                android:textSize="11sp" />
 
+            <TextView
+                android:id="@+id/txt_unread_count"
+                android:layout_width="wrap_content"
+                android:layout_height="20dp"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/bg_unread_count_badge"
+                android:fontFamily="@font/be_vietnam_pro"
+                android:gravity="center"
+                android:minWidth="20dp"
+                android:paddingHorizontal="6dp"
+                android:text="3"
+                android:textColor="#FFFFFF"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+        </LinearLayout>
     </LinearLayout>
 
-    <!-- Time and unread indicator -->
-    <LinearLayout
-        android:layout_width="80dp"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="end">
-
-        <TextView
-            android:id="@+id/txt_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="4 ngày"
-            android:textColor="#97A49C"
-            android:textSize="12sp"
-            android:fontFamily="@font/be_vietnam_pro" />
-
-        <!-- Unread Badge Dot -->
-        <View
-            android:id="@+id/view_unread_dot"
-            android:layout_width="8dp"
-            android:layout_height="8dp"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/bg_notification_badge"
-            android:backgroundTint="#1976D2"
-            android:visibility="gone" />
-
-    </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="66dp"
+        android:background="#ECEEE6" />
 
 </LinearLayout>

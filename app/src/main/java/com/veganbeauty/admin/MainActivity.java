@@ -226,6 +226,40 @@ public class MainActivity extends RootieAdminActivity {
         return new ArrayList<>(cachedChatMessages);
     }
 
+    public void broadcastChatMessageUpdate(List<ChatMessage> messages) {
+        cachedChatMessages = messages != null ? new ArrayList<>(messages) : new ArrayList<>();
+        int unreadConvCount = countUnreadConversationsFromMessages(cachedChatMessages);
+        lastUnreadCount = unreadConvCount;
+        updateGlobalMessageBadges(unreadConvCount);
+        notifyChatMessagesListeners(cachedChatMessages);
+    }
+
+    private int countUnreadConversationsFromMessages(List<ChatMessage> messages) {
+        if (messages == null || messages.isEmpty()) {
+            return 0;
+        }
+        Map<String, Boolean> unreadByPartner = new HashMap<>();
+        for (ChatMessage msg : messages) {
+            if (msg == null) {
+                continue;
+            }
+            String partnerId = "rootie_vn".equals(msg.getSenderId()) ? msg.getReceiverId() : msg.getSenderId();
+            if (partnerId == null || partnerId.trim().isEmpty() || "rootie_vn".equals(partnerId)) {
+                continue;
+            }
+            if ("rootie_vn".equals(msg.getReceiverId()) && !msg.isRead()) {
+                unreadByPartner.put(partnerId, true);
+            }
+        }
+        int count = 0;
+        for (Boolean unread : unreadByPartner.values()) {
+            if (Boolean.TRUE.equals(unread)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     private void notifyChatMessagesListeners(List<ChatMessage> messages) {
         List<ChatMessage> copy = new ArrayList<>(messages);
         runOnUiThread(() -> {
