@@ -1,6 +1,7 @@
 package com.veganbeauty.admin.data.repository;
 
 import android.content.Context;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import com.veganbeauty.admin.core.utils.BookingExpiryHelper;
 import com.veganbeauty.admin.data.local.dao.BookingDao;
@@ -117,6 +118,24 @@ public class BookingRepository {
                 be.setCreatedAt(obj.optString("createdAt", ""));
                 be.setConsultantName(obj.optString("consultantName", ""));
                 be.setCancelReason(obj.optString("cancelReason", ""));
+                be.setUserRating((float) obj.optDouble("userRating", 0.0));
+                be.setUserReview(obj.optString("userReview", ""));
+                be.setReviewDate(obj.optString("reviewDate", ""));
+                JSONArray feedbackImages = obj.optJSONArray("feedbackImageUrls");
+                if (feedbackImages != null && feedbackImages.length() > 0) {
+                    StringBuilder imageUrls = new StringBuilder();
+                    for (int j = 0; j < feedbackImages.length(); j++) {
+                        String url = feedbackImages.optString(j, "").trim();
+                        if (url.isEmpty()) {
+                            continue;
+                        }
+                        if (imageUrls.length() > 0) {
+                            imageUrls.append('|');
+                        }
+                        imageUrls.append(url);
+                    }
+                    be.setFeedbackImageUrls(imageUrls.toString());
+                }
                 list.add(be);
             }
             if (!list.isEmpty()) {
@@ -150,6 +169,16 @@ public class BookingRepository {
 
     public boolean updateBookingStatus(String bookingId, String status) {
         return updateBookingStatus(bookingId, status, "");
+    }
+
+    @Nullable
+    public BookingEntity fetchBookingById(String bookingId) {
+        BookingEntity remoteBooking = firebaseService.fetchBookingById(bookingId);
+        if (remoteBooking != null) {
+            bookingDao.insertSync(remoteBooking);
+            return remoteBooking;
+        }
+        return bookingDao.getByIdSync(bookingId);
     }
 
 }

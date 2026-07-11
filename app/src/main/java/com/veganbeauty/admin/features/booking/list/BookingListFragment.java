@@ -14,11 +14,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import com.veganbeauty.admin.MainActivity;
 import com.veganbeauty.admin.core.base.RootieAdminFragment;
 import com.veganbeauty.admin.data.local.SessionManager;
 import com.veganbeauty.admin.databinding.BookingDialogCancelBinding;
 import com.veganbeauty.admin.databinding.BookingFragmentListBinding;
 import com.veganbeauty.admin.features.booking.BookingViewModel;
+import com.veganbeauty.admin.features.booking.detail.BookingDetailFragment;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -76,7 +78,13 @@ public class BookingListFragment extends RootieAdminFragment {
                 viewModel.updateBookingStatus(booking.getId(), nextStatus);
                 Toast.makeText(requireContext(), "Đang cập nhật lịch hẹn...", Toast.LENGTH_SHORT).show();
             },
-            booking -> showCancelDialog(booking.getId())
+            booking -> showCancelDialog(booking.getId()),
+            booking -> {
+                MainActivity mainActivity = (MainActivity) getActivity();
+                if (mainActivity != null) {
+                    mainActivity.loadFragment(BookingDetailFragment.newInstance(booking.getId()));
+                }
+            }
         );
         binding.rvBookings.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.rvBookings.setAdapter(adapter);

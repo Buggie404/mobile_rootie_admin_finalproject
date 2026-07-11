@@ -282,7 +282,7 @@ public class HomeFragment extends RootieAdminFragment {
         if (mainActivity == null) return;
 
         mainActivity.setCurrentTabId(R.id.nav_product);
-        mainActivity.loadFragment(new ProductListFragment());
+        mainActivity.loadFragment(ProductListFragment.newInstance(true));
 
         View bottomNav = mainActivity.findViewById(R.id.bottom_nav);
         if (bottomNav != null) {

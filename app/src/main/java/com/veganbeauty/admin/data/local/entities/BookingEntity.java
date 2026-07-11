@@ -29,6 +29,11 @@ public class BookingEntity {
     private String createdAt;
     private String consultantName;
     private String cancelReason;
+    private float userRating;
+    private String userReview;
+    private String reviewDate;
+    /** Pipe-separated image URLs from Firestore feedbackImageUrls */
+    private String feedbackImageUrls;
 
     public BookingEntity() {
         this.id = "";
@@ -52,6 +57,10 @@ public class BookingEntity {
         this.createdAt = "";
         this.consultantName = "";
         this.cancelReason = "";
+        this.userRating = 0f;
+        this.userReview = "";
+        this.reviewDate = "";
+        this.feedbackImageUrls = "";
     }
 
     @NonNull
@@ -118,6 +127,24 @@ public class BookingEntity {
     public String getCancelReason() { return cancelReason; }
     public void setCancelReason(String cancelReason) { this.cancelReason = cancelReason; }
 
+    public float getUserRating() { return userRating; }
+    public void setUserRating(float userRating) { this.userRating = userRating; }
+
+    public String getUserReview() { return userReview; }
+    public void setUserReview(String userReview) { this.userReview = userReview; }
+
+    public String getReviewDate() { return reviewDate; }
+    public void setReviewDate(String reviewDate) { this.reviewDate = reviewDate; }
+
+    public String getFeedbackImageUrls() { return feedbackImageUrls; }
+    public void setFeedbackImageUrls(String feedbackImageUrls) { this.feedbackImageUrls = feedbackImageUrls; }
+
+    public boolean hasCustomerFeedback() {
+        return userRating > 0f
+                || (userReview != null && !userReview.trim().isEmpty())
+                || (feedbackImageUrls != null && !feedbackImageUrls.trim().isEmpty());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -143,11 +170,15 @@ public class BookingEntity {
                 java.util.Objects.equals(status, that.status) &&
                 java.util.Objects.equals(createdAt, that.createdAt) &&
                 java.util.Objects.equals(consultantName, that.consultantName) &&
-                java.util.Objects.equals(cancelReason, that.cancelReason);
+                java.util.Objects.equals(cancelReason, that.cancelReason) &&
+                Float.compare(that.userRating, userRating) == 0 &&
+                java.util.Objects.equals(userReview, that.userReview) &&
+                java.util.Objects.equals(reviewDate, that.reviewDate) &&
+                java.util.Objects.equals(feedbackImageUrls, that.feedbackImageUrls);
     }
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(id, userId, userName, userPhone, userEmail, serviceName, dateDisplay, monthDisplay, dayOfWeek, time, duration, storeName, storeAddress, storePhone, storeImage, storeID, note, status, createdAt, consultantName, cancelReason);
+        return java.util.Objects.hash(id, userId, userName, userPhone, userEmail, serviceName, dateDisplay, monthDisplay, dayOfWeek, time, duration, storeName, storeAddress, storePhone, storeImage, storeID, note, status, createdAt, consultantName, cancelReason, userRating, userReview, reviewDate, feedbackImageUrls);
     }
 }

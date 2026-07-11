@@ -120,7 +120,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
 
             <ImageView
                 android:layout_width="18dp"
@@ -137,6 +138,37 @@
                 android:text="1 sản phẩm"
                 android:textColor="#677559"
                 android:textSize="14sp"
+                android:fontFamily="@font/be_vietnam_pro" />
+        </LinearLayout>
+
+        <!-- Customer Review Badge -->
+        <LinearLayout
+            android:id="@+id/layout_review_badge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="⭐"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/txt_review_badge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_nav_pill"
+                android:backgroundTint="#FFF8E7"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="4dp"
+                android:text="Đã đánh giá 5/5"
+                android:textColor="#B0882E"
+                android:textSize="12sp"
+                android:textStyle="bold"
                 android:fontFamily="@font/be_vietnam_pro" />
         </LinearLayout>
 

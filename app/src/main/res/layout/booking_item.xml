@@ -185,6 +185,104 @@
 
         </LinearLayout>
 
+        <!-- Customer Feedback Area -->
+        <LinearLayout
+            android:id="@+id/ll_customer_feedback"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="12dp"
+            android:padding="12dp"
+            android:background="@drawable/bg_rounded_white_card"
+            android:backgroundTint="#FEF7ED"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="PHẢN HỒI KHÁCH HÀNG"
+                android:textColor="#B0882E"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.05"
+                android:fontFamily="@font/be_vietnam_pro"
+                android:drawableStart="@drawable/ic_history"
+                android:drawablePadding="6dp"
+                app:drawableTint="#B0882E" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="8dp">
+
+                <TextView
+                    android:id="@+id/tv_feedback_stars"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="★★★★★"
+                    android:textColor="#F5A623"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/be_vietnam_pro" />
+
+                <TextView
+                    android:id="@+id/tv_feedback_score"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="5/5"
+                    android:textColor="#3E4D44"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/be_vietnam_pro" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_feedback_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:lineSpacingExtra="3sp"
+                android:text="Dịch vụ rất tốt."
+                android:textColor="#3E4D44"
+                android:textSize="13sp"
+                android:fontFamily="@font/be_vietnam_pro" />
+
+            <ImageView
+                android:id="@+id/img_feedback_photo"
+                android:layout_width="match_parent"
+                android:layout_height="140dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_rounded_white_card"
+                android:contentDescription="Ảnh phản hồi"
+                android:scaleType="centerCrop"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tv_feedback_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="Đánh giá ngày 19/06/2026"
+                android:textColor="#7E8A83"
+                android:textSize="11sp"
+                android:fontFamily="@font/be_vietnam_pro"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tv_feedback_empty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="Khách chưa phản hồi lịch này."
+                android:textColor="#7E8A83"
+                android:textSize="13sp"
+                android:fontFamily="@font/be_vietnam_pro"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -201,6 +299,8 @@
                 android:id="@+id/tv_status_badge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
                 android:background="@drawable/bg_nav_pill"
                 android:backgroundTint="#FFEED6"
                 android:paddingHorizontal="14dp"
@@ -210,6 +310,24 @@
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:fontFamily="@font/be_vietnam_pro" />
+
+            <TextView
+                android:id="@+id/tv_feedback_badge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/tv_status_badge"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_nav_pill"
+                android:backgroundTint="#FFF8E7"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="6dp"
+                android:text="Đã phản hồi 5/5"
+                android:textColor="#B0882E"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/be_vietnam_pro"
+                android:visibility="gone" />
 
             <!-- Action Buttons -->
             <LinearLayout

@@ -3,9 +3,12 @@ package com.veganbeauty.admin.features.order;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -15,6 +18,8 @@ import com.veganbeauty.admin.MainActivity;
 import com.veganbeauty.admin.R;
 import com.veganbeauty.admin.core.base.RootieAdminFragment;
 import com.veganbeauty.admin.core.utils.ImageUtils;
+import com.veganbeauty.admin.core.utils.ImageViewerDialog;
+import com.veganbeauty.admin.core.utils.ReviewImageParser;
 import com.veganbeauty.admin.data.local.RootieAdminDatabase;
 import com.veganbeauty.admin.data.local.entities.OrderEntity;
 import com.veganbeauty.admin.data.local.entities.OrderItem;
@@ -24,6 +29,7 @@ import com.veganbeauty.admin.databinding.OrderDetailFragmentBinding;
 import com.veganbeauty.admin.databinding.ItemOrderDetailProductBinding;
 
 import java.text.NumberFormat;
+import java.util.List;
 import java.util.Locale;
 
 public class OrderDetailFragment extends RootieAdminFragment {
@@ -81,8 +87,7 @@ public class OrderDetailFragment extends RootieAdminFragment {
 
         new Thread(() -> {
             try {
-                RootieAdminDatabase database = RootieAdminDatabase.getDatabase(requireContext().getApplicationContext());
-                OrderEntity order = database.orderDao().getByIdSync(id);
+                OrderEntity order = repository.fetchOrderById(id);
 
                 if (getActivity() == null) return;
                 getActivity().runOnUiThread(() -> {
@@ -195,6 +200,136 @@ public class OrderDetailFragment extends RootieAdminFragment {
 
         // Setup Actions
         setupActionButtons(order);
+
+        // Customer review
+        bindCustomerReview(order);
+    }
+
+    private void bindCustomerReview(OrderEntity order) {
+        String status = order.getStatus() != null ? order.getStatus().trim().toLowerCase() : "";
+        boolean isCompleted = status.contains("hoàn") || status.contains("tất") || status.contains("thành");
+        boolean hasReview = order.isHasReview()
+                || order.getReviewStars() > 0
+                || (order.getReviewText() != null && !order.getReviewText().trim().isEmpty())
+                || ReviewImageParser.hasLoadableImages(order.getReviewImage());
+
+        if (!isCompleted) {
+            binding.txtReviewSectionHeader.setVisibility(View.GONE);
+            binding.layoutCustomerReview.setVisibility(View.GONE);
+            return;
+        }
+
+        binding.txtReviewSectionHeader.setVisibility(View.VISIBLE);
+        binding.layoutCustomerReview.setVisibility(View.VISIBLE);
+
+        if (!hasReview) {
+            binding.txtReviewStars.setVisibility(View.GONE);
+            binding.txtReviewScore.setVisibility(View.GONE);
+            binding.txtReviewAnonymous.setVisibility(View.GONE);
+            binding.txtReviewText.setVisibility(View.GONE);
+            binding.imgReviewPhoto.setVisibility(View.GONE);
+            binding.scrollReviewImages.setVisibility(View.GONE);
+            binding.txtReviewImagesPending.setVisibility(View.GONE);
+            binding.txtReviewRecommend.setVisibility(View.GONE);
+            binding.txtReviewEmpty.setVisibility(View.VISIBLE);
+            return;
+        }
+
+        binding.txtReviewEmpty.setVisibility(View.GONE);
+        binding.txtReviewStars.setVisibility(View.VISIBLE);
+        binding.txtReviewScore.setVisibility(View.VISIBLE);
+
+        int stars = Math.max(0, Math.min(5, order.getReviewStars()));
+        binding.txtReviewStars.setText(buildStarText(stars));
+        binding.txtReviewScore.setText(stars + "/5");
+
+        if (order.isAnonymous()) {
+            binding.txtReviewAnonymous.setVisibility(View.VISIBLE);
+        } else {
+            binding.txtReviewAnonymous.setVisibility(View.GONE);
+        }
+
+        String reviewText = order.getReviewText();
+        if (reviewText != null && !reviewText.trim().isEmpty()) {
+            binding.txtReviewText.setVisibility(View.VISIBLE);
+            binding.txtReviewText.setText(reviewText.trim());
+        } else {
+            binding.txtReviewText.setVisibility(View.GONE);
+        }
+
+        bindReviewImages(order.getReviewImage());
+
+        if (order.isRecommendToFriends()) {
+            binding.txtReviewRecommend.setVisibility(View.VISIBLE);
+        } else {
+            binding.txtReviewRecommend.setVisibility(View.GONE);
+        }
+    }
+
+    private void bindReviewImages(String reviewImageRaw) {
+        binding.imgReviewPhoto.setVisibility(View.GONE);
+        binding.scrollReviewImages.setVisibility(View.GONE);
+        binding.layoutReviewImages.removeAllViews();
+        binding.txtReviewImagesPending.setVisibility(View.GONE);
+
+        List<String> imageUrls = ReviewImageParser.parseLoadableUrls(reviewImageRaw);
+        if (imageUrls.isEmpty()) {
+            if (ReviewImageParser.hasPendingLocalImages(reviewImageRaw)) {
+                int count = ReviewImageParser.countParsedImages(reviewImageRaw);
+                binding.txtReviewImagesPending.setVisibility(View.VISIBLE);
+                binding.txtReviewImagesPending.setText(
+                        "📷 Khách đã gửi " + count + " ảnh nhưng link chưa hợp lệ. "
+                                + "Yêu cầu khách cập nhật app User và gửi lại đánh giá (có mạng)."
+                );
+            }
+            return;
+        }
+
+        if (imageUrls.size() == 1) {
+            binding.imgReviewPhoto.setVisibility(View.VISIBLE);
+            ImageUtils.loadImage(requireContext(), binding.imgReviewPhoto, imageUrls.get(0), R.drawable.nuoc_sen_hau_giang);
+            binding.imgReviewPhoto.setOnClickListener(v ->
+                    ImageViewerDialog.show(requireContext(), imageUrls, 0)
+            );
+            return;
+        }
+
+        binding.scrollReviewImages.setVisibility(View.VISIBLE);
+        int imageSize = dpToPx(120);
+        int margin = dpToPx(8);
+        for (int i = 0; i < imageUrls.size(); i++) {
+            final int imageIndex = i;
+            String imageUrl = imageUrls.get(i);
+            ImageView imageView = new ImageView(requireContext());
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(imageSize, imageSize);
+            if (i > 0) {
+                params.setMarginStart(margin);
+            }
+            imageView.setLayoutParams(params);
+            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            imageView.setBackgroundResource(R.drawable.bg_rounded_white_card);
+            ImageUtils.loadImage(requireContext(), imageView, imageUrl, R.drawable.nuoc_sen_hau_giang);
+            imageView.setOnClickListener(v ->
+                    ImageViewerDialog.show(requireContext(), imageUrls, imageIndex)
+            );
+            binding.layoutReviewImages.addView(imageView);
+        }
+    }
+
+    private int dpToPx(int dp) {
+        return Math.round(TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                dp,
+                getResources().getDisplayMetrics()
+        ));
+    }
+
+    private String buildStarText(int stars) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < 5; i++) {
+            builder.append(i < stars ? "★" : "☆");
+        }
+        return builder.toString();
     }
 
     private void setupStatusStyle(String status) {

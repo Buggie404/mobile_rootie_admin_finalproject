@@ -11,8 +11,10 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.veganbeauty.admin.R;
+import com.veganbeauty.admin.core.utils.ReviewImageParser;
 import com.veganbeauty.admin.data.local.entities.OrderEntity;
 import com.veganbeauty.admin.data.local.entities.OrderItem;
+import com.veganbeauty.admin.core.utils.ReviewImageParser;
 import com.veganbeauty.admin.databinding.OrderItemBinding;
 
 import java.text.NumberFormat;
@@ -114,6 +116,9 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ViewHolder> 
         binding.txtOrderStatusBadge.setText(statusClean);
         setupStatusBadgeStyle(binding.txtOrderStatusBadge, statusClean);
 
+        // Bind review badge for completed orders
+        bindReviewBadge(binding, item, statusClean);
+
         // Bind Checkbox
         if (isSelectionAllowed) {
             binding.imgSelectOrder.setVisibility(View.VISIBLE);
@@ -204,6 +209,26 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ViewHolder> 
 
         badgeView.setTextColor(textColor);
         badgeView.setBackgroundTintList(ColorStateList.valueOf(bgColor));
+    }
+
+    private void bindReviewBadge(OrderItemBinding binding, OrderEntity item, String status) {
+        String normalizedStatus = status.toLowerCase();
+        boolean isCompleted = normalizedStatus.contains("hoàn")
+                || normalizedStatus.contains("tất")
+                || normalizedStatus.contains("thành");
+        boolean hasReview = item.isHasReview()
+                || item.getReviewStars() > 0
+                || (item.getReviewText() != null && !item.getReviewText().trim().isEmpty())
+                || ReviewImageParser.hasLoadableImages(item.getReviewImage());
+
+        if (!isCompleted || !hasReview) {
+            binding.layoutReviewBadge.setVisibility(View.GONE);
+            return;
+        }
+
+        int stars = Math.max(0, Math.min(5, item.getReviewStars()));
+        binding.layoutReviewBadge.setVisibility(View.VISIBLE);
+        binding.txtReviewBadge.setText("Đã đánh giá " + stars + "/5");
     }
 
     private void setupActionButtons(OrderItemBinding binding, OrderEntity item) {

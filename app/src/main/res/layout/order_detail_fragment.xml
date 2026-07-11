@@ -431,6 +431,145 @@
                     android:fontFamily="@font/be_vietnam_pro" />
             </LinearLayout>
 
+            <!-- Section: Đánh giá khách hàng -->
+            <TextView
+                android:id="@+id/txt_review_section_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#FEF7ED"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="10dp"
+                android:text="Đánh giá khách hàng"
+                android:textColor="#7E8A83"
+                android:textSize="13sp"
+                android:fontFamily="@font/be_vietnam_pro"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/layout_customer_review"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="#FFFFFF"
+                android:padding="16dp"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="10dp">
+
+                    <TextView
+                        android:id="@+id/txt_review_stars"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="★★★★★"
+                        android:textColor="#F5A623"
+                        android:textSize="18sp"
+                        android:fontFamily="@font/be_vietnam_pro" />
+
+                    <TextView
+                        android:id="@+id/txt_review_score"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="5/5"
+                        android:textColor="#3E4D44"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/be_vietnam_pro" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/txt_review_anonymous"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/bg_nav_pill"
+                    android:backgroundTint="#F2F3EC"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp"
+                    android:text="Ẩn danh"
+                    android:textColor="#677559"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/be_vietnam_pro"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/txt_review_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:lineSpacingExtra="4sp"
+                    android:text="Sản phẩm rất tốt, giao hàng nhanh."
+                    android:textColor="#3E4D44"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/be_vietnam_pro" />
+
+                <ImageView
+                    android:id="@+id/img_review_photo"
+                    android:layout_width="match_parent"
+                    android:layout_height="180dp"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/bg_rounded_white_card"
+                    android:contentDescription="Ảnh đánh giá"
+                    android:scaleType="centerCrop"
+                    android:visibility="gone" />
+
+                <HorizontalScrollView
+                    android:id="@+id/scroll_review_images"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:scrollbars="none"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:id="@+id/layout_review_images"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal" />
+                </HorizontalScrollView>
+
+                <TextView
+                    android:id="@+id/txt_review_images_pending"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/bg_nav_pill"
+                    android:backgroundTint="#FFF8E7"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="8dp"
+                    android:text="📷 Khách đã gửi ảnh nhưng admin chưa xem được. Yêu cầu khách cập nhật app User và gửi lại đánh giá."
+                    android:textColor="#B0882E"
+                    android:textSize="12sp"
+                    android:fontFamily="@font/be_vietnam_pro"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/txt_review_recommend"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="👍 Khách sẵn sàng giới thiệu cho bạn bè"
+                    android:textColor="#1B8756"
+                    android:textSize="13sp"
+                    android:fontFamily="@font/be_vietnam_pro"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/txt_review_empty"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Khách chưa đánh giá đơn này."
+                    android:textColor="#7E8A83"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/be_vietnam_pro"
+                    android:visibility="gone" />
+            </LinearLayout>
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 

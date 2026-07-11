@@ -42,6 +42,7 @@ import java.util.Locale;
 
 public class ProductListFragment extends RootieAdminFragment {
 
+    private static final String ARG_SHOW_BACK = "arg_show_back";
     private static final String PREFS_FAB = "product_fab_prefs";
     private static final String KEY_FAB_X = "fab_x";
     private static final String KEY_FAB_Y = "fab_y";
@@ -53,6 +54,23 @@ public class ProductListFragment extends RootieAdminFragment {
     private ProductViewModel viewModel;
     private ProductAdapter adapter;
     private ListenerRegistration firestoreListener = null;
+    private boolean showBack = false;
+
+    public static ProductListFragment newInstance(boolean showBack) {
+        ProductListFragment fragment = new ProductListFragment();
+        Bundle args = new Bundle();
+        args.putBoolean(ARG_SHOW_BACK, showBack);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            showBack = getArguments().getBoolean(ARG_SHOW_BACK, false);
+        }
+    }
 
     @Nullable
     @Override
@@ -64,6 +82,8 @@ public class ProductListFragment extends RootieAdminFragment {
     @Override
     protected void setupUI(View view) {
         viewModel = new ViewModelProvider(requireActivity()).get(ProductViewModel.class);
+
+        setupHeaderNavigation();
 
         // Setup RecyclerView with Grid Layout
         adapter = new ProductAdapter(
@@ -128,6 +148,37 @@ public class ProductListFragment extends RootieAdminFragment {
 
         // Bind message button in header
         setupHeaderMessageButton(binding.btnMessage);
+    }
+
+    private void setupHeaderNavigation() {
+        if (showBack) {
+            binding.btnBack.setVisibility(View.VISIBLE);
+            binding.imgLogo.setVisibility(View.GONE);
+
+            android.widget.RelativeLayout.LayoutParams titleParams =
+                    (android.widget.RelativeLayout.LayoutParams) binding.txtTitle.getLayoutParams();
+            titleParams.removeRule(android.widget.RelativeLayout.END_OF);
+            titleParams.addRule(android.widget.RelativeLayout.END_OF, R.id.btn_back);
+            binding.txtTitle.setLayoutParams(titleParams);
+
+            binding.btnBack.setOnClickListener(v -> navigateBackToHome());
+        } else {
+            binding.btnBack.setVisibility(View.GONE);
+            binding.imgLogo.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void navigateBackToHome() {
+        MainActivity mainAct = (MainActivity) getActivity();
+        if (mainAct == null) return;
+
+        mainAct.setCurrentTabId(R.id.nav_home);
+        mainAct.loadFragment(new com.veganbeauty.admin.features.home.HomeFragment());
+
+        View bottomNav = mainAct.findViewById(R.id.bottom_nav);
+        if (bottomNav != null) {
+            BottomNavHelper.highlightTab(bottomNav, R.id.nav_home);
+        }
     }
 
     private void openAddProduct() {

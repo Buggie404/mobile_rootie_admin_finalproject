@@ -2,6 +2,7 @@ package com.veganbeauty.admin.data.repository;
 
 import android.content.Context;
 
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import com.veganbeauty.admin.data.local.RootieAdminDatabase;
 import com.veganbeauty.admin.data.local.dao.OrderDao;
@@ -106,6 +107,12 @@ public class OrderRepository {
                 entity.setBillingPhone(obj.optString("billingPhone", null));
                 entity.setBillingEmail(obj.optString("billingEmail", null));
                 entity.setDeliveryDate(obj.optString("deliveryDate", null));
+                entity.setHasReview(obj.optBoolean("hasReview", false));
+                entity.setReviewStars(obj.optInt("reviewStars", 0));
+                entity.setReviewText(obj.optString("reviewText", null));
+                entity.setReviewImage(obj.optString("reviewImage", null));
+                entity.setAnonymous(obj.optBoolean("isAnonymous", false));
+                entity.setRecommendToFriends(obj.optBoolean("recommendToFriends", false));
                 list.add(entity);
             }
         } catch (Exception e) {
@@ -124,6 +131,15 @@ public class OrderRepository {
         } else {
             return success;
         }
+    }
+
+    @Nullable
+    public OrderEntity fetchOrderById(String orderId) {
+        OrderEntity remoteOrder = firebaseService.fetchOrderById(orderId);
+        if (remoteOrder != null) {
+            orderDao.insertSync(remoteOrder);
+        }
+        return remoteOrder != null ? remoteOrder : orderDao.getByIdSync(orderId);
     }
 
     public com.google.firebase.firestore.ListenerRegistration startRealtimeSync() {

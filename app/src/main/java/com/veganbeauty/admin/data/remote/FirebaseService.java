@@ -1,6 +1,7 @@
 package com.veganbeauty.admin.data.remote;
 
 import android.util.Log;
+import androidx.annotation.Nullable;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
@@ -120,6 +121,24 @@ public class FirebaseService {
             return result;
         }
         return Collections.emptyList();
+    }
+
+    private String joinDelimited(List<String> values, String delimiter) {
+        if (values == null || values.isEmpty()) {
+            return "";
+        }
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < values.size(); i++) {
+            String value = values.get(i);
+            if (value == null || value.trim().isEmpty()) {
+                continue;
+            }
+            if (builder.length() > 0) {
+                builder.append(delimiter);
+            }
+            builder.append(value.trim());
+        }
+        return builder.toString();
     }
 
     private List<KeyIngredient> toKeyIngredientsList(Object value) {
@@ -716,6 +735,23 @@ public class FirebaseService {
         }
     }
 
+    @Nullable
+    public OrderEntity fetchOrderById(String orderId) {
+        if (db == null || orderId == null || orderId.trim().isEmpty()) {
+            return null;
+        }
+        try {
+            DocumentSnapshot doc = Tasks.await(db.collection("orders").document(orderId).get());
+            if (!doc.exists()) {
+                return null;
+            }
+            return parseOrderFromDoc(doc);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public List<BookingEntity> fetchAllBookings() {
         if (db == null) {
             return Collections.emptyList();
@@ -724,54 +760,89 @@ public class FirebaseService {
             QuerySnapshot snapshot = Tasks.await(db.collection("bookings").get());
             List<BookingEntity> list = new ArrayList<>();
             for (DocumentSnapshot doc : snapshot.getDocuments()) {
-                try {
-                    String rawStoreName = doc.getString("storeName") != null ? doc.getString("storeName") : "";
-                    String rawStoreAddress = doc.getString("storeAddress") != null ? doc.getString("storeAddress") : "";
-                    String storeID = doc.getString("storeID");
-                    if (storeID == null) {
-                        storeID = doc.getString("storeId");
-                    }
-                    if (storeID == null) {
-                        if (rawStoreName.toLowerCase().contains("cơ sở 1") || rawStoreAddress.toLowerCase().contains("minh khai")) {
-                            storeID = "CH001";
-                        } else if (rawStoreName.toLowerCase().contains("cơ sở 5") || rawStoreAddress.toLowerCase().contains("hoàng văn thụ")) {
-                            storeID = "CH005";
-                        } else {
-                            storeID = "";
-                        }
-                    }
-
-                    BookingEntity be = new BookingEntity();
-                    be.setId(doc.getId());
-                    be.setUserId(doc.getString("userId") != null ? doc.getString("userId") : "");
-                    be.setUserName(doc.getString("userName") != null ? doc.getString("userName") : "");
-                    be.setUserPhone(doc.getString("userPhone") != null ? doc.getString("userPhone") : "");
-                    be.setUserEmail(doc.getString("userEmail") != null ? doc.getString("userEmail") : "");
-                    be.setServiceName(doc.getString("serviceName") != null ? doc.getString("serviceName") : "");
-                    be.setDateDisplay(doc.getString("dateDisplay") != null ? doc.getString("dateDisplay") : "");
-                    be.setMonthDisplay(doc.getString("monthDisplay") != null ? doc.getString("monthDisplay") : "");
-                    be.setDayOfWeek(doc.getString("dayOfWeek") != null ? doc.getString("dayOfWeek") : "");
-                    be.setTime(doc.getString("time") != null ? doc.getString("time") : "");
-                    be.setDuration(doc.getString("duration") != null ? doc.getString("duration") : "");
-                    be.setStoreName(rawStoreName);
-                    be.setStoreAddress(rawStoreAddress);
-                    be.setStorePhone(doc.getString("storePhone") != null ? doc.getString("storePhone") : "");
-                    be.setStoreImage(doc.getString("storeImage") != null ? doc.getString("storeImage") : "");
-                    be.setStoreID(storeID);
-                    be.setNote(doc.getString("note") != null ? doc.getString("note") : "");
-                    be.setStatus(doc.getString("status") != null ? doc.getString("status") : "");
-                    be.setCreatedAt(doc.getString("createdAt") != null ? doc.getString("createdAt") : "");
-                    be.setConsultantName(doc.getString("consultantName") != null ? doc.getString("consultantName") : "");
-                    be.setCancelReason(doc.getString("cancelReason") != null ? doc.getString("cancelReason") : "");
-                    list.add(be);
-                } catch (Exception e) {
-                    e.printStackTrace();
+                BookingEntity booking = mapBookingFromDoc(doc);
+                if (booking != null) {
+                    list.add(booking);
                 }
             }
             return list;
         } catch (Exception e) {
             e.printStackTrace();
             return Collections.emptyList();
+        }
+    }
+
+    @Nullable
+    public BookingEntity fetchBookingById(String bookingId) {
+        if (db == null || bookingId == null || bookingId.trim().isEmpty()) {
+            return null;
+        }
+        try {
+            DocumentSnapshot doc = Tasks.await(db.collection("bookings").document(bookingId.trim()).get());
+            if (!doc.exists()) {
+                return null;
+            }
+            return mapBookingFromDoc(doc);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Nullable
+    private BookingEntity mapBookingFromDoc(DocumentSnapshot doc) {
+        try {
+            String rawStoreName = doc.getString("storeName") != null ? doc.getString("storeName") : "";
+            String rawStoreAddress = doc.getString("storeAddress") != null ? doc.getString("storeAddress") : "";
+            String storeID = doc.getString("storeID");
+            if (storeID == null) {
+                storeID = doc.getString("storeId");
+            }
+            if (storeID == null) {
+                if (rawStoreName.toLowerCase().contains("cơ sở 1") || rawStoreAddress.toLowerCase().contains("minh khai")) {
+                    storeID = "CH001";
+                } else if (rawStoreName.toLowerCase().contains("cơ sở 5") || rawStoreAddress.toLowerCase().contains("hoàng văn thụ")) {
+                    storeID = "CH005";
+                } else {
+                    storeID = "";
+                }
+            }
+
+            String docId = doc.getString("id");
+            if (docId == null || docId.isEmpty()) {
+                docId = doc.getId();
+            }
+
+            BookingEntity be = new BookingEntity();
+            be.setId(docId);
+            be.setUserId(doc.getString("userId") != null ? doc.getString("userId") : "");
+            be.setUserName(doc.getString("userName") != null ? doc.getString("userName") : "");
+            be.setUserPhone(doc.getString("userPhone") != null ? doc.getString("userPhone") : "");
+            be.setUserEmail(doc.getString("userEmail") != null ? doc.getString("userEmail") : "");
+            be.setServiceName(doc.getString("serviceName") != null ? doc.getString("serviceName") : "");
+            be.setDateDisplay(doc.getString("dateDisplay") != null ? doc.getString("dateDisplay") : "");
+            be.setMonthDisplay(doc.getString("monthDisplay") != null ? doc.getString("monthDisplay") : "");
+            be.setDayOfWeek(doc.getString("dayOfWeek") != null ? doc.getString("dayOfWeek") : "");
+            be.setTime(doc.getString("time") != null ? doc.getString("time") : "");
+            be.setDuration(doc.getString("duration") != null ? doc.getString("duration") : "");
+            be.setStoreName(rawStoreName);
+            be.setStoreAddress(rawStoreAddress);
+            be.setStorePhone(doc.getString("storePhone") != null ? doc.getString("storePhone") : "");
+            be.setStoreImage(doc.getString("storeImage") != null ? doc.getString("storeImage") : "");
+            be.setStoreID(storeID);
+            be.setNote(doc.getString("note") != null ? doc.getString("note") : "");
+            be.setStatus(doc.getString("status") != null ? doc.getString("status") : "");
+            be.setCreatedAt(doc.getString("createdAt") != null ? doc.getString("createdAt") : "");
+            be.setConsultantName(doc.getString("consultantName") != null ? doc.getString("consultantName") : "");
+            be.setCancelReason(doc.getString("cancelReason") != null ? doc.getString("cancelReason") : "");
+            be.setUserRating(toFloat(doc.get("userRating")));
+            be.setUserReview(doc.getString("userReview") != null ? doc.getString("userReview") : "");
+            be.setReviewDate(doc.getString("reviewDate") != null ? doc.getString("reviewDate") : "");
+            be.setFeedbackImageUrls(joinDelimited(toStringList(doc.get("feedbackImageUrls")), "|"));
+            return be;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
     }
 

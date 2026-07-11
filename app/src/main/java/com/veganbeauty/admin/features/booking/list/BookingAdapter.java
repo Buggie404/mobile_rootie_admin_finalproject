@@ -9,8 +9,14 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
+import com.veganbeauty.admin.R;
+import com.veganbeauty.admin.core.utils.ImageUtils;
+import com.veganbeauty.admin.core.utils.ImageViewerDialog;
+import com.veganbeauty.admin.core.utils.ReviewImageParser;
 import com.veganbeauty.admin.data.local.entities.BookingEntity;
 import com.veganbeauty.admin.databinding.BookingItemBinding;
+
+import java.util.List;
 
 public class BookingAdapter extends ListAdapter<BookingEntity, BookingAdapter.BookingViewHolder> {
 
@@ -22,19 +28,34 @@ public class BookingAdapter extends ListAdapter<BookingEntity, BookingAdapter.Bo
         void onCancelClick(BookingEntity booking);
     }
 
+    public interface OnItemClickListener {
+        void onItemClick(BookingEntity booking);
+    }
+
     private final boolean isAdmin;
     private final OnActionClickListener onActionClickListener;
     private final OnCancelClickListener onCancelClickListener;
+    private final OnItemClickListener onItemClickListener;
 
     public BookingAdapter(
         boolean isAdmin,
         OnActionClickListener onActionClickListener,
         OnCancelClickListener onCancelClickListener
     ) {
+        this(isAdmin, onActionClickListener, onCancelClickListener, null);
+    }
+
+    public BookingAdapter(
+        boolean isAdmin,
+        OnActionClickListener onActionClickListener,
+        OnCancelClickListener onCancelClickListener,
+        OnItemClickListener onItemClickListener
+    ) {
         super(new BookingDiffCallback());
         this.isAdmin = isAdmin;
         this.onActionClickListener = onActionClickListener;
         this.onCancelClickListener = onCancelClickListener;
+        this.onItemClickListener = onItemClickListener;
     }
 
     @NonNull
@@ -98,8 +119,93 @@ public class BookingAdapter extends ListAdapter<BookingEntity, BookingAdapter.Bo
             // Setup Badge Status
             setupStatusBadge(booking.getStatus());
 
+            // Customer feedback for completed bookings
+            bindCustomerFeedback(booking);
+
             // Setup Actions layout
             setupActions(booking);
+
+            binding.getRoot().setOnClickListener(v -> {
+                if (onItemClickListener != null) {
+                    onItemClickListener.onItemClick(booking);
+                }
+            });
+        }
+
+        private void bindCustomerFeedback(BookingEntity booking) {
+            String status = booking.getStatus() != null ? booking.getStatus().trim() : "";
+            boolean isCompleted = status.equalsIgnoreCase("Đã hoàn thành") || status.equalsIgnoreCase("completed");
+            boolean hasFeedback = booking.hasCustomerFeedback();
+
+            if (!isCompleted) {
+                binding.llCustomerFeedback.setVisibility(View.GONE);
+                binding.tvFeedbackBadge.setVisibility(View.GONE);
+                return;
+            }
+
+            binding.llCustomerFeedback.setVisibility(View.VISIBLE);
+
+            if (!hasFeedback) {
+                binding.tvFeedbackStars.setVisibility(View.GONE);
+                binding.tvFeedbackScore.setVisibility(View.GONE);
+                binding.tvFeedbackText.setVisibility(View.GONE);
+                binding.imgFeedbackPhoto.setVisibility(View.GONE);
+                binding.tvFeedbackDate.setVisibility(View.GONE);
+                binding.tvFeedbackEmpty.setVisibility(View.VISIBLE);
+                binding.tvFeedbackBadge.setVisibility(View.GONE);
+                return;
+            }
+
+            binding.tvFeedbackEmpty.setVisibility(View.GONE);
+            binding.tvFeedbackStars.setVisibility(View.VISIBLE);
+            binding.tvFeedbackScore.setVisibility(View.VISIBLE);
+
+            int stars = Math.max(0, Math.min(5, Math.round(booking.getUserRating())));
+            binding.tvFeedbackStars.setText(buildStarText(stars));
+            binding.tvFeedbackScore.setText(stars + "/5");
+            binding.tvFeedbackBadge.setVisibility(View.VISIBLE);
+            binding.tvFeedbackBadge.setText("Đã phản hồi " + stars + "/5");
+
+            String reviewText = booking.getUserReview();
+            if (reviewText != null && !reviewText.trim().isEmpty()) {
+                binding.tvFeedbackText.setVisibility(View.VISIBLE);
+                binding.tvFeedbackText.setText(reviewText.trim());
+            } else {
+                binding.tvFeedbackText.setVisibility(View.GONE);
+            }
+
+            List<String> allImages = ReviewImageParser.parseLoadableUrls(booking.getFeedbackImageUrls());
+            String firstImageUrl = allImages.isEmpty() ? "" : allImages.get(0);
+            if (!firstImageUrl.isEmpty()) {
+                binding.imgFeedbackPhoto.setVisibility(View.VISIBLE);
+                ImageUtils.loadImage(
+                        binding.getRoot().getContext(),
+                        binding.imgFeedbackPhoto,
+                        firstImageUrl,
+                        R.drawable.nuoc_sen_hau_giang
+                );
+                binding.imgFeedbackPhoto.setOnClickListener(v ->
+                        ImageViewerDialog.show(binding.getRoot().getContext(), allImages, 0)
+                );
+            } else {
+                binding.imgFeedbackPhoto.setVisibility(View.GONE);
+            }
+
+            String reviewDate = booking.getReviewDate();
+            if (reviewDate != null && !reviewDate.trim().isEmpty()) {
+                binding.tvFeedbackDate.setVisibility(View.VISIBLE);
+                binding.tvFeedbackDate.setText("Đánh giá ngày " + reviewDate.trim());
+            } else {
+                binding.tvFeedbackDate.setVisibility(View.GONE);
+            }
+        }
+
+        private String buildStarText(int stars) {
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < 5; i++) {
+                builder.append(i < stars ? "★" : "☆");
+            }
+            return builder.toString();
         }
 
         private void setupStatusBadge(String status) {
