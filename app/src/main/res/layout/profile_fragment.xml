@@ -228,14 +228,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginTop="32dp"
-                android:background="@drawable/bg_nav_pill"
-                android:backgroundTint="#FADBD8"
+                android:background="@drawable/bg_logout_button"
+                app:backgroundTint="@null"
                 android:text="Đăng xuất"
-                android:textColor="#E74C3C"
+                android:textColor="#8B1D1D"
                 android:textSize="15sp"
                 android:textStyle="bold"
                 android:textAllCaps="false"
-                android:fontFamily="@font/be_vietnam_pro" />
+                android:fontFamily="@font/be_vietnam_pro"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:paddingHorizontal="40dp" />
 
         </LinearLayout>
     </ScrollView>

@@ -1,5 +1,6 @@
 package com.veganbeauty.admin.features.profile;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -74,15 +75,32 @@ public class ProfileFragment extends RootieAdminFragment {
             binding.cardMessageInbox.setVisibility(View.GONE);
         }
 
-        binding.btnLogout.setOnClickListener(v -> {
-            sessionManager.clearSession();
-            Toast.makeText(requireContext(), "Đã đăng xuất!", Toast.LENGTH_SHORT).show();
+        binding.btnLogout.setOnClickListener(v -> showLogoutDialog());
+    }
 
-            Intent intent = new Intent(requireActivity(), LoginActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            requireActivity().finish();
+    private void showLogoutDialog() {
+        View dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_logout_confirm, null);
+        AlertDialog dialog = new AlertDialog.Builder(requireContext(), R.style.CustomDialogTheme)
+                .setView(dialogView)
+                .create();
+
+        dialogView.findViewById(R.id.btn_cancel).setOnClickListener(v -> dialog.dismiss());
+        dialogView.findViewById(R.id.btn_confirm).setOnClickListener(v -> {
+            dialog.dismiss();
+            performLogout();
         });
+
+        dialog.show();
+    }
+
+    private void performLogout() {
+        sessionManager.clearSession();
+        Toast.makeText(requireContext(), "Đã đăng xuất!", Toast.LENGTH_SHORT).show();
+
+        Intent intent = new Intent(requireActivity(), LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        requireActivity().finish();
     }
 
     @Override
